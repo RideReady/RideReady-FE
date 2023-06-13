@@ -1,0 +1,36 @@
+@use '../../../abstract/variables' as *;
+
+.new-part-form-section {
+  height: 100vh;
+  width: 100vw;
+  @include centered(column, center);
+
+  button {
+    width: 20vw;
+  }
+}
+
+.new-part-form {
+  @include centered(column, center);
+
+
+  label {
+    margin: 5px;
+    @include bodyText(16px);
+  }
+
+  input, select {
+    margin: 5px;
+  }
+}
+
+.newpartform-button-section {
+  @include centered(row, space-between);
+  width: 50vw;
+  height: 15vh;
+}
+
+.error-wait-message {
+  color: $darkOrange;
+  font-weight: 700;
+}

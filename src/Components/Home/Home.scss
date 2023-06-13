@@ -1,0 +1,34 @@
+@use '../../../abstract/variables' as *;
+
+.site-logo {
+  @include logoText;
+  font-size: 3.5rem;
+}
+
+.home-page{
+  @include centered(column, center);
+  height: 100vh;
+  width: 100vw;
+}
+
+.tag-line {
+  color: $lightBlue;
+  margin-bottom: 20px;
+  font-size: 20px;
+}
+
+.home-content {
+  @include centered(column, center);
+  width: 90vw;
+  max-width: 500px;
+}
+
+.notes {
+  margin-top: 20px;
+}
+
+@media only screen and (min-width: 440px) {
+  .site-logo {
+    font-size: 5rem;
+  }
+}

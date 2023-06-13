@@ -1,0 +1,54 @@
+@use '../../../abstract/variables' as *;
+
+.tile {
+  @include centered(column, center);
+  width: 88vw;
+  height: fit-content;
+  background-color: $lightBlue;
+  border-radius: 10px;
+  margin-top: 10px;
+  padding-top: 10px;
+  padding-bottom: 10px;
+
+  h2 {
+    color: $darkBlue;
+    font-size: 32px;
+    font-weight: 700;
+  }
+
+  h3 {
+    color: $darkBlue;
+  }
+
+  p {
+    color: $darkBlue;
+  }
+
+  button {
+    height: 6vh;
+    font-size: 14px;
+  }
+}
+
+.tile-button-section {
+  @include centered(row, space-between);
+  
+  width: 285px;
+  height: 9vh;
+}
+
+.rebuild-good {
+  text-shadow: 1px 1px 0px $lightOrange;
+  margin: 3px;
+}
+
+.rebuild-bad {
+  text-shadow: 1px 1px 0px $darkOrange;
+  margin: 3px;
+}
+
+@media only screen and (min-width: 860px) {
+  .tile {
+    width: 775px;
+  }
+}

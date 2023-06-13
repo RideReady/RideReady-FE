@@ -1,0 +1,26 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  width: 94vw;
+  height: -moz-fit-content;
+  height: fit-content;
+  background-color: #33658A;
+  border-radius: 10px;
+  padding-bottom: 10px;
+}
+
+.add-new-mesg {
+  color: #86BBD8;
+  font-family: "Kalam", cursive;
+  font-size: 18px;
+  font-weight: 400;
+  margin-top: 10px;
+}
+
+@media only screen and (min-width: 860px) {
+  .container {
+    width: 800px;
+  }
+}/*# sourceMappingURL=Container.css.map */
