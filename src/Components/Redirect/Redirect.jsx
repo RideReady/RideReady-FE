@@ -76,10 +76,9 @@ export default function Redirect({
       .then((userData) => {
         const currentUser = new User(userData);
         setCurrentUser(currentUser);
-        postNewUserToDatabase(currentUser)
-          .then((response) => {
-            console.log(response)
-          })
+        postNewUserToDatabase(currentUser).then((response) => {
+          console.log(response);
+        });
       })
       .catch(() => {
         changeErrorMessage(`An error occurred while fetching your user information.
@@ -94,21 +93,23 @@ export default function Redirect({
       .then((activities) => {
         const rideActivities = filterRideActivities(activities);
         const cleanedRides = cleanRideData(rideActivities, currentUser);
-        console.log(cleanedRides)
-        if (cleanedRides) {
-          setUserRides(cleanedRides);
-          // window.localStorage.setItem(
-          //   "userRides",
-          //   JSON.stringify(cleanedRides)
-          // );
-          
-          // REPLACE localStorage with DB calls
 
-          postNewRidesToDatabase(cleanedRides)
-          .then((response) => {
-            console.log(response)
-          })
-        }
+        setUserRides(cleanedRides);
+        // console.log(userRides)
+        // console.log(getGearIDNumbers(userRides))
+
+
+        // window.localStorage.setItem(
+        //   "userRides",
+        //   JSON.stringify(cleanedRides)
+        // );
+
+        // REPLACED localStorage with DB calls - moved down after bikes DB call
+
+        // postNewRidesToDatabase(cleanedRides)
+        // .then((response) => {
+        //   console.log(response)
+        // })
       })
       .catch(() => {
         changeErrorMessage(`An error occurred while fetching your rides. 
@@ -119,18 +120,16 @@ export default function Redirect({
 
   useEffect(() => {
     if (!userRides) return;
-    setUserGear(getGearIDNumbers(userRides));
-
     if (getGearIDNumbers(userRides).length === 0) {
       navigate("/dashboard", { replace: true });
+    } else {
+      setUserGear(getGearIDNumbers(userRides));
     }
     // eslint-disable-next-line
   }, [userRides]);
 
   useEffect(() => {
-    if (!userGear) {
-      return;
-    }
+    if (userGear <= 0 || !userGear) return;
     Promise.all(
       userGear.map((gearID) => getUserGearDetails(gearID, userAccessToken))
     )
@@ -180,5 +179,5 @@ Redirect.propTypes = {
   userRides: PropTypes.array,
   changeErrorMessage: PropTypes.func,
   setCurrentUser: PropTypes.func,
-  currentUser: PropTypes.object
+  currentUser: PropTypes.object,
 };
