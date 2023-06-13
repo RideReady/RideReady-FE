@@ -53,7 +53,7 @@ describe('template spec', () => {
   it('Should delete the selected tile and navigate to the dashboard', () => {
     cy.get('button').eq(0).click()
 
-    cy.get('button').eq(0).click()
+    cy.get('button').eq(1).click()
 
     cy.url().should('eq', 'http://localhost:5173/dashboard')
 

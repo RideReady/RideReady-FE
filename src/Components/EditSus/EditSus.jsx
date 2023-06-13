@@ -63,7 +63,7 @@ export default function EditSus({
   }, []);
 
   useEffect(() => {
-    if (!(selectedSuspension || userSuspension)) return;
+    if (!selectedSuspension || !userSuspension) return;
     const index = findSusIndexByID(selectedSuspension, userSuspension);
     setEditSusDetails(userSuspension[index]);
     setEditSusIndex(index);
