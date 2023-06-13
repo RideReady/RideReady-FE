@@ -25,7 +25,7 @@ export default function Dashboard({
   }, []);
 
   useEffect(() => {
-    if (userBikes.length !== 0 && userBikes) {
+    if (userBikes) {
       window.localStorage.setItem("userBikes", JSON.stringify(userBikes));
     }
   }, [userBikes]);
