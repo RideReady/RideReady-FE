@@ -17,14 +17,15 @@ export const filterRideActivities = (activities) => {
   return rideActivities;
 };
 
-export const cleanRideData = (rides) => {
+export const cleanRideData = (rides, user) => {
   const cleanedRides = rides.map((ride) => {
     return {
       id: ride.id,
       ride_duration: ride.moving_time,
       ride_distance: ride.distance,
       ride_date: ride.start_date,
-      gear_id: ride.gear_id,
+      fk_gear_id: ride.gear_id,
+      fk_user_id: user.id
     };
   });
   return cleanedRides;
@@ -32,7 +33,7 @@ export const cleanRideData = (rides) => {
 
 export const getGearIDNumbers = (userRides) => {
   let gearNumbers = userRides.reduce((arr, ride) => {
-    let gearID = ride.gear_id;
+    let gearID = ride.fk_gear_id;
     if (arr.includes(gearID)) {
       return arr;
     } else if (gearID === null) {
@@ -58,6 +59,7 @@ export const calculateRebuildLife = (
   let rideTimeSinceLastRebuild;
   if (onBike.startsWith("b") && bikeOptions) {
     susBike = bikeOptions.find((bike) => bike.id === onBike);
+    // LIKELY NEED TO CHANGE ride.gear_id to ride.fk
     ridesOnBike = userRides.filter((ride) => ride.gear_id === susBike.id);
   }
   if (ridesOnBike) {

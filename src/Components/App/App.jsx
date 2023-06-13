@@ -40,6 +40,7 @@ export default function App() {
               setUserAccessToken={setUserAccessToken}
               userAccessToken={userAccessToken}
               setCurrentUser={setCurrentUser}
+              currentUser={currentUser}
               setUserBikes={setUserBikes}
               setUserRides={setUserRides}
               userRides={userRides}

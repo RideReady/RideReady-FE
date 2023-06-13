@@ -5,6 +5,7 @@ import {
   getUserActivities,
   getUserDetails,
   getUserGearDetails,
+  postNewRidesToDatabase,
   postNewUserToDatabase,
 } from "../../Services/APICalls";
 import {
@@ -24,6 +25,7 @@ export default function Redirect({
   setUserAccessToken,
   userAccessToken,
   setCurrentUser,
+  currentUser,
   setUserBikes,
   setUserRides,
   userRides,
@@ -87,17 +89,25 @@ export default function Redirect({
   }, [userAccessToken]);
 
   useEffect(() => {
-    if (!userAccessToken) return;
+    if (!userAccessToken || !currentUser) return;
     getUserActivities(1, userAccessToken)
       .then((activities) => {
         const rideActivities = filterRideActivities(activities);
-        const cleanedRides = cleanRideData(rideActivities);
+        const cleanedRides = cleanRideData(rideActivities, currentUser);
+        console.log(cleanedRides)
         if (cleanedRides) {
           setUserRides(cleanedRides);
-          window.localStorage.setItem(
-            "userRides",
-            JSON.stringify(cleanedRides)
-          );
+          // window.localStorage.setItem(
+          //   "userRides",
+          //   JSON.stringify(cleanedRides)
+          // );
+          
+          // REPLACE localStorage with DB calls
+
+          postNewRidesToDatabase(cleanedRides)
+          .then((response) => {
+            console.log(response)
+          })
         }
       })
       .catch(() => {
@@ -105,7 +115,7 @@ export default function Redirect({
       Please return to the home page and try logging in again.`);
       });
     // eslint-disable-next-line
-  }, [userAccessToken]);
+  }, [userAccessToken, currentUser]);
 
   useEffect(() => {
     if (!userRides) return;
@@ -169,5 +179,6 @@ Redirect.propTypes = {
   setUserRides: PropTypes.func,
   userRides: PropTypes.array,
   changeErrorMessage: PropTypes.func,
-  setCurrentUser:PropTypes.func,
+  setCurrentUser: PropTypes.func,
+  currentUser: PropTypes.object
 };
