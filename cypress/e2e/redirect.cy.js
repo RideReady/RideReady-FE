@@ -1,8 +1,7 @@
-import '../fixtures/rideData.json'
-
+/* global cy, describe, beforeEach, it */
 describe('Redirect', () => {
   beforeEach(() => {
-    cy.visit('http://localhost:3000/redirect')
+    cy.visit('http://localhost:5173/redirect')
     cy.intercept('POST', `https://www.strava.com/oauth/token`, {
       statusCode: 200,
       body: {
@@ -30,55 +29,55 @@ describe('Redirect', () => {
   })
 
   it('Should fetch rides and gear then redirect to /dashboard once loaded', () => {
-    cy.visit('http://localhost:3000/redirect/exchange_token?state=&code=97dd82f961714a09adb14e47b242a23103c4c202&scope=read,activity:read_all')
+    cy.visit('http://localhost:5173/redirect/exchange_token?state=&code=97dd82f961714a09adb14e47b242a23103c4c202&scope=read,activity:read_all')
 
-    cy.url().should('eq', 'http://localhost:3000/dashboard')
+    cy.url().should('eq', 'http://localhost:5173/dashboard')
   })
 
   it('Should display the user an error when get auth token request fails', () => {
-    cy.visit('http://localhost:3000/redirect/exchange_token?state=&code=97dd82f961714a09adb14e47b242a23103c4c202&scope=read,activity:read_all')
+    cy.visit('http://localhost:5173/redirect/exchange_token?state=&code=97dd82f961714a09adb14e47b242a23103c4c202&scope=read,activity:read_all')
 
     cy.intercept('POST', `https://www.strava.com/oauth/token`, {
       statusCode: 500,
       body:'Server error on auth token request.'
     })
 
-    cy.url().should('eq', 'http://localhost:3000/error')
+    cy.url().should('eq', 'http://localhost:5173/error')
 
     cy.get('p').should('contain', 'An error occurred')
     cy.get('p').should('contain', 'while requesting an access token')
   })
 
   it('Should display the user an error when get user activities request fails', () => {
-    cy.visit('http://localhost:3000/redirect/exchange_token?state=&code=97dd82f961714a09adb14e47b242a23103c4c202&scope=read,activity:read_all')
+    cy.visit('http://localhost:5173/redirect/exchange_token?state=&code=97dd82f961714a09adb14e47b242a23103c4c202&scope=read,activity:read_all')
 
     cy.intercept('GET',`https://www.strava.com/api/v3/athlete/activities?page=1&per_page=200`, {
       statusCode: 500,
       body:'Server error on ride request.'
     })
 
-    cy.url().should('eq', 'http://localhost:3000/error')
+    cy.url().should('eq', 'http://localhost:5173/error')
 
     cy.get('p').should('contain', 'An error occurred')
     cy.get('p').should('contain', 'while fetching your rides')
   })
 
   it('Should display the user an error when get user activities request fails', () => {
-    cy.visit('http://localhost:3000/redirect/exchange_token?state=&code=97dd82f961714a09adb14e47b242a23103c4c202&scope=read,activity:read_all')
+    cy.visit('http://localhost:5173/redirect/exchange_token?state=&code=97dd82f961714a09adb14e47b242a23103c4c202&scope=read,activity:read_all')
 
     cy.intercept('GET',`https://www.strava.com/api/v3/gear/b1979857`, {
       statusCode: 500,
       body: 'Server error on user gear request.'
     })
 
-    cy.url().should('eq', 'http://localhost:3000/error')
+    cy.url().should('eq', 'http://localhost:5173/error')
 
     cy.get('p').should('contain', 'An error occurred')
     cy.get('p').should('contain', 'while fetching your bike details')
   })
 
   it('Should navigate to home page after 7 seconds', () => {
-    cy.visit('http://localhost:3000/redirect/exchange_token?state=&code=97dd82f961714a09adb14e47b242a23103c4c202&scope=read,activity:read_all')
+    cy.visit('http://localhost:5173/redirect/exchange_token?state=&code=97dd82f961714a09adb14e47b242a23103c4c202&scope=read,activity:read_all')
 
     cy.intercept('POST', `https://www.strava.com/oauth/token`, {
       statusCode: 500,
@@ -87,6 +86,6 @@ describe('Redirect', () => {
 
     cy.wait(7500)
 
-    cy.url().should('eq', 'http://localhost:3000/')
+    cy.url().should('eq', 'http://localhost:5173/')
   })
 })

@@ -1,6 +1,7 @@
+/* global cy, describe, beforeEach, it */
 describe('template spec', () => {
   beforeEach(() => {
-    cy.visit('http://localhost:3000/redirect/exchange_token?state=&code=97dd82f961714a09adb14e47b242a23103c4c202&scope=read,activity:read_all')
+    cy.visit('http://localhost:5173/redirect/exchange_token?state=&code=97dd82f961714a09adb14e47b242a23103c4c202&scope=read,activity:read_all')
     cy.intercept('POST', `https://www.strava.com/oauth/token`, {
       statusCode: 200,
       body: {
@@ -37,24 +38,24 @@ describe('template spec', () => {
   })
 
   it('Should navigate to the delete sus page when button is clicked on tile', () => {
-    cy.get('button').eq(1).click()
+    cy.get('button').eq(0).click()
 
-    cy.url().should('eq', 'http://localhost:3000/dashboard/delete')
+    cy.url().should('eq', 'http://localhost:5173/dashboard/delete')
   })
 
   it('Should show the name of the correct part selected to delete', () => {
-    cy.get('button').eq(1).click()
+    cy.get('button').eq(0).click()
     
     cy.get('h3').should('contain', 'RockShox Fork')
     cy.get('h3').should('contain', 'on Specialized Enduro')
   })
 
   it('Should delete the selected tile and navigate to the dashboard', () => {
-    cy.get('button').eq(1).click()
+    cy.get('button').eq(0).click()
 
     cy.get('button').eq(0).click()
 
-    cy.url().should('eq', 'http://localhost:3000/dashboard')
+    cy.url().should('eq', 'http://localhost:5173/dashboard')
 
     cy.get('article[class="tile"]').should('not.exist')
   })

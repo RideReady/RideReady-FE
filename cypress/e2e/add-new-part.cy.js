@@ -1,6 +1,7 @@
+/* global cy, describe, beforeEach, it */
 describe('add-new-part', () => {
   beforeEach(() => {
-    cy.visit('http://localhost:3000/dashboard/add-new-part')
+    cy.visit('http://localhost:5173/dashboard/add-new-part')
   })
 
   it('Should display the site title', () => {
@@ -36,7 +37,7 @@ describe('add-new-part', () => {
     cy.get('button').eq(0).click()
 
     cy.get('p[class=error-wait-message]').should('be.visible')
-    cy.url().should('eq', 'http://localhost:3000/dashboard/add-new-part')
+    cy.url().should('eq', 'http://localhost:5173/dashboard/add-new-part')
   })
   
   it('Should not allow a user to submit a new part without suspension selected', () => {
@@ -45,7 +46,7 @@ describe('add-new-part', () => {
     cy.get('button').eq(0).click()
 
     cy.get('p[class=error-wait-message]').should('be.visible')
-    cy.url().should('eq', 'http://localhost:3000/dashboard/add-new-part')
+    cy.url().should('eq', 'http://localhost:5173/dashboard/add-new-part')
   })
 
   it('Should not allow a user to submit a new part without bike selected', () => {
@@ -54,11 +55,11 @@ describe('add-new-part', () => {
     cy.get('button').eq(0).click()
 
     cy.get('p[class=error-wait-message]').should('be.visible')
-    cy.url().should('eq', 'http://localhost:3000/dashboard/add-new-part')
+    cy.url().should('eq', 'http://localhost:5173/dashboard/add-new-part')
   })
 
   it('Should create a new suspension part on the dashboard when all inputs are filled out', () => {
-    cy.visit('http://localhost:3000/redirect/exchange_token?state=&code=97dd82f961714a09adb14e47b242a23103c4c202&scope=read,activity:read_all')
+    cy.visit('http://localhost:5173/redirect/exchange_token?state=&code=97dd82f961714a09adb14e47b242a23103c4c202&scope=read,activity:read_all')
     cy.intercept('POST', `https://www.strava.com/oauth/token`, {
       statusCode: 200,
       body: {

@@ -70,53 +70,53 @@ const getUserGearDetails = (id, userAccessToken) => {
 
 // Heroku BE Database API Calls
 
-const postNewUserToDatabase = (user) => {
-  let url;
-  if (window.location.href.startsWith("http://localhost:5173")) {
-    url = "http://localhost:5001/users";
-  } else {
-    url = "https://rideready-be.herokuapp.com/users";
-  }
-  return fetch(url, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(user),
-  }).then((response) => {
-    if (response.ok) {
-      return response.json();
-    }
-    throw new Error();
-  });
-};
+// const postNewUserToDatabase = (user) => {
+//   let url;
+//   if (window.location.href.startsWith("http://localhost:5173")) {
+//     url = "http://localhost:5001/users";
+//   } else {
+//     url = "https://rideready-be.herokuapp.com/users";
+//   }
+//   return fetch(url, {
+//     method: "POST",
+//     headers: {
+//       "Content-Type": "application/json",
+//     },
+//     body: JSON.stringify(user),
+//   }).then((response) => {
+//     if (response.ok) {
+//       return response.json();
+//     }
+//     throw new Error();
+//   });
+// };
 
-const postNewRidesToDatabase = (rides) => {
-  let url;
-  if (window.location.href.startsWith("http://localhost:5173")) {
-    url = "http://localhost:5001/rides";
-  } else {
-    url = "https://rideready-be.herokuapp.com/rides";
-  }
-  return fetch(url, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(rides),
-  }).then((response) => {
-    if (response.ok) {
-      return response.json();
-    }
-    throw new Error();
-  });
-};
+// const postNewRidesToDatabase = (rides) => {
+//   let url;
+//   if (window.location.href.startsWith("http://localhost:5173")) {
+//     url = "http://localhost:5001/rides";
+//   } else {
+//     url = "https://rideready-be.herokuapp.com/rides";
+//   }
+//   return fetch(url, {
+//     method: "POST",
+//     headers: {
+//       "Content-Type": "application/json",
+//     },
+//     body: JSON.stringify(rides),
+//   }).then((response) => {
+//     if (response.ok) {
+//       return response.json();
+//     }
+//     throw new Error();
+//   });
+// };
 
 export {
   getAccessToken,
   getUserDetails,
   getUserActivities,
   getUserGearDetails,
-  postNewUserToDatabase,
-  postNewRidesToDatabase
+  // postNewUserToDatabase,
+  // postNewRidesToDatabase
 };

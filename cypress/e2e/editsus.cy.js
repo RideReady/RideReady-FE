@@ -1,6 +1,7 @@
+/* global cy, describe, beforeEach, it */
 describe('EditSus', () => {
   beforeEach(() => {
-    cy.visit('http://localhost:3000/redirect/exchange_token?state=&code=97dd82f961714a09adb14e47b242a23103c4c202&scope=read,activity:read_all')
+    cy.visit('http://localhost:5173/redirect/exchange_token?state=&code=97dd82f961714a09adb14e47b242a23103c4c202&scope=read,activity:read_all')
     cy.intercept('POST', `https://www.strava.com/oauth/token`, {
       statusCode: 200,
       body: {
@@ -37,34 +38,34 @@ describe('EditSus', () => {
   })
 
   it('Should navigate to the edit view when clicking the edit button on a tile', () => {
-    cy.get('button').eq(0).click()
-    cy.url().should('eq', 'http://localhost:3000/dashboard/edit')
+    cy.get('button').eq(1).click()
+    cy.url().should('eq', 'http://localhost:5173/dashboard/edit')
   })
 
   it('Should not allow a submission if the date field has not been modified', () => {
-    cy.get('button').eq(0).click()
+    cy.get('button').eq(1).click()
 
-    cy.get('button').eq(0).click()
+    cy.get('button').eq(1).click()
 
     cy.get('p[class="error-wait-message"]').should('be.visible')
 
-    cy.url().should('eq', 'http://localhost:3000/dashboard/edit')
+    cy.url().should('eq', 'http://localhost:5173/dashboard/edit')
   })
 
   it('Should navigate to the dashboard on new date entry', () => {
-    cy.get('button').eq(0).click()
+    cy.get('button').eq(1).click()
 
     cy.get('input').type('2022-10-10')
-    cy.get('button').eq(0).click()
+    cy.get('button').eq(1).click()
 
-    cy.url().should('eq', 'http://localhost:3000/dashboard')
+    cy.url().should('eq', 'http://localhost:5173/dashboard')
   })
 
   it('Should update the last rebuild date shown on the selected tile', () => {
-    cy.get('button').eq(0).click()
+    cy.get('button').eq(1).click()
 
     cy.get('input').type('2022-10-10')
-    cy.get('button').eq(0).click()
+    cy.get('button').eq(1).click()
 
     cy.get('p').eq(0).should('have.text', 'Last serviced: Oct 10, 2022')
   })

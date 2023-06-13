@@ -1,6 +1,7 @@
+/* global cy, describe, beforeEach, it */
 describe('dashboard', () => {
   beforeEach(() => {
-    cy.visit('http://localhost:3000/redirect/exchange_token?state=&code=97dd82f961714a09adb14e47b242a23103c4c202&scope=read,activity:read_all')
+    cy.visit('http://localhost:5173/redirect/exchange_token?state=&code=97dd82f961714a09adb14e47b242a23103c4c202&scope=read,activity:read_all')
     cy.intercept('POST', `https://www.strava.com/oauth/token`, {
       statusCode: 200,
       body: {
@@ -35,6 +36,6 @@ describe('dashboard', () => {
 
   it('Should direct you to the AddNewPartForm on button click', () => {
     cy.get('button[id="dash-add-sus"').click()
-    cy.url().should('eq', 'http://localhost:3000/dashboard/add-new-part')
+    cy.url().should('eq', 'http://localhost:5173/dashboard/add-new-part')
   })
 })

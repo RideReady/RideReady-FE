@@ -3,10 +3,7 @@ import { useNavigate } from "react-router-dom";
 import {
   getAccessToken,
   getUserActivities,
-  getUserDetails,
   getUserGearDetails,
-  postNewRidesToDatabase,
-  postNewUserToDatabase,
 } from "../../Services/APICalls";
 import {
   testForDeniedPermission,
@@ -17,15 +14,12 @@ import {
 } from "../../util.js";
 import "./Redirect.css";
 import PropTypes from "prop-types";
-import User from "../../Classes/User";
 
 export default function Redirect({
   setUserAuthToken,
   userAuthToken,
   setUserAccessToken,
   userAccessToken,
-  setCurrentUser,
-  currentUser,
   setUserBikes,
   setUserRides,
   userRides,
@@ -63,60 +57,26 @@ export default function Redirect({
     // eslint-disable-next-line
   }, [userAuthToken]);
 
-  // NEW userDetails API call to fetch id, firstname, lastname
-  // need to create app state for this
-  // query data.users table for existing userID match, if it doesn't exist, create
-  // a new user in the users table with id, firstName, lastName
-  // fetch rides as below, add to data.rides by key of user id
-  // if user already exists, fetch rides, only adding rides
-  // that are not already in data.rides entry for user
   useEffect(() => {
     if (!userAccessToken) return;
-    getUserDetails(userAccessToken)
-      .then((userData) => {
-        const currentUser = new User(userData);
-        setCurrentUser(currentUser);
-        postNewUserToDatabase(currentUser).then((response) => {
-          console.log(response);
-        });
-      })
-      .catch(() => {
-        changeErrorMessage(`An error occurred while fetching your user information.
-        Please return to the home page and try logging in again.`);
-      });
-    // eslint-disable-next-line
-  }, [userAccessToken]);
-
-  useEffect(() => {
-    if (!userAccessToken || !currentUser) return;
     getUserActivities(1, userAccessToken)
       .then((activities) => {
         const rideActivities = filterRideActivities(activities);
-        const cleanedRides = cleanRideData(rideActivities, currentUser);
-
-        setUserRides(cleanedRides);
-        // console.log(userRides)
-        // console.log(getGearIDNumbers(userRides))
-
-
-        // window.localStorage.setItem(
-        //   "userRides",
-        //   JSON.stringify(cleanedRides)
-        // );
-
-        // REPLACED localStorage with DB calls - moved down after bikes DB call
-
-        // postNewRidesToDatabase(cleanedRides)
-        // .then((response) => {
-        //   console.log(response)
-        // })
+        const cleanedRides = cleanRideData(rideActivities);
+        if (cleanedRides) {
+          setUserRides(cleanedRides);
+          window.localStorage.setItem(
+            "userRides",
+            JSON.stringify(cleanedRides)
+          );
+        }
       })
       .catch(() => {
         changeErrorMessage(`An error occurred while fetching your rides. 
       Please return to the home page and try logging in again.`);
       });
     // eslint-disable-next-line
-  }, [userAccessToken, currentUser]);
+  }, [userAccessToken]);
 
   useEffect(() => {
     if (!userRides) return;
@@ -177,7 +137,5 @@ Redirect.propTypes = {
   setUserBikes: PropTypes.func,
   setUserRides: PropTypes.func,
   userRides: PropTypes.array,
-  changeErrorMessage: PropTypes.func,
-  setCurrentUser: PropTypes.func,
-  currentUser: PropTypes.object,
+  changeErrorMessage: PropTypes.func
 };
