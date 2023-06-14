@@ -12,6 +12,7 @@ import DeleteSus from "../DeleteSus/DeleteSus";
 export default function App() {
   const [userAuthToken, setUserAuthToken] = useState(null);
   const [userAccessToken, setUserAccessToken] = useState(null);
+  const [userID, setUserID] = useState(null);
   const [userBikes, setUserBikes] = useState(null);
   const [userRides, setUserRides] = useState(null);
   const [userSuspension, setUserSuspension] = useState(null);
@@ -37,6 +38,7 @@ export default function App() {
               userAuthToken={userAuthToken}
               setUserAccessToken={setUserAccessToken}
               userAccessToken={userAccessToken}
+              setUserID={setUserID}
               setUserBikes={setUserBikes}
               setUserRides={setUserRides}
               userRides={userRides}
@@ -48,6 +50,7 @@ export default function App() {
           path="/dashboard"
           element={
             <Dashboard
+              userID={userID}
               userSuspension={userSuspension}
               setUserSuspension={setUserSuspension}
               setSelectedSuspension={setSelectedSuspension}
@@ -113,12 +116,7 @@ export default function App() {
             />
           }
         />
-        <Route
-          path="*"
-          element={
-            <Error/>
-          }
-        />
+        <Route path="*" element={<Error />} />
       </Routes>
     </main>
   );

@@ -21,6 +21,7 @@ export const cleanRideData = (rides) => {
   const cleanedRides = rides.map((ride) => {
     return {
       id: ride.id,
+      user_id: ride.athlete.id,
       ride_duration: ride.moving_time,
       ride_distance: ride.distance,
       ride_date: ride.start_date,

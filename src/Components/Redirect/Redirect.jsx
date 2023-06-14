@@ -20,6 +20,7 @@ export default function Redirect({
   userAuthToken,
   setUserAccessToken,
   userAccessToken,
+  setUserID,
   setUserBikes,
   setUserRides,
   userRides,
@@ -63,8 +64,10 @@ export default function Redirect({
       .then((activities) => {
         const rideActivities = filterRideActivities(activities);
         const cleanedRides = cleanRideData(rideActivities);
+
         if (cleanedRides) {
           setUserRides(cleanedRides);
+          setUserID(cleanedRides[0].user_id)
           window.localStorage.setItem(
             "userRides",
             JSON.stringify(cleanedRides)
@@ -134,6 +137,7 @@ Redirect.propTypes = {
   userAuthToken: PropTypes.string,
   setUserAccessToken: PropTypes.func,
   userAccessToken: PropTypes.string,
+  setUserID: PropTypes.func,
   setUserBikes: PropTypes.func,
   setUserRides: PropTypes.func,
   userRides: PropTypes.array,
