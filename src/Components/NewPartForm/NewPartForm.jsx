@@ -209,10 +209,10 @@ export default function NewPartForm({
         />
       </form>
       <div className="newpartform-button-section">
+        <button onClick={() => navigate("/dashboard")}>Back</button>
         <button onClick={() => handleSubmit()} disabled={submitDisabled}>
           Submit
         </button>
-        <button onClick={() => navigate("/dashboard")}>Back</button>
       </div>
       {submitError && (
         <p className="error-wait-message">

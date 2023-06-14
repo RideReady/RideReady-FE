@@ -34,7 +34,7 @@ describe('template spec', () => {
     cy.wait(200)
     cy.get('input[name="lastRebuild"]').type('2023-01-01')
     cy.wait(200)
-    cy.get('button').eq(0).click()
+    cy.get('button').eq(1).click()
   })
 
   it('Should navigate to the delete sus page when button is clicked on tile', () => {

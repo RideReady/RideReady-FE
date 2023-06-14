@@ -17,8 +17,8 @@ describe('add-new-part', () => {
     cy.get('select[name="suspensionSelect"]').should('be.visible')
     cy.get('input[name="lastRebuild"]').should('be.visible')
 
-    cy.get('button').eq(0).should('have.text', 'Submit')
-    cy.get('button').eq(1).should('have.text', 'Back')
+    cy.get('button').eq(0).should('have.text', 'Back')
+    cy.get('button').eq(1).should('have.text', 'Submit')
   })
 
   it('Should update values when selecting options', () => {
@@ -34,7 +34,7 @@ describe('add-new-part', () => {
   it('Should not allow a user to submit a new part without date selected', () => {
     cy.get('select[name="bikeSelect"]').select(1)
     cy.get('select[name="suspensionSelect"]').select([5])
-    cy.get('button').eq(0).click()
+    cy.get('button').eq(1).click()
 
     cy.get('p[class=error-wait-message]').should('be.visible')
     cy.url().should('eq', 'http://localhost:5173/dashboard/add-new-part')
@@ -43,7 +43,7 @@ describe('add-new-part', () => {
   it('Should not allow a user to submit a new part without suspension selected', () => {
     cy.get('select[name="bikeSelect"]').select(1)
     cy.get('input[name="lastRebuild"]').type('2023-01-01')
-    cy.get('button').eq(0).click()
+    cy.get('button').eq(1).click()
 
     cy.get('p[class=error-wait-message]').should('be.visible')
     cy.url().should('eq', 'http://localhost:5173/dashboard/add-new-part')
@@ -52,7 +52,7 @@ describe('add-new-part', () => {
   it('Should not allow a user to submit a new part without bike selected', () => {
     cy.get('select[name="suspensionSelect"]').select([5])
     cy.get('input[name="lastRebuild"]').type('2023-01-01')
-    cy.get('button').eq(0).click()
+    cy.get('button').eq(1).click()
 
     cy.get('p[class=error-wait-message]').should('be.visible')
     cy.url().should('eq', 'http://localhost:5173/dashboard/add-new-part')
