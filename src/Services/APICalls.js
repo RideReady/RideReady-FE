@@ -70,7 +70,7 @@ export const getUserGearDetails = (id, userAccessToken) => {
 
 // Heroku BE Database API Calls
 
-export const loadSuspensionFromDatabase = (userID) => {
+export const loadUserSuspensionFromDatabase = (userID) => {
   let url;
   if (window.location.href.startsWith("http://localhost:5173")) {
     url = `http://localhost:5001/suspension/${userID}`;

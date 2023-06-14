@@ -3,13 +3,15 @@ import { useNavigate } from "react-router-dom";
 import Container from "../Container/Container";
 import "./Dashboard.css";
 import PropTypes from "prop-types";
+import { loadUserSuspensionFromDatabase } from "../../Services/APICalls";
 
 export default function Dashboard({
+  userID,
   userSuspension,
   setUserSuspension,
   setSelectedSuspension,
   userBikes,
-  setUserBikes,
+  setUserBikes
 }) {
   const navigate = useNavigate();
 
@@ -31,13 +33,16 @@ export default function Dashboard({
   }, []);
 
   useEffect(() => {
-    if (userSuspension === null) return;
+    if (userSuspension === null || userID === null) return;
     if (userSuspension.length === 0) {
       // API call
-      
+      loadUserSuspensionFromDatabase(userID)
+      .then((result) => {
+        console.log(result)
+      })
       // assign userSuspension
     }
-  }, [userSuspension])
+  }, [userSuspension, userID])
 
   useEffect(() => {
     if (userBikes) {
@@ -58,6 +63,7 @@ export default function Dashboard({
 }
 
 Dashboard.propTypes = {
+  userID: PropTypes.number,
   userSuspension: PropTypes.array,
   setUserSuspension: PropTypes.func,
   setSelectedSuspension: PropTypes.func,
