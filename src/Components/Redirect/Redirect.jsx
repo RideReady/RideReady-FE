@@ -64,7 +64,6 @@ export default function Redirect({
       .then((activities) => {
         const rideActivities = filterRideActivities(activities);
         const cleanedRides = cleanRideData(rideActivities);
-
         if (cleanedRides) {
           setUserRides(cleanedRides);
           setUserID(cleanedRides[0].user_id)

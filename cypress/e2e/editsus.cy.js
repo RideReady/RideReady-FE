@@ -9,12 +9,12 @@ describe('EditSus', () => {
       }
     })
 
-    cy.intercept('GET',`https://www.strava.com/api/v3/athlete/activities?page=1&per_page=200`, {
-      fixture: 'RideData.json'
-    })
+    // cy.intercept('GET',`https://www.strava.com/api/v3/athlete/activities?page=1&per_page=200`, {
+    //   fixture: 'rideData.json'
+    // })
 
     cy.intercept('GET',`https://www.strava.com/api/v3/athlete/activities?page=*`, {
-      fixture: 'RideData.json'
+      fixture: 'rideData.json'
     })
 
     cy.intercept('GET',`https://www.strava.com/api/v3/gear/b9082682`, {
@@ -25,6 +25,7 @@ describe('EditSus', () => {
       fixture: 'AllezData.json'
     })
 
+    cy.wait(200)
     cy.get('button[id="dash-add-sus"').click()
 
     cy.wait(200)
