@@ -12,6 +12,7 @@ export default function Dashboard({
   setUserBikes,
 }) {
   const navigate = useNavigate();
+
   useEffect(() => {
     if (userBikes === null) {
       const loadedBikes = JSON.parse(localStorage.getItem("userBikes"));
@@ -19,10 +20,24 @@ export default function Dashboard({
     }
     if (userSuspension === null) {
       const loadedSus = JSON.parse(localStorage.getItem("userSuspension"));
-      setUserSuspension(loadedSus);
+      if (loadedSus === null) {
+        setUserSuspension([])
+      } else {
+        setUserSuspension(loadedSus)
+      }
     }
+
     // eslint-disable-next-line
   }, []);
+
+  useEffect(() => {
+    if (userSuspension === null) return;
+    if (userSuspension.length === 0) {
+      // API call
+      
+      // assign userSuspension
+    }
+  }, [userSuspension])
 
   useEffect(() => {
     if (userBikes) {
