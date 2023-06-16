@@ -63,6 +63,7 @@ export default function App() {
           path="/dashboard/add-new-part"
           element={
             <NewPartForm
+              userID={userID}
               userAccessToken={userAccessToken}
               setUserAccessToken={setUserAccessToken}
               userBikes={userBikes}

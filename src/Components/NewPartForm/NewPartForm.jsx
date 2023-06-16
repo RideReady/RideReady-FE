@@ -8,10 +8,11 @@ import {
   filterRideActivities,
   cleanRideData,
 } from "../../util";
-import { getUserActivities } from "../../Services/APICalls";
+import { getUserActivities, postUserSuspensionToDatabase } from "../../Services/APICalls";
 import { useNavigate } from "react-router-dom";
 
 export default function NewPartForm({
+  userID,
   userBikes,
   setUserBikes,
   userRides,
@@ -24,7 +25,6 @@ export default function NewPartForm({
   setPagesFetched,
   changeErrorMessage,
 }) {
-  // eslint-disable-next-line
   const [bikeOptions, setBikeOptions] = useState(userBikes);
   const [bikeDropdownOptions, setBikeDropdownOptions] = useState([]);
   const [selectedBike, setSelectedBike] = useState("");
@@ -127,9 +127,10 @@ export default function NewPartForm({
       return;
     }
 
-    const selectedSuspensionName = suspensionData.find(
+    const selectedSuspensionData = suspensionData.find(
       (sus) => sus.id === +selectedSus
     );
+
     let selectedBikeName;
     if (bikeOptions) {
       selectedBikeName = bikeOptions.find((bike) => bike.id === selectedBike);
@@ -138,7 +139,7 @@ export default function NewPartForm({
     }
 
     const newSuspensionData = {
-      susData: selectedSuspensionName,
+      susData: selectedSuspensionData,
       onBike: selectedBikeName || {
         id: Date.now().toString(),
         brand_name: "Unlisted",
@@ -153,6 +154,25 @@ export default function NewPartForm({
         userBikes
       ),
     };
+
+        // Seems to be working but need to test before committing
+
+    const newSusPostData = {
+      id: `${newSuspensionData.onBike.id}+${newSuspensionData.susData.id}`,
+      user_id: userID,
+      rebuild_life: newSuspensionData.rebuildLife,
+      rebuild_date: newSuspensionData.rebuildDate,
+      sus_data_id: newSuspensionData.susData.id,
+      on_bike_id: newSuspensionData.onBike.id
+    }
+
+    postUserSuspensionToDatabase(newSusPostData)
+    .then((response) => {
+      console.log(response)
+    })
+    .catch((error) => {
+      console.log(error)
+    })
 
     if (userSuspension) {
       setUserSuspension([...userSuspension, newSuspensionData]);
@@ -231,6 +251,7 @@ export default function NewPartForm({
 }
 
 NewPartForm.propTypes = {
+  userID: PropTypes.number,
   userBikes: PropTypes.array,
   setUserBikes: PropTypes.func,
   userRides: PropTypes.array,

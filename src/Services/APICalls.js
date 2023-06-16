@@ -86,3 +86,22 @@ export const loadUserSuspensionFromDatabase = (userID) => {
   });
 };
 
+export const postUserSuspensionToDatabase = (newSus) => {
+  let url;
+  if (window.location.href.startsWith("http://localhost:5173")) {
+    url = `http://localhost:5001/suspension`;
+  } else {
+    url = `https://rideready-be.herokuapp.com/suspension`;
+  }
+  return fetch (url, {
+    method: "POST",
+    headers: { "Content-Type": "application/JSON" },
+    body: JSON.stringify(newSus)
+  })
+  .then((response) => {
+    if (response.ok) {
+      return response.json()
+    }
+    throw new Error();
+})
+}
