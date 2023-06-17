@@ -33,7 +33,6 @@ export default function DeleteSus({
     const index = findSusIndexByID(selectedSuspension, userSuspension);
     setDeleteSusDetails(userSuspension[index]);
     setDeleteSusIndex(index);
-    // eslint-disable-next-line
   }, [selectedSuspension, userSuspension]);
 
   const handleDelete = () => {
@@ -47,7 +46,7 @@ export default function DeleteSus({
 
       // Delete from DB here
       // Use deleteSusDetails.id to query and remove
-      
+
     setSelectedSuspension(null);
     navigate("/dashboard");
   };

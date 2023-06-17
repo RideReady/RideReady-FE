@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import "./Container.css";
 import PropTypes from "prop-types";
 import Tile from "../Tile/Tile";
-// import { v4 as uuidv4 } from 'uuid';
 
 export default function Container({ userSuspension, setSelectedSuspension }) {
   const [susTiles, setSusTiles] = useState([]);
@@ -20,16 +19,8 @@ export default function Container({ userSuspension, setSelectedSuspension }) {
           <Tile
             susDetails={sus}
             setSelectedSuspension={setSelectedSuspension}
-
-            // THESE ARE NOT TRULY UNIQUE - NEED TO THINK OF A BETTER WAY
-            // WILL REQUIRE A GOOD AMOUNT OF REFACTORING
-            // NPM PACKAGE TO CREATE UNIQUE ID'S?
-
-            // id={uuidv4()}
-            // key={uuidv4()}
-
-            id={`${sus.onBike.id}+${sus.susData.id}`}
-            key={`${sus.onBike.id}+${sus.susData.id}`}
+            id={sus.id}
+            key={sus.id}
           />
         );
       });

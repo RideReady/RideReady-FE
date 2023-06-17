@@ -10,6 +10,8 @@ import {
 } from "../../util";
 import { getUserActivities, postUserSuspensionToDatabase } from "../../Services/APICalls";
 import { useNavigate } from "react-router-dom";
+import { v4 as uuidv4 } from 'uuid';
+
 
 export default function NewPartForm({
   userID,
@@ -131,19 +133,20 @@ export default function NewPartForm({
       (sus) => sus.id === +selectedSus
     );
 
-    let selectedBikeName;
+    let selectedBikeDetails;
     if (bikeOptions) {
-      selectedBikeName = bikeOptions.find((bike) => bike.id === selectedBike);
+      selectedBikeDetails = bikeOptions.find((bike) => bike.id === selectedBike);
     } else {
-      selectedBikeName = null;
+      selectedBikeDetails = null;
     }
 
-    const newSuspensionData = {
+    const newSuspensionDetails = {
+      id: uuidv4(),
       susData: selectedSuspensionData,
-      onBike: selectedBikeName || {
-        id: Date.now().toString(),
-        brand_name: "Unlisted",
-        model_name: "bike",
+      onBike: selectedBikeDetails || {
+        id: "unknownBike",
+        brand_name: "Unknown",
+        model_name: "Bike",
       },
       rebuildDate: selectedRebuildDate,
       rebuildLife: calculateRebuildLife(
@@ -157,34 +160,37 @@ export default function NewPartForm({
 
         // Seems to be working but need to test before committing
 
-    const newSusPostData = {
-      id: `${newSuspensionData.onBike.id}+${newSuspensionData.susData.id}`,
-      user_id: userID,
-      rebuild_life: newSuspensionData.rebuildLife,
-      rebuild_date: newSuspensionData.rebuildDate,
-      sus_data_id: newSuspensionData.susData.id,
-      on_bike_id: newSuspensionData.onBike.id
-    }
+        // COMMENTED OUT TO WORK OFFLINE
 
-    postUserSuspensionToDatabase(newSusPostData)
-    .then((response) => {
-      console.log(response)
-    })
-    .catch((error) => {
-      console.log(error)
-    })
+    // const newSusPostData = {
+    //   // Change to uuid
+    //   id: newSuspensionDetails.id,
+    //   user_id: userID,
+    //   rebuild_life: newSuspensionDetails.rebuildLife,
+    //   rebuild_date: newSuspensionDetails.rebuildDate,
+    //   sus_data_id: newSuspensionDetails.susData.id,
+    //   on_bike_id: newSuspensionDetails.onBike.id
+    // }
+
+    // postUserSuspensionToDatabase(newSusPostData)
+    // .then((response) => {
+    //   console.log(response)
+    // })
+    // .catch((error) => {
+    //   console.log(error)
+    // })
 
     if (userSuspension) {
-      setUserSuspension([...userSuspension, newSuspensionData]);
+      setUserSuspension([...userSuspension, newSuspensionDetails]);
       window.localStorage.setItem(
         "userSuspension",
-        JSON.stringify([...userSuspension, newSuspensionData])
+        JSON.stringify([...userSuspension, newSuspensionDetails])
       );
     } else {
-      setUserSuspension([newSuspensionData]);
+      setUserSuspension([newSuspensionDetails]);
       window.localStorage.setItem(
         "userSuspension",
-        JSON.stringify([newSuspensionData])
+        JSON.stringify([newSuspensionDetails])
       );
     }
 

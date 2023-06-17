@@ -64,11 +64,10 @@ export default function EditSus({
 
   useEffect(() => {
     if (!selectedSuspension || !userSuspension) return;
+    console.log({selectedSuspension}, {userSuspension})
     const index = findSusIndexByID(selectedSuspension, userSuspension);
-    console.log(index)
-    setEditSusDetails(userSuspension[index]);
     setEditSusIndex(index);
-    // eslint-disable-next-line
+    setEditSusDetails(userSuspension[index]);
   }, [selectedSuspension, userSuspension]);
 
   useEffect(() => {
