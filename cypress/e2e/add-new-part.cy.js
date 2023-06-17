@@ -67,6 +67,12 @@ describe('add-new-part', () => {
       }
     })
 
+    cy.intercept("GET","http://localhost:5001/suspension/*", {
+      body: []
+    })
+
+    // Need to create a stub for the DB post here
+
     cy.intercept('GET',`https://www.strava.com/api/v3/athlete/activities?page=1&per_page=200`, {
       fixture: 'RideData.json'
     })
@@ -92,6 +98,6 @@ describe('add-new-part', () => {
     cy.wait(200)
     cy.get('input[name="lastRebuild"]').type('2023-01-01')
     cy.wait(200)
-    cy.get('button').eq(0).click()
+    cy.get('button').eq(1).click()
   })
 })

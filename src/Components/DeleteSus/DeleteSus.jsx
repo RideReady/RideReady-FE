@@ -43,7 +43,11 @@ export default function DeleteSus({
     window.localStorage.setItem(
       "userSuspension",
       JSON.stringify(newUserSusArr)
-    );
+      );
+
+      // Delete from DB here
+      // Use deleteSusDetails.id to query and remove
+      
     setSelectedSuspension(null);
     navigate("/dashboard");
   };

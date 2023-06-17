@@ -1,5 +1,5 @@
 /* global cy, describe, beforeEach, it */
-describe('template spec', () => {
+describe('deleteSus', () => {
   beforeEach(() => {
     cy.visit('http://localhost:5173/redirect/exchange_token?state=&code=97dd82f961714a09adb14e47b242a23103c4c202&scope=read,activity:read_all')
     cy.intercept('POST', `https://www.strava.com/oauth/token`, {
@@ -8,6 +8,12 @@ describe('template spec', () => {
         access_token: 'accessToken'
       }
     })
+
+    cy.intercept("GET","http://localhost:5001/suspension/*", {
+      body: []
+    })
+
+    // Need to stub DB requests
 
     cy.intercept('GET',`https://www.strava.com/api/v3/athlete/activities?page=1&per_page=200`, {
       fixture: 'RideData.json'

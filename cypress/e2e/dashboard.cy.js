@@ -9,6 +9,13 @@ describe('dashboard', () => {
       }
     })
 
+    // Stubs DB load to return an empty array
+    // Need to create a test for loading from DB
+    // and create a intercept with results
+    cy.intercept("GET","http://localhost:5001/suspension/*", {
+      body: []
+    })
+
     cy.intercept('GET',`https://www.strava.com/api/v3/athlete/activities?page=1&per_page=200`, {
       fixture: 'RideData.json'
     })

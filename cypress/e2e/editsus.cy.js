@@ -9,9 +9,11 @@ describe('EditSus', () => {
       }
     })
 
-    // cy.intercept('GET',`https://www.strava.com/api/v3/athlete/activities?page=1&per_page=200`, {
-    //   fixture: 'rideData.json'
-    // })
+    cy.intercept("GET","http://localhost:5001/suspension/*", {
+      body: []
+    })
+
+    // Need to stub DB requests
 
     cy.intercept('GET',`https://www.strava.com/api/v3/athlete/activities?page=*`, {
       fixture: 'rideData.json'

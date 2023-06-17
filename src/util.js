@@ -102,5 +102,7 @@ export const findSusIndexByID = (id, susOptions) => {
   const foundSusIndex = susOptions.findIndex((sus) => {
     return sus.onBike.id === bikeID && sus.susData.id === susID;
   });
+  // NEW VERSION HERE TO USE UUID
+  // const foundSusIndex = susOptions.findIndex((sus) => sus.id === id)
   return foundSusIndex;
 };

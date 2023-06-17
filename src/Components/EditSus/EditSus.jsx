@@ -65,6 +65,7 @@ export default function EditSus({
   useEffect(() => {
     if (!selectedSuspension || !userSuspension) return;
     const index = findSusIndexByID(selectedSuspension, userSuspension);
+    console.log(index)
     setEditSusDetails(userSuspension[index]);
     setEditSusIndex(index);
     // eslint-disable-next-line
@@ -125,6 +126,9 @@ export default function EditSus({
       "userSuspension",
       JSON.stringify(newUserSusArr)
     );
+
+    // Send edit request to DB here
+    // Use modifiedSus.id to query
 
     setSelectedSuspension(null);
     setPagesFetched(fetchCount);
