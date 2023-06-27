@@ -129,10 +129,12 @@ export default function NewPartForm({
       return;
     }
 
+    // Add to utils - using in Util as helper for Dashboard func
     const selectedSuspensionData = suspensionData.find(
       (sus) => sus.id === +selectedSus
     );
 
+    // Add to utils - using in Util as helper for Dashboard func
     let selectedBikeDetails;
     if (bikeOptions) {
       selectedBikeDetails = bikeOptions.find((bike) => bike.id === selectedBike);
@@ -158,27 +160,27 @@ export default function NewPartForm({
       ),
     };
 
-        // Seems to be working but need to test before committing
+    // Seems to be working but need to test before committing
 
-        // COMMENTED OUT TO WORK OFFLINE
+    // COMMENTED OUT TO WORK OFFLINE
 
-    // const newSusPostData = {
-    //   // Change to uuid
-    //   id: newSuspensionDetails.id,
-    //   user_id: userID,
-    //   rebuild_life: newSuspensionDetails.rebuildLife,
-    //   rebuild_date: newSuspensionDetails.rebuildDate,
-    //   sus_data_id: newSuspensionDetails.susData.id,
-    //   on_bike_id: newSuspensionDetails.onBike.id
-    // }
+    const newSusPostData = {
+      // Change to uuid
+      id: newSuspensionDetails.id,
+      user_id: userID,
+      rebuild_life: newSuspensionDetails.rebuildLife,
+      rebuild_date: newSuspensionDetails.rebuildDate,
+      sus_data_id: newSuspensionDetails.susData.id,
+      on_bike_id: newSuspensionDetails.onBike.id
+    }
 
-    // postUserSuspensionToDatabase(newSusPostData)
-    // .then((response) => {
-    //   console.log(response)
-    // })
-    // .catch((error) => {
-    //   console.log(error)
-    // })
+    postUserSuspensionToDatabase(newSusPostData)
+    .then((response) => {
+      console.log(response)
+    })
+    .catch((error) => {
+      console.log(error)
+    })
 
     if (userSuspension) {
       setUserSuspension([...userSuspension, newSuspensionDetails]);

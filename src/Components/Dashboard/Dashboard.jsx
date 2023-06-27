@@ -4,6 +4,7 @@ import Container from "../Container/Container";
 import "./Dashboard.css";
 import PropTypes from "prop-types";
 import { loadUserSuspensionFromDatabase } from "../../Services/APICalls";
+import { convertDBSus } from "../../util";
 
 export default function Dashboard({
   userID,
@@ -11,44 +12,53 @@ export default function Dashboard({
   setUserSuspension,
   setSelectedSuspension,
   userBikes,
-  setUserBikes
+  setUserBikes,
 }) {
   const navigate = useNavigate();
 
   useEffect(() => {
     if (userBikes === null) {
       const loadedBikes = JSON.parse(localStorage.getItem("userBikes"));
-      setUserBikes(loadedBikes);
-    }
-    if (userSuspension === null) {
-      const loadedSus = JSON.parse(localStorage.getItem("userSuspension"));
-      if (loadedSus === null) {
-        setUserSuspension([])
+      if (loadedBikes) {
+        setUserBikes(loadedBikes);
       } else {
-        setUserSuspension(loadedSus)
+        setUserBikes([]);
       }
     }
-
+    // if (userSuspension === null) {
+    //   const loadedSus = JSON.parse(localStorage.getItem("userSuspension"));
+    //   if (loadedSus) {
+    //     setUserSuspension(loadedSus);
+    //   }
+    // }
     // eslint-disable-next-line
   }, []);
-
-  useEffect(() => {
-    if (userSuspension === null || userID === null) return;
-    if (userSuspension.length === 0) {
-      // API call
-      loadUserSuspensionFromDatabase(userID)
-      .then((result) => {
-        console.log(result)
-      })
-      // assign userSuspension
-    }
-  }, [userSuspension, userID])
 
   useEffect(() => {
     if (userBikes) {
       window.localStorage.setItem("userBikes", JSON.stringify(userBikes));
     }
   }, [userBikes]);
+
+  useEffect(() => {
+    if (userID === null || userBikes === null) return;
+    if (!userSuspension && userBikes.length > 0) {
+      console.log(userID);
+      console.log({ userBikes });
+      loadUserSuspensionFromDatabase(userID).then((result) => {
+        if (result.suspension && result.suspension.length > 0) {
+          const convertedDBSus = result.suspension.map((sus) =>
+            convertDBSus(sus, userBikes)
+          );
+          console.log(`User suspension loaded from DB`, convertedDBSus);
+          setUserSuspension(convertedDBSus);
+        } else {
+          console.log(`No suspension loaded from DB for userID: ${userID}`);
+        }
+      });
+    }
+    // eslint-disable-next-line
+  }, [userSuspension, userID, userBikes]);
 
   return (
     <section className="dashboard">
@@ -57,7 +67,12 @@ export default function Dashboard({
         userSuspension={userSuspension}
         setSelectedSuspension={setSelectedSuspension}
       />
-      <button id="dash-add-sus" onClick={() => navigate('/dashboard/add-new-part')}>Add new suspension</button>
+      <button
+        id="dash-add-sus"
+        onClick={() => navigate("/dashboard/add-new-part")}
+      >
+        Add new suspension
+      </button>
     </section>
   );
 }
