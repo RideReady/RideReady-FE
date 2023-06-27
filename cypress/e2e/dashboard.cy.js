@@ -45,6 +45,23 @@ describe("dashboard", () => {
   });
 
   it("Should direct you to the AddNewPartForm on button click", () => {
+    cy.intercept("GET", "http://localhost:5001/suspension/*", {
+      body: {
+        suspension: [
+          {
+            id: "8e2c847e-dd9c-44c6-91bc-6495c7eb803e",
+            user_id: 391197,
+            rebuild_life: 0.992804,
+            rebuild_date: "2023-06-01T06:00:00.000Z",
+            sus_data_id: 1,
+            on_bike_id: "b9082682",
+          },
+        ],
+      },
+    });
+
+    cy.wait(1000);
+
     cy.get('button[id="dash-add-sus"').click();
     cy.url().should("eq", "http://localhost:5173/dashboard/add-new-part");
   });
@@ -64,6 +81,8 @@ describe("dashboard", () => {
         ],
       },
     });
+
+    cy.wait(1000);
 
     cy.get("h2").should("have.text", "RockShox Fork");
     cy.get("h3").eq(0).should("have.text", "on your Specialized Enduro");

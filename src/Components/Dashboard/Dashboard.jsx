@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Container from "../Container/Container";
 import "./Dashboard.css";
@@ -14,6 +14,7 @@ export default function Dashboard({
   userBikes,
   setUserBikes,
 }) {
+  const [loadingSus, setLoadingSus] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -25,12 +26,6 @@ export default function Dashboard({
         setUserBikes([]);
       }
     }
-    // if (userSuspension === null) {
-    //   const loadedSus = JSON.parse(localStorage.getItem("userSuspension"));
-    //   if (loadedSus) {
-    //     setUserSuspension(loadedSus);
-    //   }
-    // }
     // eslint-disable-next-line
   }, []);
 
@@ -42,9 +37,9 @@ export default function Dashboard({
 
   useEffect(() => {
     if (userID === null || userBikes === null) return;
-    if (!userSuspension && userBikes.length > 0) {
-      console.log(userID);
-      console.log({ userBikes });
+    if (!userSuspension) {
+      setLoadingSus(true);
+      console.log(userBikes)
       loadUserSuspensionFromDatabase(userID).then((result) => {
         if (result.suspension && result.suspension.length > 0) {
           const convertedDBSus = result.suspension.map((sus) =>
@@ -52,8 +47,10 @@ export default function Dashboard({
           );
           console.log(`User suspension loaded from DB`, convertedDBSus);
           setUserSuspension(convertedDBSus);
+          setLoadingSus(false);
         } else {
           console.log(`No suspension loaded from DB for userID: ${userID}`);
+          setLoadingSus(false);
         }
       });
     }
@@ -66,6 +63,7 @@ export default function Dashboard({
       <Container
         userSuspension={userSuspension}
         setSelectedSuspension={setSelectedSuspension}
+        loadingSus={loadingSus}
       />
       <button
         id="dash-add-sus"

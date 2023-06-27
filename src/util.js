@@ -119,10 +119,14 @@ export const convertDBSus = (sus, bikeOptions)=> {
   } 
 
  const findBikeDetailsById = () => {
-  if (bikeOptions) {
+  if (bikeOptions.length > 0) {
     return bikeOptions.find((bike) => bike.id === sus.on_bike_id);
   } else {
-    return null;
+    return {
+      id: "unknownBike",
+      brand_name: "Unknown",
+      model_name: "Bike"
+    };
   }
  }
 
@@ -131,7 +135,8 @@ export const convertDBSus = (sus, bikeOptions)=> {
     onBike: findBikeDetailsById(),
     rebuildDate: sus.rebuild_date,
     rebuildLife: sus.rebuild_life,
-    susData: findSusInfoById()
+    susData: findSusInfoById(),
+    dateCreated: sus.date_created
   }
 
   return convertedSus;

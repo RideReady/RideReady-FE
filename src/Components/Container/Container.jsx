@@ -3,17 +3,26 @@ import "./Container.css";
 import PropTypes from "prop-types";
 import Tile from "../Tile/Tile";
 
-export default function Container({ userSuspension, setSelectedSuspension }) {
+export default function Container({
+  userSuspension,
+  setSelectedSuspension,
+  loadingSus,
+}) {
   const [susTiles, setSusTiles] = useState([]);
-  const noSusMessage = (
+  const [noSuspensionMessage, setNoSuspensionMessage] = useState(
     <p className="add-new-mesg">
       No suspension to view. Add a new suspension part by clicking the button
       below.
     </p>
   );
 
+  const loadingMessage = (
+    <p className="add-new-mesg">Loading your suspension...</p>
+  );
+
   useEffect(() => {
     if (userSuspension) {
+      setNoSuspensionMessage(null);
       const suspensionTiles = userSuspension.map((sus) => {
         return (
           <Tile
@@ -31,7 +40,7 @@ export default function Container({ userSuspension, setSelectedSuspension }) {
 
   return (
     <section className="container">
-      {(userSuspension === null || userSuspension.length === 0) && noSusMessage}
+      {loadingSus ? loadingMessage : noSuspensionMessage}
       {susTiles}
     </section>
   );
@@ -39,5 +48,6 @@ export default function Container({ userSuspension, setSelectedSuspension }) {
 
 Container.propTypes = {
   userSuspension: PropTypes.array,
-  setSelectedSuspension: PropTypes.func
+  setSelectedSuspension: PropTypes.func,
+  loadingSus: PropTypes.bool,
 };

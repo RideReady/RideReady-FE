@@ -148,7 +148,7 @@ export default function NewPartForm({
       onBike: selectedBikeDetails || {
         id: "unknownBike",
         brand_name: "Unknown",
-        model_name: "Bike",
+        model_name: "Bike"
       },
       rebuildDate: selectedRebuildDate,
       rebuildLife: calculateRebuildLife(
@@ -160,18 +160,14 @@ export default function NewPartForm({
       ),
     };
 
-    // Seems to be working but need to test before committing
-
-    // COMMENTED OUT TO WORK OFFLINE
-
     const newSusPostData = {
-      // Change to uuid
       id: newSuspensionDetails.id,
       user_id: userID,
       rebuild_life: newSuspensionDetails.rebuildLife,
       rebuild_date: newSuspensionDetails.rebuildDate,
       sus_data_id: newSuspensionDetails.susData.id,
-      on_bike_id: newSuspensionDetails.onBike.id
+      on_bike_id: newSuspensionDetails.onBike.id,
+      date_created: new Date()
     }
 
     postUserSuspensionToDatabase(newSusPostData)

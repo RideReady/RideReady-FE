@@ -102,5 +102,11 @@ describe('add-new-part', () => {
     cy.get('input[name="lastRebuild"]').type('2023-01-01')
     cy.wait(200)
     cy.get('button').eq(1).click()
+
+    cy.get('h2').should('have.text', 'RockShox Fork')
+    cy.get('h3').eq(0).should('have.text', 'on your Specialized Enduro')
+    cy.get('h3').eq(1).should('have.text', '92% service life remaining')
+    cy.get('h3').eq(2).should('have.text', `It's Ride Ready!`)
+    cy.get('p').eq(0).should('have.text', 'Last serviced: Jan 1, 2023')
   })
 })
