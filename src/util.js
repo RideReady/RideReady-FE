@@ -96,19 +96,19 @@ export const isOldestRideBeforeRebuild = (rides, rebuildDate) => {
 };
 
 export const findSusIndexByID = (id, susOptions) => {
-  const foundSusIndex = susOptions.findIndex((sus) => sus.id === id)
+  const foundSusIndex = susOptions.findIndex((sus) => sus.id === id);
   return foundSusIndex;
 };
 
-export const convertDBSus = (sus, bikeOptions)=> {
-
+// REFACTOR THIS TO PULL OUT THE TWO SUB FUNCTIONS
+export const convertSuspensionFromDatabase   = (sus, bikeOptions) => {
   //  DB sus : {
-    // id : "8e2c847e-dd9c-44c6-91bc-6495c7eb803e"
-    // on_bike_id : "b9082682"
-    // rebuild_date: "2023-06-01T06:00:00.000Z"
-    // rebuild_life: 0.992804
-    // sus_data_id: 1
-    // user_id: 391197
+  // id : "8e2c847e-dd9c-44c6-91bc-6495c7eb803e"
+  // on_bike_id : "b9082682"
+  // rebuild_date: "2023-06-01T06:00:00.000Z"
+  // rebuild_life: 0.992804
+  // sus_data_id: 1
+  // user_id: 391197
   // }
 
   const findSusInfoById = () => {
@@ -116,19 +116,19 @@ export const convertDBSus = (sus, bikeOptions)=> {
       (susData) => sus.sus_data_id === susData.id
     );
     return susInfo;
-  } 
+  };
 
- const findBikeDetailsById = () => {
-  if (bikeOptions.length > 0) {
-    return bikeOptions.find((bike) => bike.id === sus.on_bike_id);
-  } else {
-    return {
-      id: "unknownBike",
-      brand_name: "Unknown",
-      model_name: "Bike"
-    };
-  }
- }
+  const findBikeDetailsById = () => {
+    if (bikeOptions.length > 0) {
+      return bikeOptions.find((bike) => bike.id === sus.on_bike_id);
+    } else {
+      return {
+        id: "unknownBike",
+        brand_name: "Unknown",
+        model_name: "Bike",
+      };
+    }
+  };
 
   const convertedSus = {
     id: sus.id,
@@ -136,8 +136,8 @@ export const convertDBSus = (sus, bikeOptions)=> {
     rebuildDate: sus.rebuild_date,
     rebuildLife: sus.rebuild_life,
     susData: findSusInfoById(),
-    dateCreated: sus.date_created
-  }
+    dateCreated: sus.date_created,
+  };
 
   return convertedSus;
-}
+};

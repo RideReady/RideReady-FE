@@ -26,6 +26,8 @@ export const getAccessToken = (userAuthToken) => {
   });
 };
 
+// Not using this but may in down the road, works for
+// fetching all user information
 export const getUserDetails = (userAccessToken) => {
   return fetch("https://www.strava.com/api/v3/athlete", {
     headers: {
@@ -77,8 +79,7 @@ export const loadUserSuspensionFromDatabase = (userID) => {
   } else {
     url = `https://rideready-be.herokuapp.com/suspension/${userID}`;
   }
-  return fetch(url)
-  .then((response) => {
+  return fetch(url).then((response) => {
     if (response.ok) {
       return response.json();
     }
@@ -93,15 +94,24 @@ export const postUserSuspensionToDatabase = (newSus) => {
   } else {
     url = `https://rideready-be.herokuapp.com/suspension`;
   }
-  return fetch (url, {
+  return fetch(url, {
     method: "POST",
     headers: { "Content-Type": "application/JSON" },
-    body: JSON.stringify(newSus)
-  })
-  .then((response) => {
+    body: JSON.stringify(newSus),
+  }).then((response) => {
     if (response.ok) {
-      return response.json()
+      return response.json();
     }
     throw new Error();
-})
+  });
+};
+
+export const editUserSuspensionInDatabase = () => {
+  let url;
+  if (window.location.href.startsWith("http://localhost:5173")) {
+    url = `http://localhost:5001/suspension`;
+  } else {
+    url = `https://rideready-be.herokuapp.com/suspension`;
+  }
+  return fetch(url)
 }

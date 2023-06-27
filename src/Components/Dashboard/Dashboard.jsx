@@ -4,7 +4,7 @@ import Container from "../Container/Container";
 import "./Dashboard.css";
 import PropTypes from "prop-types";
 import { loadUserSuspensionFromDatabase } from "../../Services/APICalls";
-import { convertDBSus } from "../../util";
+import { convertSuspensionFromDatabase } from "../../util";
 
 export default function Dashboard({
   userID,
@@ -12,38 +12,39 @@ export default function Dashboard({
   setUserSuspension,
   setSelectedSuspension,
   userBikes,
-  setUserBikes,
+  // setUserBikes,
 }) {
   const [loadingSus, setLoadingSus] = useState(false);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    if (userBikes === null) {
-      const loadedBikes = JSON.parse(localStorage.getItem("userBikes"));
-      if (loadedBikes) {
-        setUserBikes(loadedBikes);
-      } else {
-        setUserBikes([]);
-      }
-    }
-    // eslint-disable-next-line
-  }, []);
+  // DISABLED ALL LOCAL STORAGE, CAUSING ISSUES WITH DB FETCH
 
-  useEffect(() => {
-    if (userBikes) {
-      window.localStorage.setItem("userBikes", JSON.stringify(userBikes));
-    }
-  }, [userBikes]);
+  // useEffect(() => {
+  //   if (userBikes) {
+  //     window.localStorage.setItem("userBikes", JSON.stringify(userBikes));
+  //   }
+  // }, [userBikes]);
+
+  // useEffect(() => {
+  //   if (userBikes === null) {
+  //     const loadedBikes = JSON.parse(localStorage.getItem("userBikes"));
+  //     if (loadedBikes) {
+  //       setUserBikes(loadedBikes);
+  //     } else {
+  //       setUserBikes([]);
+  //     }
+  //   }
+  //   // eslint-disable-next-line
+  // }, []);
 
   useEffect(() => {
     if (userID === null || userBikes === null) return;
     if (!userSuspension) {
       setLoadingSus(true);
-      console.log(userBikes)
       loadUserSuspensionFromDatabase(userID).then((result) => {
         if (result.suspension && result.suspension.length > 0) {
           const convertedDBSus = result.suspension.map((sus) =>
-            convertDBSus(sus, userBikes)
+          convertSuspensionFromDatabase(sus, userBikes)
           );
           console.log(`User suspension loaded from DB`, convertedDBSus);
           setUserSuspension(convertedDBSus);

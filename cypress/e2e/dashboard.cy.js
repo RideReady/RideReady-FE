@@ -77,6 +77,7 @@ describe("dashboard", () => {
             rebuild_date: "2023-06-01T06:00:00.000Z",
             sus_data_id: 1,
             on_bike_id: "b9082682",
+            date_created:"2023-06-27T06:00:00.000Z"
           },
         ],
       },
