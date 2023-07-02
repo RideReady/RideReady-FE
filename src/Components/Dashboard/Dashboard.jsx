@@ -12,30 +12,24 @@ export default function Dashboard({
   setUserSuspension,
   setSelectedSuspension,
   userBikes,
-  // setUserBikes,
+  setUserBikes,
 }) {
   const [loadingSus, setLoadingSus] = useState(false);
   const navigate = useNavigate();
 
-  // DISABLED ALL LOCAL STORAGE, CAUSING ISSUES WITH DB FETCH
-
-  // useEffect(() => {
-  //   if (userBikes) {
-  //     window.localStorage.setItem("userBikes", JSON.stringify(userBikes));
-  //   }
-  // }, [userBikes]);
-
-  // useEffect(() => {
-  //   if (userBikes === null) {
-  //     const loadedBikes = JSON.parse(localStorage.getItem("userBikes"));
-  //     if (loadedBikes) {
-  //       setUserBikes(loadedBikes);
-  //     } else {
-  //       setUserBikes([]);
-  //     }
-  //   }
-  //   // eslint-disable-next-line
-  // }, []);
+  useEffect(() => {
+    if (userBikes === null) {
+      const loadedBikes = JSON.parse(localStorage.getItem("userBikes"));
+      if (loadedBikes) {
+        setUserBikes(loadedBikes);
+      } else {
+        setUserBikes([]);
+      }
+    } else if (userBikes) {
+      window.localStorage.setItem("userBikes", JSON.stringify(userBikes));
+    }
+    // eslint-disable-next-line
+  }, []);
 
   useEffect(() => {
     if (userID === null || userBikes === null) return;

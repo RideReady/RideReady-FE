@@ -100,42 +100,38 @@ export const findSusIndexByID = (id, susOptions) => {
   return foundSusIndex;
 };
 
+
+const findSusInfoById = (sus) => {
+  const susInfo = suspensionData.find(
+    (susData) => sus.sus_data_id === susData.id
+  );
+  return susInfo;
+};
+
+const findBikeDetailsById = (sus, bikeOptions) => {
+  console.log(bikeOptions)
+  if (bikeOptions.length > 0) {
+    return bikeOptions.find((bike) => bike.id === sus.on_bike_id);
+  } else {
+    return {
+      id: "unknownBike",
+      brand_name: "Unknown",
+      model_name: "Bike",
+    };
+  }
+};
+
 // REFACTOR THIS TO PULL OUT THE TWO SUB FUNCTIONS
 export const convertSuspensionFromDatabase = (sus, bikeOptions) => {
-  //  DB sus : {
-  // id : "8e2c847e-dd9c-44c6-91bc-6495c7eb803e"
-  // on_bike_id : "b9082682"
-  // rebuild_date: "2023-06-01T06:00:00.000Z"
-  // rebuild_life: 0.992804
-  // sus_data_id: 1
-  // user_id: 391197
-  // }
-
-  const findSusInfoById = () => {
-    const susInfo = suspensionData.find(
-      (susData) => sus.sus_data_id === susData.id
-    );
-    return susInfo;
-  };
-
-  const findBikeDetailsById = () => {
-    if (bikeOptions.length > 0) {
-      return bikeOptions.find((bike) => bike.id === sus.on_bike_id);
-    } else {
-      return {
-        id: "unknownBike",
-        brand_name: "Unknown",
-        model_name: "Bike",
-      };
-    }
-  };
+  const foundBike = findBikeDetailsById(sus, bikeOptions);
+  const foundSusInfo = findSusInfoById(sus);
 
   const convertedSus = {
     id: sus.id,
-    onBike: findBikeDetailsById(),
+    onBike: foundBike,
     rebuildDate: sus.rebuild_date,
     rebuildLife: sus.rebuild_life,
-    susData: findSusInfoById(),
+    susData: foundSusInfo,
     dateCreated: sus.date_created,
   };
 
