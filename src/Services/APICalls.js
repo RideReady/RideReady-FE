@@ -106,12 +106,22 @@ export const postUserSuspensionToDatabase = (newSus) => {
   });
 };
 
-export const editUserSuspensionInDatabase = () => {
+export const editUserSuspensionInDatabase = (susToEdit) => {
   let url;
   if (window.location.href.startsWith("http://localhost:5173")) {
-    url = `http://localhost:5001/suspension`;
+    url = `http://localhost:5001/suspension/${susToEdit.id}`;
   } else {
-    url = `https://rideready-be.herokuapp.com/suspension`;
+    url = `https://rideready-be.herokuapp.com/suspension/${susToEdit.id}`;
   }
-  return fetch(url)
+  return fetch(url, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/JSON" },
+    body: JSON.stringify(susToEdit),
+  }).then((response) => {
+    if (response.ok) {
+      return response.json();
+    } else {
+      throw new Error();
+    }
+  })
 }

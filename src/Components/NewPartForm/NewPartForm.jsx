@@ -7,6 +7,7 @@ import {
   isOldestRideBeforeRebuild,
   filterRideActivities,
   cleanRideData,
+  convertSusToDatabaseFormat,
 } from "../../util";
 import { getUserActivities, postUserSuspensionToDatabase } from "../../Services/APICalls";
 import { useNavigate } from "react-router-dom";
@@ -160,15 +161,7 @@ export default function NewPartForm({
       ),
     };
 
-    const newSusPostData = {
-      id: newSuspensionDetails.id,
-      user_id: userID,
-      rebuild_life: newSuspensionDetails.rebuildLife,
-      rebuild_date: newSuspensionDetails.rebuildDate,
-      sus_data_id: newSuspensionDetails.susData.id,
-      on_bike_id: newSuspensionDetails.onBike.id,
-      date_created: new Date()
-    }
+    const newSusPostData = convertSusToDatabaseFormat(newSuspensionDetails, userID)
 
     postUserSuspensionToDatabase(newSusPostData)
     .then((response) => {

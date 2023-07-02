@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import "./EditSus.css";
 import { useNavigate } from "react-router-dom";
-import { findSusIndexByID } from "../../util";
+import { convertSusToDatabaseFormat, findSusIndexByID } from "../../util";
 import moment from "moment";
 import {
   calculateRebuildLife,
@@ -9,7 +9,10 @@ import {
   filterRideActivities,
   cleanRideData,
 } from "../../util";
-import { getUserActivities } from "../../Services/APICalls";
+import {
+  editUserSuspensionInDatabase,
+  getUserActivities,
+} from "../../Services/APICalls";
 import PropTypes from "prop-types";
 
 export default function EditSus({
@@ -125,8 +128,15 @@ export default function EditSus({
       JSON.stringify(newUserSusArr)
     );
 
-    // Send edit request to DB here
-    // Use modifiedSus.id to query
+    const susDataConvertedForDatabase = convertSusToDatabaseFormat(modifiedSus);
+
+    editUserSuspensionInDatabase(susDataConvertedForDatabase)
+    .then((response) => {
+        console.log(response)
+    })
+    .catch((error) => {
+      console.log(error)
+    })
 
     setSelectedSuspension(null);
     setPagesFetched(fetchCount);

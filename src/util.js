@@ -109,7 +109,6 @@ const findSusInfoById = (sus) => {
 };
 
 const findBikeDetailsById = (sus, bikeOptions) => {
-  console.log(bikeOptions)
   if (bikeOptions.length > 0) {
     return bikeOptions.find((bike) => bike.id === sus.on_bike_id);
   } else {
@@ -121,7 +120,6 @@ const findBikeDetailsById = (sus, bikeOptions) => {
   }
 };
 
-// REFACTOR THIS TO PULL OUT THE TWO SUB FUNCTIONS
 export const convertSuspensionFromDatabase = (sus, bikeOptions) => {
   const foundBike = findBikeDetailsById(sus, bikeOptions);
   const foundSusInfo = findSusInfoById(sus);
@@ -137,3 +135,17 @@ export const convertSuspensionFromDatabase = (sus, bikeOptions) => {
 
   return convertedSus;
 };
+
+export const convertSusToDatabaseFormat = (sus, userID) => {
+  const susDataConverted = {
+    id: sus.id,
+    user_id: userID,
+    rebuild_life: sus.rebuildLife,
+    rebuild_date: sus.rebuildDate,
+    sus_data_id: sus.susData.id,
+    on_bike_id: sus.onBike.id,
+    date_created: new Date()
+  }
+
+  return susDataConverted;
+}

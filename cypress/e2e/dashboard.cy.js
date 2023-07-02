@@ -83,7 +83,7 @@ describe("dashboard", () => {
       },
     });
 
-    cy.wait(1000);
+    cy.wait(2500);
 
     cy.get("h2").should("have.text", "RockShox Fork");
     cy.get("h3").eq(0).should("have.text", "on your Specialized Enduro");
