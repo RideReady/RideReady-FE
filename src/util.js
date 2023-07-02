@@ -101,7 +101,7 @@ export const findSusIndexByID = (id, susOptions) => {
 };
 
 // REFACTOR THIS TO PULL OUT THE TWO SUB FUNCTIONS
-export const convertSuspensionFromDatabase   = (sus, bikeOptions) => {
+export const convertSuspensionFromDatabase = (sus, bikeOptions) => {
   //  DB sus : {
   // id : "8e2c847e-dd9c-44c6-91bc-6495c7eb803e"
   // on_bike_id : "b9082682"

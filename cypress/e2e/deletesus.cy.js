@@ -13,7 +13,10 @@ describe('deleteSus', () => {
       body: []
     })
 
-    // Need to stub DB requests
+    cy.intercept('POST', 'http://localhost:5001/suspension', {
+      statusCode: 201,
+      body: JSON.stringify('New suspension added to DB: newSusData from test')
+    })
 
     cy.intercept('GET',`https://www.strava.com/api/v3/athlete/activities?page=1&per_page=200`, {
       fixture: 'RideData.json'
