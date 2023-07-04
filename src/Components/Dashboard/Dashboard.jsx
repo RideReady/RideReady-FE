@@ -15,6 +15,8 @@ export default function Dashboard({
   // setUserBikes,
 }) {
   const [loadingSus, setLoadingSus] = useState("");
+  const [buttonLink, setButtonLink] = useState("/dashboard/add-new-part");
+  const [buttonMsg, setButtonMsg] = useState("Add new suspension")
   const navigate = useNavigate();
 
   // useEffect(() => {
@@ -34,7 +36,7 @@ export default function Dashboard({
   useEffect(() => {
     if (userID === null || userBikes === null) return;
     if (!userSuspension) {
-      setLoadingSus("Loading your suspension...");
+      setLoadingSus("loading")
       loadUserSuspensionFromDatabase(userID).then((result) => {
         if (result.suspension && result.suspension.length > 0) {
           const convertedDBSus = result.suspension.map((sus) =>
@@ -49,10 +51,11 @@ export default function Dashboard({
         }
       }).catch((error) => {
         console.log(error)
-        setLoadingSus("An error occurred while loading your suspension, please try refreshing the page.")
+        setLoadingSus("error")
+        setUserSuspension([])
+        setButtonLink("/")
+        setButtonMsg("Return to login page")
       })
-      // NEED TO ADD A CATCH HERE FOR FAILED DB LOAD CALL
-      // Console log error, show user an error in the loadingSus msg
     }
     // eslint-disable-next-line
   }, [userSuspension, userID, userBikes]);
@@ -67,9 +70,9 @@ export default function Dashboard({
       />
       <button
         id="dash-add-sus"
-        onClick={() => navigate("/dashboard/add-new-part")}
+        onClick={() => navigate(buttonLink)}
       >
-        Add new suspension
+        {buttonMsg}
       </button>
     </section>
   );

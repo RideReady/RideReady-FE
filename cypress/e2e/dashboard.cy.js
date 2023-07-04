@@ -77,7 +77,7 @@ describe("dashboard", () => {
             rebuild_date: "2023-06-01T06:00:00.000Z",
             sus_data_id: 1,
             on_bike_id: "b9082682",
-            date_created:"2023-06-27T06:00:00.000Z"
+            date_created: "2023-06-27T06:00:00.000Z",
           },
         ],
       },
@@ -89,17 +89,35 @@ describe("dashboard", () => {
     cy.get("h3").eq(0).should("have.text", "on your Specialized Enduro");
     cy.get("h3").eq(1).should("have.text", "99% service life remaining");
     cy.get("h3").eq(2).should("have.text", `It's Ride Ready!`);
-    cy.get("p").eq(1).should("have.text", `Last serviced: Jun 1, 2023`);
+    cy.get("p").eq(0).should("have.text", `Last serviced: Jun 1, 2023`);
   });
 
-  it('Should show the user an error if error loading suspension from DB', () => {
+  it("Should show the user an error if error loading suspension from DB", () => {
     cy.intercept("GET", "http://localhost:5001/suspension/*", {
-    statusCode: 500,
-    body: 'Error with suspension query for userID: Error details'
-    })
+      statusCode: 500,
+      body: "Error with suspension query for userID: Error details",
+    });
 
     cy.wait(1000);
 
-    cy.get('p[class="add-new-mesg"]').should("contain", "An error occurred while loading your suspension");
-  })
+    cy.get('p[class="add-new-mesg"]').should(
+      "contain",
+      "An error occurred while loading your suspension"
+    );
+  });
+
+  it("Should show the user a button to return home and try logging in again", () => {
+    cy.intercept("GET", "http://localhost:5001/suspension/*", {
+      statusCode: 500,
+      body: "Error with suspension query for userID: Error details",
+    });
+
+    cy.wait(1000);
+
+    cy.get("button").should("have.text", "Return to login page");
+
+    cy.get("button").click();
+
+    cy.url().should("eq", "http://localhost:5173/");
+  });
 });

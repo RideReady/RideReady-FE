@@ -67,6 +67,8 @@ describe('deleteSus', () => {
     cy.url().should('eq', 'http://localhost:5173/dashboard')
 
     cy.get('article[class="tile"]').should('not.exist')
+
+    cy.get('p[class="add-new-mesg"]').should('have.text', "No suspension to view. Add a new suspension part by clicking the button below.")
   })
 
 })

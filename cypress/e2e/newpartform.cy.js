@@ -107,6 +107,6 @@ describe('add-new-part', () => {
     cy.get('h3').eq(0).should('have.text', 'on your Specialized Enduro')
     cy.get('h3').eq(1).should('have.text', '92% service life remaining')
     cy.get('h3').eq(2).should('have.text', `It's Ride Ready!`)
-    cy.get('p').eq(1).should('have.text', 'Last serviced: Jan 1, 2023')
+    cy.get('p').eq(0).should('have.text', 'Last serviced: Jan 1, 2023')
   })
 })
