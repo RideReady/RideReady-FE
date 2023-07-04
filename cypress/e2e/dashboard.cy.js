@@ -83,12 +83,23 @@ describe("dashboard", () => {
       },
     });
 
-    cy.wait(2500);
+    cy.wait(1000);
 
     cy.get("h2").should("have.text", "RockShox Fork");
     cy.get("h3").eq(0).should("have.text", "on your Specialized Enduro");
     cy.get("h3").eq(1).should("have.text", "99% service life remaining");
     cy.get("h3").eq(2).should("have.text", `It's Ride Ready!`);
-    cy.get("p").eq(0).should("have.text", `Last serviced: Jun 1, 2023`);
+    cy.get("p").eq(1).should("have.text", `Last serviced: Jun 1, 2023`);
   });
+
+  it('Should show the user an error if error loading suspension from DB', () => {
+    cy.intercept("GET", "http://localhost:5001/suspension/*", {
+    statusCode: 500,
+    body: 'Error with suspension query for userID: Error details'
+    })
+
+    cy.wait(1000);
+
+    cy.get('p[class="add-new-mesg"]').should("contain", "An error occurred while loading your suspension");
+  })
 });

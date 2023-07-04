@@ -12,29 +12,29 @@ export default function Dashboard({
   setUserSuspension,
   setSelectedSuspension,
   userBikes,
-  setUserBikes,
+  // setUserBikes,
 }) {
-  const [loadingSus, setLoadingSus] = useState(false);
+  const [loadingSus, setLoadingSus] = useState("");
   const navigate = useNavigate();
 
-  useEffect(() => {
-    if (userBikes === null) {
-      const loadedBikes = JSON.parse(localStorage.getItem("userBikes"));
-      if (loadedBikes) {
-        setUserBikes(loadedBikes);
-      } else {
-        setUserBikes([]);
-      }
-    } else if (userBikes) {
-      window.localStorage.setItem("userBikes", JSON.stringify(userBikes));
-    }
-    // eslint-disable-next-line
-  }, []);
+  // useEffect(() => {
+  //   if (userBikes === null) {
+  //     const loadedBikes = JSON.parse(localStorage.getItem("userBikes"));
+  //     if (loadedBikes) {
+  //       setUserBikes(loadedBikes);
+  //     } else {
+  //       setUserBikes([]);
+  //     }
+  //   } else if (userBikes) {
+  //     window.localStorage.setItem("userBikes", JSON.stringify(userBikes));
+  //   }
+  //   // eslint-disable-next-line
+  // }, []);
 
   useEffect(() => {
     if (userID === null || userBikes === null) return;
     if (!userSuspension) {
-      setLoadingSus(true);
+      setLoadingSus("Loading your suspension...");
       loadUserSuspensionFromDatabase(userID).then((result) => {
         if (result.suspension && result.suspension.length > 0) {
           const convertedDBSus = result.suspension.map((sus) =>
@@ -42,12 +42,17 @@ export default function Dashboard({
           );
           console.log(`User suspension loaded from DB`, convertedDBSus);
           setUserSuspension(convertedDBSus);
-          setLoadingSus(false);
+          setLoadingSus("");
         } else {
           console.log(`No suspension loaded from DB for userID: ${userID}`);
-          setLoadingSus(false);
+          setLoadingSus("");
         }
-      });
+      }).catch((error) => {
+        console.log(error)
+        setLoadingSus("An error occurred while loading your suspension, please try refreshing the page.")
+      })
+      // NEED TO ADD A CATCH HERE FOR FAILED DB LOAD CALL
+      // Console log error, show user an error in the loadingSus msg
     }
     // eslint-disable-next-line
   }, [userSuspension, userID, userBikes]);

@@ -9,20 +9,22 @@ export default function Container({
   loadingSus,
 }) {
   const [susTiles, setSusTiles] = useState([]);
-  const [noSuspensionMessage, setNoSuspensionMessage] = useState(
-    <p className="add-new-mesg">
-      No suspension to view. Add a new suspension part by clicking the button
-      below.
-    </p>
-  );
 
-  const loadingMessage = (
-    <p className="add-new-mesg">Loading your suspension...</p>
-  );
+  // Need to rethink this noSus / loading message to
+  // maybe a switch statement to add a third case where
+  // loading from DB fails and shows user a message saying loading from
+  // DB failed. Show a reload button that tries the request again
+  // or tells them to return to home page?
+
+  const [dashboardMessage, setDashboardMessage] = useState(null);
+
+  // const loadingMessage = (
+  //   <p className="add-new-mesg">Loading your suspension...</p>
+  // );
 
   useEffect(() => {
-    if (userSuspension) {
-      setNoSuspensionMessage(null);
+    if (userSuspension && !loadingSus) {
+      setDashboardMessage(null);
       const suspensionTiles = userSuspension.map((sus) => {
         return (
           <Tile
@@ -34,13 +36,17 @@ export default function Container({
         );
       });
       setSusTiles(suspensionTiles);
+    } else if (loadingSus) {
+      setDashboardMessage(loadingSus);
+    } else if (!loadingSus && !userSuspension) {
+      setDashboardMessage("No suspension to view. Add a new suspension part by clicking the button below.")
     }
     // eslint-disable-next-line
-  }, [userSuspension]);
+  }, [userSuspension, loadingSus]);
 
   return (
     <section className="container">
-      {loadingSus ? loadingMessage : noSuspensionMessage}
+      <p className="add-new-mesg">{dashboardMessage}</p>
       {susTiles}
     </section>
   );
@@ -49,5 +55,5 @@ export default function Container({
 Container.propTypes = {
   userSuspension: PropTypes.array,
   setSelectedSuspension: PropTypes.func,
-  loadingSus: PropTypes.bool,
+  loadingSus: PropTypes.string,
 };
