@@ -57,10 +57,12 @@ export const calculateRebuildLife = (
   let susBike;
   let ridesOnBike;
   let rideTimeSinceLastRebuild;
+  console.log(onBike);
   if (onBike.startsWith("b") && bikeOptions) {
     susBike = bikeOptions.find((bike) => bike.id === onBike);
     ridesOnBike = userRides.filter((ride) => ride.gear_id === susBike.id);
   }
+  // For known bikes, ridesOnBike is now true
   if (ridesOnBike) {
     rideTimeSinceLastRebuild = ridesOnBike.reduce((total, ride) => {
       if (moment(ride.ride_date).isAfter(rebuildDate)) {
@@ -68,6 +70,7 @@ export const calculateRebuildLife = (
       }
       return total;
     }, 0);
+    // For unknownBike, ridesOnBike is false
   } else {
     rideTimeSinceLastRebuild = userRides.reduce((total, ride) => {
       if (moment(ride.ride_date).isAfter(rebuildDate)) {
@@ -100,7 +103,6 @@ export const findSusIndexByID = (id, susOptions) => {
   return foundSusIndex;
 };
 
-
 const findSusInfoById = (sus) => {
   const susInfo = suspensionData.find(
     (susData) => sus.sus_data_id === susData.id
@@ -109,8 +111,10 @@ const findSusInfoById = (sus) => {
 };
 
 const findBikeDetailsById = (sus, bikeOptions) => {
-  if (bikeOptions.length > 0) {
-    return bikeOptions.find((bike) => bike.id === sus.on_bike_id);
+  const bikeResult = bikeOptions.find((bike) => bike.id === sus.on_bike_id);
+
+  if (bikeResult) {
+    return bikeResult;
   } else {
     return {
       id: "unknownBike",
@@ -144,8 +148,8 @@ export const convertSusToDatabaseFormat = (sus, userID) => {
     rebuild_date: sus.rebuildDate,
     sus_data_id: sus.susData.id,
     on_bike_id: sus.onBike.id,
-    date_created: new Date()
-  }
+    date_created: new Date(),
+  };
 
   return susDataConverted;
-}
+};
