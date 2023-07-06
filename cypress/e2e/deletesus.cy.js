@@ -18,6 +18,10 @@ describe('deleteSus', () => {
       body: JSON.stringify('New suspension added to DB: newSusData from test')
     })
 
+    // ADD INTERCEPT FOR DB DELETE
+
+    // ALSO NEED NEW TEST FOR FAILED DB DELETE
+
     cy.intercept('GET',`https://www.strava.com/api/v3/athlete/activities?page=1&per_page=200`, {
       fixture: 'RideData.json'
     })

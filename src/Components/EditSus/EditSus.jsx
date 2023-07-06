@@ -37,6 +37,7 @@ export default function EditSus({
   const [fetchCount, setFetchCount] = useState(pagesFetched);
   const [submitDisabled, setSubmitDisabled] = useState(false);
   const [submitError, setSubmitError] = useState(false);
+  const [databaseReqSuccess, setDatabaseReqSuccess] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -120,27 +121,41 @@ export default function EditSus({
       modifiedSus.onBike.id,
       userBikes
     );
-    let newUserSusArr = userSuspension;
-    newUserSusArr.splice(editSusIndex, 1, modifiedSus);
-    setUserSuspension(newUserSusArr);
-    window.localStorage.setItem(
-      "userSuspension",
-      JSON.stringify(newUserSusArr)
-    );
 
     const susDataConvertedForDatabase = convertSusToDatabaseFormat(modifiedSus);
 
     editUserSuspensionInDatabase(susDataConvertedForDatabase)
-    .then((response) => {
-        console.log(response)
-    })
-    .catch((error) => {
-      console.log(error)
-    })
+      .then((result) => {
+        setDatabaseReqSuccess(true);
+        console.log(result);
+      })
+      .catch((error) => {
+        setDatabaseReqSuccess(false);
+        console.log(error);
+        // Replace with more user friendly notification
+        alert(
+          "There was an issue modifying your suspension rebuild date. Please wait a moment then submit your request again."
+        );
+        // This is currently working to keep user on this page, but 
+        // need to figure out how to keep the editSusDetails and user
+        // "Currently: date" display from updating if error
+        // I think editSusDetails is changing based on lines 115 - 123
+        // when modifiedSus is assigned and then modified
+        // Maybe try making modifiedSus stateful?
+        console.log({editSusDetails})
+        console.log({modifiedSus})
+      });
 
-    setSelectedSuspension(null);
-    setPagesFetched(fetchCount);
-    navigate("/dashboard");
+    if (databaseReqSuccess) {
+      console.log("thinks DB successful")
+      let newUserSusArr = userSuspension;
+      newUserSusArr.splice(editSusIndex, 1, modifiedSus);
+      setUserSuspension(newUserSusArr);
+
+      setSelectedSuspension(null);
+      setPagesFetched(fetchCount);
+      navigate("/dashboard");
+    }
   };
 
   return (

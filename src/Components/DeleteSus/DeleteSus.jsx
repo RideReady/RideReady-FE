@@ -3,6 +3,7 @@ import "./DeleteSus.css";
 import { useNavigate } from "react-router-dom";
 import { findSusIndexByID } from "../../util";
 import PropTypes from "prop-types";
+import { deleteUserSuspensionInDatabase } from "../../Services/APICalls";
 
 export default function DeleteSus({
   setUserSuspension,
@@ -12,6 +13,7 @@ export default function DeleteSus({
 }) {
   const [deleteSusIndex, setDeleteSusIndex] = useState(null);
   const [deleteSusDetails, setDeleteSusDetails] = useState(null);
+  const [databaseReqSuccess, setDatabaseReqSuccess] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -36,19 +38,28 @@ export default function DeleteSus({
   }, [selectedSuspension, userSuspension]);
 
   const handleDelete = () => {
-    let newUserSusArr = userSuspension;
-    newUserSusArr.splice(deleteSusIndex, 1);
-    setUserSuspension(newUserSusArr);
-    window.localStorage.setItem(
-      "userSuspension",
-      JSON.stringify(newUserSusArr)
-      );
+    deleteUserSuspensionInDatabase(deleteSusDetails.id)
+      .then((result) => {
+        setDatabaseReqSuccess(true);
+        console.log(result);
+      })
+      .catch((error) => {
+        setDatabaseReqSuccess(false);
+        console.log(error);
+        // Replace with more user friendly notification
+        alert(
+          "There was an issue deleting your suspension. Please wait a moment then submit your request again."
+        );
+      });
 
-      // Delete from DB here
-      // Use deleteSusDetails.id to query and remove
+    if (databaseReqSuccess) {
+      let newUserSusArr = userSuspension;
+      newUserSusArr.splice(deleteSusIndex, 1);
+      setUserSuspension(newUserSusArr);
 
-    setSelectedSuspension(null);
-    navigate("/dashboard");
+      setSelectedSuspension(null);
+      navigate("/dashboard");
+    }
   };
 
   return (
@@ -77,9 +88,9 @@ export default function DeleteSus({
   );
 }
 
-DeleteSus.propTypes = { 
+DeleteSus.propTypes = {
   setUserSuspension: PropTypes.func,
   userSuspension: PropTypes.array,
   setSelectedSuspension: PropTypes.func,
   selectedSuspension: PropTypes.string,
-}
+};

@@ -18,6 +18,10 @@ describe('EditSus', () => {
       body: JSON.stringify('New suspension added to DB: newSusData from test')
     })
 
+    // ADD INTERCEPT FOR DB PATCH
+
+    // ALSO NEED NEW TEST FOR FAILED DB PATCH
+
     cy.intercept('GET',`https://www.strava.com/api/v3/athlete/activities?page=*`, {
       fixture: 'rideData.json'
     })

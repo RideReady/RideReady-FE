@@ -125,3 +125,21 @@ export const editUserSuspensionInDatabase = (susToEdit) => {
     }
   })
 }
+
+export const deleteUserSuspensionInDatabase = (susToDeleteId) => {
+  let url;
+  if (window.location.href.startsWith("http://localhost:5173")) {
+    url = `http://localhost:5001/suspension/${susToDeleteId}`;
+  } else {
+    url = `https://rideready-be.herokuapp.com/suspension/${susToDeleteId}`;
+  }
+  return fetch(url, {
+    method: "DELETE"
+  }).then((response) => {
+    if (response.ok) {
+      return response.json();
+    } else {
+      throw new Error();
+    }
+  })
+}
