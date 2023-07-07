@@ -13,7 +13,6 @@ export default function DeleteSus({
 }) {
   const [deleteSusIndex, setDeleteSusIndex] = useState(null);
   const [deleteSusDetails, setDeleteSusDetails] = useState(null);
-  const [databaseReqSuccess, setDatabaseReqSuccess] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -40,26 +39,21 @@ export default function DeleteSus({
   const handleDelete = () => {
     deleteUserSuspensionInDatabase(deleteSusDetails.id)
       .then((result) => {
-        setDatabaseReqSuccess(true);
         console.log(result);
+        let newUserSusArr = userSuspension;
+        newUserSusArr.splice(deleteSusIndex, 1);
+        setUserSuspension(newUserSusArr);
+
+        setSelectedSuspension(null);
+        navigate("/dashboard");
       })
       .catch((error) => {
-        setDatabaseReqSuccess(false);
         console.log(error);
         // Replace with more user friendly notification
         alert(
           "There was an issue deleting your suspension. Please wait a moment then submit your request again."
         );
       });
-
-    if (databaseReqSuccess) {
-      let newUserSusArr = userSuspension;
-      newUserSusArr.splice(deleteSusIndex, 1);
-      setUserSuspension(newUserSusArr);
-
-      setSelectedSuspension(null);
-      navigate("/dashboard");
-    }
   };
 
   return (

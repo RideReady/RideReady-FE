@@ -18,10 +18,6 @@ describe('deleteSus', () => {
       body: JSON.stringify('New suspension added to DB: newSusData from test')
     })
 
-    // ADD INTERCEPT FOR DB DELETE
-
-    // ALSO NEED NEW TEST FOR FAILED DB DELETE
-
     cy.intercept('GET',`https://www.strava.com/api/v3/athlete/activities?page=1&per_page=200`, {
       fixture: 'RideData.json'
     })
@@ -74,5 +70,18 @@ describe('deleteSus', () => {
 
     cy.get('p[class="add-new-mesg"]').should('have.text', "No suspension to view. Add a new suspension part by clicking the button below.")
   })
+
+  it("Should remain on the deleteSus page if the database delete request fails", () => {
+    cy.intercept("DELETE", "http://localhost:5001/suspension/*", {
+      statusCode: 500,
+      body: "Error deleting suspension: errorDetails",
+    });
+
+    cy.get("button").eq(0).click();
+
+    cy.get("button").eq(1).click();
+
+    cy.url().should("eq", "http://localhost:5173/dashboard/delete");
+  });
 
 })
