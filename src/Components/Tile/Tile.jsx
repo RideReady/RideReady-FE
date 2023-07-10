@@ -45,7 +45,7 @@ export default function Tile({ susDetails, setSelectedSuspension, id }) {
       >
         {rebuildLifeMessage}
       </h3>
-      <p>{`Last serviced: ${moment(susDetails.rebuildDate).format("ll")}`}</p>
+      <p>{`Last serviced: ${moment(susDetails.rebuildDate).format("MMMM D, YYYY")}`}</p>
       <a href={susDetails.susData.serviceLink}>
         <p>Link to service resource</p>
       </a>
