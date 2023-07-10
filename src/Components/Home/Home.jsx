@@ -6,7 +6,7 @@ export default function Home() {
     `${import.meta.env.VITE_CLIENT_ID}`
   );
   const [redirectUrl, setRedirectUrl] = useState(
-    "https://ride-ready.vercel.app/redirect"
+    "https://ride-ready-fe-vite.vercel.app/redirect"
   );
 
   useEffect(() => {

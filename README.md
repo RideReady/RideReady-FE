@@ -73,7 +73,7 @@ Built in 6 days for a Turing School of Software Mod 3 Showcase project. This req
   
 ## Deployed Link
 
-[Click here to view deployed app on Vercel](https://ride-ready.vercel.app/)
+[Click here to view deployed app on Vercel](https://ride-ready-fe-vite.vercel.app/)
 
 ---
 
