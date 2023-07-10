@@ -131,7 +131,7 @@ export const convertSuspensionFromDatabase = (sus, bikeOptions) => {
   const convertedSus = {
     id: sus.id,
     onBike: foundBike,
-    rebuildDate: new Date(sus.rebuild_date),
+    rebuildDate: sus.rebuild_date,
     rebuildLife: sus.rebuild_life,
     susData: foundSusInfo,
     dateCreated: sus.date_created,
