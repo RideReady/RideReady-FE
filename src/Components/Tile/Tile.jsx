@@ -45,8 +45,8 @@ export default function Tile({ susDetails, setSelectedSuspension, id }) {
       >
         {rebuildLifeMessage}
       </h3>
-      <p>{`Last serviced: ${moment(susDetails.rebuildDate).format("MMMM")} ${moment(susDetails.rebuildDate).format("Do")}, ${moment(susDetails.rebuildDate).format("YYYY")}`}</p>
-      <a href={susDetails.susData.serviceLink}>ll
+      <p>{`Last serviced: ${susDetails.rebuildDate}`}</p>
+      <a href={susDetails.susData.serviceLink}>
         <p>Link to service resource</p>
       </a>
       <div className="tile-button-section">
