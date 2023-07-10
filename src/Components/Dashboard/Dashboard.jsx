@@ -3,8 +3,17 @@ import { useNavigate } from "react-router-dom";
 import Container from "../Container/Container";
 import "./Dashboard.css";
 import PropTypes from "prop-types";
-import { loadUserSuspensionFromDatabase } from "../../Services/APICalls";
-import { calculateRebuildLife, convertSuspensionFromDatabase, isNewestRideAfterLastCalculated } from "../../util";
+import {
+  editUserSuspensionInDatabase,
+  loadUserSuspensionFromDatabase,
+} from "../../Services/APICalls";
+import {
+  calculateRebuildLife,
+  convertSuspensionFromDatabase,
+  isNewestRideAfterLastCalculated,
+  filterRidesForSpecificBike,
+  convertSusToDatabaseFormat,
+} from "../../util";
 
 export default function Dashboard({
   userID,
@@ -13,11 +22,11 @@ export default function Dashboard({
   setSelectedSuspension,
   userBikes,
   // setUserBikes,
-  userRides
+  userRides,
 }) {
   const [loadingSus, setLoadingSus] = useState("");
   const [buttonLink, setButtonLink] = useState("/dashboard/add-new-part");
-  const [buttonMsg, setButtonMsg] = useState("Add new suspension")
+  const [buttonMsg, setButtonMsg] = useState("Add new suspension");
   const navigate = useNavigate();
 
   // Need to replace this LS func with a call to Strava for bikes
@@ -39,52 +48,83 @@ export default function Dashboard({
   useEffect(() => {
     if (userID === null || userBikes === null) return;
     if (!userSuspension) {
-      setLoadingSus("loading")
-      loadUserSuspensionFromDatabase(userID).then((result) => {
-        if (result.suspension && result.suspension.length > 0) {
-          const convertedDBSus = result.suspension.map((sus) =>
-          convertSuspensionFromDatabase(sus, userBikes)
-          );
-          console.log(`User suspension loaded from DB`, convertedDBSus);
-          setUserSuspension(convertedDBSus);
-          setLoadingSus("");
-        } else {
-          console.log(`No suspension loaded from DB for userID: ${userID}`);
+      setLoadingSus("loading");
+      loadUserSuspensionFromDatabase(userID)
+        .then((result) => {
+          if (result.suspension && result.suspension.length > 0) {
+            const convertedDBSus = result.suspension.map((sus) =>
+              convertSuspensionFromDatabase(sus, userBikes)
+            );
+            console.log(`User suspension loaded from DB`, convertedDBSus);
+            setUserSuspension(convertedDBSus);
+            setLoadingSus("");
+          } else {
+            console.log(`No suspension loaded from DB for userID: ${userID}`);
+            setUserSuspension([]);
+            setLoadingSus("");
+          }
+        })
+        .catch((error) => {
+          console.log(error);
+          setLoadingSus("error");
           setUserSuspension([]);
-          setLoadingSus("");
-        }
-      }).catch((error) => {
-        console.log(error)
-        setLoadingSus("error")
-        setUserSuspension([])
-        setButtonLink("/")
-        setButtonMsg("Return to login page")
-      })
+          setButtonLink("/");
+          setButtonMsg("Return to login page");
+        });
     }
-
   }, [userSuspension, userID, userBikes, setUserSuspension]);
 
   useEffect(() => {
-    // Need to recalculate service life based on the new ride data here
-
-    // Create a func to test the most recent userRide loaded vs.
-    // the suspension's last_ride_calculated. If the suspension ride date
-    // is prior to the latest userRide loaded for that particular
-    // bike, then recalculate else do not.
+    // THIS NEEDS TO BE TESTED
 
     if (!userSuspension || !userRides || !userBikes) return;
+    let userSusStateNeedsReset = false;
 
-    userSuspension.forEach((sus) => {
-      if(isNewestRideAfterLastCalculated(userRides, sus)) {
-        console.log(`${sus.id} needs recalculation`)
-        const newRebuildLife = calculateRebuildLife(sus.id, sus.rebuildDate, userRides, sus.onBike.id, userBikes)
-        console.log(`New rebuild life is ${newRebuildLife} for ${sus.id}`)
-      } else {
-        console.log(`${sus.id} does not need recalculation`)
+    const recalculatedUserSus = userSuspension.map((sus) => {
+      console.log(sus);
+      const susNeedsRecalc = isNewestRideAfterLastCalculated(userRides, sus);
+      if (susNeedsRecalc === true) {
+        console.log(`${sus.id} needs recalculation`);
+        userSusStateNeedsReset = true;
+        const newRebuildLife = calculateRebuildLife(
+          sus.susData.id,
+          sus.rebuildDate,
+          userRides,
+          sus.onBike.id,
+          userBikes
+        );
+        console.log(`New rebuild life is ${newRebuildLife} for ${sus.id}`);
+
+        let updatedSus = JSON.parse(JSON.stringify(sus));
+        updatedSus.rebuildLife = newRebuildLife;
+        const newestRideOnBikeDate = filterRidesForSpecificBike(
+          userRides,
+          sus.onBike
+        )[0].ride_date;
+        updatedSus.lastRideCalculated = newestRideOnBikeDate;
+
+        const susDataToPatch = convertSusToDatabaseFormat(updatedSus, userID);
+        editUserSuspensionInDatabase(susDataToPatch)
+          .then((result) => {
+            console.log(result);
+          })
+          .catch((error) => {
+            console.log(
+              `There was an error updating rebuild life based on new ride data. ${error}`
+            );
+          });
+
+        return updatedSus;
+      } else if (susNeedsRecalc === false) {
+        console.log(`${sus.id} does not need recalculation`);
+        return sus;
       }
+    });
 
-    })
-  }, [userSuspension, userBikes, userRides])
+    if (userSusStateNeedsReset) {
+      setUserSuspension(recalculatedUserSus)
+    }
+  }, [userSuspension, userBikes, userRides, userID, setUserSuspension]);
 
   return (
     <section className="dashboard">
@@ -94,10 +134,7 @@ export default function Dashboard({
         setSelectedSuspension={setSelectedSuspension}
         loadingSus={loadingSus}
       />
-      <button
-        id="dash-add-sus"
-        onClick={() => navigate(buttonLink)}
-      >
+      <button id="dash-add-sus" onClick={() => navigate(buttonLink)}>
         {buttonMsg}
       </button>
     </section>
@@ -111,5 +148,5 @@ Dashboard.propTypes = {
   setSelectedSuspension: PropTypes.func,
   userBikes: PropTypes.array,
   setUserBikes: PropTypes.func,
-  userRides: PropTypes.array
+  userRides: PropTypes.array,
 };
