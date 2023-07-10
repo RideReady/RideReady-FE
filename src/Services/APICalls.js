@@ -1,6 +1,6 @@
 // STRAVA API Calls
 
-const getAccessToken = (userAuthToken) => {
+export const getAccessToken = (userAuthToken) => {
   let clientID = `${import.meta.env.VITE_CLIENT_ID}`;
   let clientSecret = `${import.meta.env.VITE_CLIENT_SECRET}`;
 
@@ -26,7 +26,9 @@ const getAccessToken = (userAuthToken) => {
   });
 };
 
-const getUserDetails = (userAccessToken) => {
+// Not using this but may in down the road, works for
+// fetching all user information
+export const getUserDetails = (userAccessToken) => {
   return fetch("https://www.strava.com/api/v3/athlete", {
     headers: {
       Authorization: `Bearer ${userAccessToken}`,
@@ -39,7 +41,7 @@ const getUserDetails = (userAccessToken) => {
   });
 };
 
-const getUserActivities = (pageNum, userAccessToken) => {
+export const getUserActivities = (pageNum, userAccessToken) => {
   return fetch(
     `https://www.strava.com/api/v3/athlete/activities?page=${pageNum}&per_page=200`,
     {
@@ -55,7 +57,7 @@ const getUserActivities = (pageNum, userAccessToken) => {
   });
 };
 
-const getUserGearDetails = (id, userAccessToken) => {
+export const getUserGearDetails = (id, userAccessToken) => {
   return fetch(`https://www.strava.com/api/v3/gear/${id}`, {
     headers: {
       Authorization: `Bearer ${userAccessToken}`,
@@ -70,19 +72,32 @@ const getUserGearDetails = (id, userAccessToken) => {
 
 // Heroku BE Database API Calls
 
-const postNewUserToDatabase = (user) => {
+export const loadUserSuspensionFromDatabase = (userID) => {
   let url;
   if (window.location.href.startsWith("http://localhost:5173")) {
-    url = "http://localhost:5001/users";
+    url = `http://localhost:5001/suspension/${userID}`;
   } else {
-    url = "https://rideready-be.herokuapp.com/users";
+    url = `https://rideready-be.herokuapp.com/suspension/${userID}`;
+  }
+  return fetch(url).then((response) => {
+    if (response.ok) {
+      return response.json();
+    }
+    throw new Error();
+  });
+};
+
+export const postUserSuspensionToDatabase = (newSus) => {
+  let url;
+  if (window.location.href.startsWith("http://localhost:5173")) {
+    url = `http://localhost:5001/suspension`;
+  } else {
+    url = `https://rideready-be.herokuapp.com/suspension`;
   }
   return fetch(url, {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(user),
+    headers: { "Content-Type": "application/JSON" },
+    body: JSON.stringify(newSus),
   }).then((response) => {
     if (response.ok) {
       return response.json();
@@ -91,10 +106,40 @@ const postNewUserToDatabase = (user) => {
   });
 };
 
-export {
-  getAccessToken,
-  getUserDetails,
-  getUserActivities,
-  getUserGearDetails,
-  postNewUserToDatabase
-};
+export const editUserSuspensionInDatabase = (susToEdit) => {
+  let url;
+  if (window.location.href.startsWith("http://localhost:5173")) {
+    url = `http://localhost:5001/suspension/${susToEdit.id}`;
+  } else {
+    url = `https://rideready-be.herokuapp.com/suspension/${susToEdit.id}`;
+  }
+  return fetch(url, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/JSON" },
+    body: JSON.stringify(susToEdit),
+  }).then((response) => {
+    if (response.ok) {
+      return response.json();
+    } else {
+      throw new Error();
+    }
+  })
+}
+
+export const deleteUserSuspensionInDatabase = (susToDeleteId) => {
+  let url;
+  if (window.location.href.startsWith("http://localhost:5173")) {
+    url = `http://localhost:5001/suspension/${susToDeleteId}`;
+  } else {
+    url = `https://rideready-be.herokuapp.com/suspension/${susToDeleteId}`;
+  }
+  return fetch(url, {
+    method: "DELETE"
+  }).then((response) => {
+    if (response.ok) {
+      return response.json();
+    } else {
+      throw new Error();
+    }
+  })
+}

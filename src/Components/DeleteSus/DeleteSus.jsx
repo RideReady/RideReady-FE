@@ -3,6 +3,7 @@ import "./DeleteSus.css";
 import { useNavigate } from "react-router-dom";
 import { findSusIndexByID } from "../../util";
 import PropTypes from "prop-types";
+import { deleteUserSuspensionInDatabase } from "../../Services/APICalls";
 
 export default function DeleteSus({
   setUserSuspension,
@@ -29,23 +30,30 @@ export default function DeleteSus({
   }, []);
 
   useEffect(() => {
-    if (!(selectedSuspension || userSuspension)) return;
+    if (!selectedSuspension || !userSuspension) return;
     const index = findSusIndexByID(selectedSuspension, userSuspension);
     setDeleteSusDetails(userSuspension[index]);
     setDeleteSusIndex(index);
-    // eslint-disable-next-line
   }, [selectedSuspension, userSuspension]);
 
   const handleDelete = () => {
-    let newUserSusArr = userSuspension;
-    newUserSusArr.splice(deleteSusIndex, 1);
-    setUserSuspension(newUserSusArr);
-    window.localStorage.setItem(
-      "userSuspension",
-      JSON.stringify(newUserSusArr)
-    );
-    setSelectedSuspension(null);
-    navigate("/dashboard");
+    deleteUserSuspensionInDatabase(deleteSusDetails.id)
+      .then((result) => {
+        console.log(result);
+        let newUserSusArr = userSuspension;
+        newUserSusArr.splice(deleteSusIndex, 1);
+        setUserSuspension(newUserSusArr);
+
+        setSelectedSuspension(null);
+        navigate("/dashboard");
+      })
+      .catch((error) => {
+        console.log(error);
+        // Replace with more user friendly notification
+        alert(
+          "There was an issue deleting your suspension. Please wait a moment then submit your request again."
+        );
+      });
   };
 
   return (
@@ -74,9 +82,9 @@ export default function DeleteSus({
   );
 }
 
-DeleteSus.propTypes = { 
+DeleteSus.propTypes = {
   setUserSuspension: PropTypes.func,
   userSuspension: PropTypes.array,
   setSelectedSuspension: PropTypes.func,
   selectedSuspension: PropTypes.string,
-}
+};

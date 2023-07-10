@@ -1,3 +1,4 @@
+/* global Cypress, cy, describe, beforeEach, it */
 describe('Login', () => {
 
   beforeEach(() => {

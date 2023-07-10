@@ -1,15 +1,19 @@
 import { useEffect, useState } from "react";
 import "./EditSus.css";
 import { useNavigate } from "react-router-dom";
-import { findSusIndexByID } from "../../util";
+import { convertSusToDatabaseFormat, findSusIndexByID } from "../../util";
 import moment from "moment";
 import {
   calculateRebuildLife,
   isOldestRideBeforeRebuild,
   filterRideActivities,
   cleanRideData,
+  filterRidesForSpecificBike
 } from "../../util";
-import { getUserActivities } from "../../Services/APICalls";
+import {
+  editUserSuspensionInDatabase,
+  getUserActivities,
+} from "../../Services/APICalls";
 import PropTypes from "prop-types";
 
 export default function EditSus({
@@ -26,6 +30,7 @@ export default function EditSus({
   userBikes,
   setUserBikes,
   changeErrorMessage,
+  userID
 }) {
   const [newRebuildDate, setNewRebuildDate] = useState("");
   const [editSusIndex, setEditSusIndex] = useState(null);
@@ -63,11 +68,10 @@ export default function EditSus({
   }, []);
 
   useEffect(() => {
-    if (!(selectedSuspension || userSuspension)) return;
+    if (!selectedSuspension || !userSuspension) return;
     const index = findSusIndexByID(selectedSuspension, userSuspension);
-    setEditSusDetails(userSuspension[index]);
     setEditSusIndex(index);
-    // eslint-disable-next-line
+    setEditSusDetails(userSuspension[index]);
   }, [selectedSuspension, userSuspension]);
 
   useEffect(() => {
@@ -109,7 +113,8 @@ export default function EditSus({
       return;
     }
 
-    const modifiedSus = editSusDetails;
+    // Deep copy creation using JSON to prevent changes to editSusDetails
+    const modifiedSus = JSON.parse(JSON.stringify(editSusDetails));
     modifiedSus.rebuildDate = newRebuildDate;
     modifiedSus.rebuildLife = calculateRebuildLife(
       modifiedSus.susData.id,
@@ -118,17 +123,32 @@ export default function EditSus({
       modifiedSus.onBike.id,
       userBikes
     );
-    let newUserSusArr = userSuspension;
-    newUserSusArr.splice(editSusIndex, 1, modifiedSus);
-    setUserSuspension(newUserSusArr);
-    window.localStorage.setItem(
-      "userSuspension",
-      JSON.stringify(newUserSusArr)
-    );
+    const newestRideOnBikeDate = filterRidesForSpecificBike(
+      userRides,
+      modifiedSus.onBike
+    )[0].ride_date;
+    modifiedSus.lastRideCalculated = newestRideOnBikeDate;
 
-    setSelectedSuspension(null);
-    setPagesFetched(fetchCount);
-    navigate("/dashboard");
+    const susDataConvertedForDatabase = convertSusToDatabaseFormat(modifiedSus);
+
+    editUserSuspensionInDatabase(susDataConvertedForDatabase)
+      .then((result) => {
+        console.log(result.message);
+        let newUserSusArr = JSON.parse(JSON.stringify(userSuspension, userID));
+        newUserSusArr.splice(editSusIndex, 1, modifiedSus);
+        setUserSuspension(newUserSusArr);
+
+        setSelectedSuspension(null);
+        setPagesFetched(fetchCount);
+        navigate("/dashboard");
+      })
+      .catch((error) => {
+        console.log(error);
+        // Replace with more user friendly notification
+        alert(
+          "There was an issue modifying your suspension rebuild date. Please wait a moment then submit your request again."
+        );
+      });
   };
 
   return (
@@ -197,4 +217,5 @@ EditSus.propTypes = {
   userBikes: PropTypes.array,
   setUserBikes: PropTypes.func,
   changeErrorMessage: PropTypes.func,
+  userID: PropTypes.number
 };

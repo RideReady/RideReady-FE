@@ -7,11 +7,16 @@ import {
   isOldestRideBeforeRebuild,
   filterRideActivities,
   cleanRideData,
+  convertSusToDatabaseFormat,
+  filterRidesForSpecificBike,
 } from "../../util";
-import { getUserActivities } from "../../Services/APICalls";
+import { getUserActivities, postUserSuspensionToDatabase } from "../../Services/APICalls";
 import { useNavigate } from "react-router-dom";
+import { v4 as uuidv4 } from 'uuid';
+
 
 export default function NewPartForm({
+  userID,
   userBikes,
   setUserBikes,
   userRides,
@@ -24,7 +29,6 @@ export default function NewPartForm({
   setPagesFetched,
   changeErrorMessage,
 }) {
-  // eslint-disable-next-line
   const [bikeOptions, setBikeOptions] = useState(userBikes);
   const [bikeDropdownOptions, setBikeDropdownOptions] = useState([]);
   const [selectedBike, setSelectedBike] = useState("");
@@ -127,22 +131,26 @@ export default function NewPartForm({
       return;
     }
 
-    const selectedSuspensionName = suspensionData.find(
+    // Add to utils - using in Util as helper for Dashboard func
+    const selectedSuspensionData = suspensionData.find(
       (sus) => sus.id === +selectedSus
     );
-    let selectedBikeName;
+
+    // Add to utils - using in Util as helper for Dashboard func
+    let selectedBikeDetails;
     if (bikeOptions) {
-      selectedBikeName = bikeOptions.find((bike) => bike.id === selectedBike);
+      selectedBikeDetails = bikeOptions.find((bike) => bike.id === selectedBike);
     } else {
-      selectedBikeName = null;
+      selectedBikeDetails = null;
     }
 
-    const newSuspensionData = {
-      susData: selectedSuspensionName,
-      onBike: selectedBikeName || {
-        id: Date.now().toString(),
-        brand_name: "Unlisted",
-        model_name: "bike",
+    const newSuspensionDetails = {
+      id: uuidv4(),
+      susData: selectedSuspensionData,
+      onBike: selectedBikeDetails || {
+        id: "unknownBike",
+        brand_name: "Unknown",
+        model_name: "Bike"
       },
       rebuildDate: selectedRebuildDate,
       rebuildLife: calculateRebuildLife(
@@ -152,19 +160,32 @@ export default function NewPartForm({
         selectedBike,
         userBikes
       ),
+      lastRideCalculated: filterRidesForSpecificBike(userRides, selectedBikeDetails)[0].ride_date
     };
 
+    console.log(newSuspensionDetails)
+
+    const newSusPostData = convertSusToDatabaseFormat(newSuspensionDetails, userID)
+
+    postUserSuspensionToDatabase(newSusPostData)
+    .then((response) => {
+      console.log(response)
+    })
+    .catch((error) => {
+      console.log(error)
+    })
+
     if (userSuspension) {
-      setUserSuspension([...userSuspension, newSuspensionData]);
+      setUserSuspension([...userSuspension, newSuspensionDetails]);
       window.localStorage.setItem(
         "userSuspension",
-        JSON.stringify([...userSuspension, newSuspensionData])
+        JSON.stringify([...userSuspension, newSuspensionDetails])
       );
     } else {
-      setUserSuspension([newSuspensionData]);
+      setUserSuspension([newSuspensionDetails]);
       window.localStorage.setItem(
         "userSuspension",
-        JSON.stringify([newSuspensionData])
+        JSON.stringify([newSuspensionDetails])
       );
     }
 
@@ -209,10 +230,10 @@ export default function NewPartForm({
         />
       </form>
       <div className="newpartform-button-section">
+        <button onClick={() => navigate("/dashboard")}>Back</button>
         <button onClick={() => handleSubmit()} disabled={submitDisabled}>
           Submit
         </button>
-        <button onClick={() => navigate("/dashboard")}>Back</button>
       </div>
       {submitError && (
         <p className="error-wait-message">
@@ -231,6 +252,7 @@ export default function NewPartForm({
 }
 
 NewPartForm.propTypes = {
+  userID: PropTypes.number,
   userBikes: PropTypes.array,
   setUserBikes: PropTypes.func,
   userRides: PropTypes.array,

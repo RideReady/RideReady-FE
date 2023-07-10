@@ -21,6 +21,7 @@ export const cleanRideData = (rides) => {
   const cleanedRides = rides.map((ride) => {
     return {
       id: ride.id,
+      user_id: ride.athlete.id,
       ride_duration: ride.moving_time,
       ride_distance: ride.distance,
       ride_date: ride.start_date,
@@ -56,10 +57,12 @@ export const calculateRebuildLife = (
   let susBike;
   let ridesOnBike;
   let rideTimeSinceLastRebuild;
+
   if (onBike.startsWith("b") && bikeOptions) {
     susBike = bikeOptions.find((bike) => bike.id === onBike);
     ridesOnBike = userRides.filter((ride) => ride.gear_id === susBike.id);
   }
+  // For known bikes, ridesOnBike is now true
   if (ridesOnBike) {
     rideTimeSinceLastRebuild = ridesOnBike.reduce((total, ride) => {
       if (moment(ride.ride_date).isAfter(rebuildDate)) {
@@ -67,6 +70,7 @@ export const calculateRebuildLife = (
       }
       return total;
     }, 0);
+    // For unknownBike, ridesOnBike is false
   } else {
     rideTimeSinceLastRebuild = userRides.reduce((total, ride) => {
       if (moment(ride.ride_date).isAfter(rebuildDate)) {
@@ -95,11 +99,76 @@ export const isOldestRideBeforeRebuild = (rides, rebuildDate) => {
 };
 
 export const findSusIndexByID = (id, susOptions) => {
-  const splitIDArr = id.split("+");
-  const bikeID = splitIDArr[0];
-  const susID = +splitIDArr[1];
-  const foundSusIndex = susOptions.findIndex((sus) => {
-    return sus.onBike.id === bikeID && sus.susData.id === susID;
-  });
+  const foundSusIndex = susOptions.findIndex((sus) => sus.id === id);
   return foundSusIndex;
+};
+
+const findSusInfoById = (sus) => {
+  const susInfo = suspensionData.find(
+    (susData) => sus.sus_data_id === susData.id
+  );
+  return susInfo;
+};
+
+const findBikeDetailsById = (sus, bikeOptions) => {
+  const bikeResult = bikeOptions.find((bike) => bike.id === sus.on_bike_id);
+
+  if (bikeResult) {
+    return bikeResult;
+  } else {
+    return {
+      id: "unknownBike",
+      brand_name: "Unknown",
+      model_name: "Bike",
+    };
+  }
+};
+
+export const convertSuspensionFromDatabase = (sus, bikeOptions) => {
+  const foundBike = findBikeDetailsById(sus, bikeOptions);
+  const foundSusInfo = findSusInfoById(sus);
+
+  const convertedSus = {
+    id: sus.id,
+    onBike: foundBike,
+    rebuildDate: sus.rebuild_date,
+    rebuildLife: sus.rebuild_life,
+    susData: foundSusInfo,
+    dateCreated: sus.date_created,
+    lastRideCalculated: sus.last_ride_calculated,
+  };
+
+  return convertedSus;
+};
+
+export const convertSusToDatabaseFormat = (sus, userID) => {
+  const susDataConverted = {
+    id: sus.id,
+    user_id: userID,
+    rebuild_life: sus.rebuildLife,
+    rebuild_date: sus.rebuildDate,
+    sus_data_id: sus.susData.id,
+    on_bike_id: sus.onBike.id,
+    date_created: new Date(),
+    last_ride_calculated: sus.lastRideCalculated
+  };
+
+  return susDataConverted;
+};
+
+export const isNewestRideAfterLastCalculated = (userRides, sus) => {
+  const lastRideCalculatedDate = sus.lastRideCalculated;
+  const newestRideOnBikeDate = filterRidesForSpecificBike(userRides, sus.onBike)[0].ride_date;
+
+  if (moment(newestRideOnBikeDate).isAfter(lastRideCalculatedDate)) {
+    return true;
+  } else {
+    return false;
+  }
+};
+
+// Could above functions be refactored to use this?
+export const filterRidesForSpecificBike = (userRides, onBike) => {
+  const filteredRides = userRides.filter((ride) => ride.gear_id === onBike.id);
+  return filteredRides;
 };

@@ -1,6 +1,7 @@
+/* global cy, describe, beforeEach, it */
 describe('Home', () => {
   beforeEach(() => {
-    cy.visit('http://localhost:3000/')
+    cy.visit('http://localhost:5173/')
   })
     
   it('Should display the site title, tagline and login button', () => {
@@ -10,7 +11,7 @@ describe('Home', () => {
   })
 
   it('Should show an error on a bad url request', () => {
-    cy.visit('http://localhost:3000/ergheth')
+    cy.visit('http://localhost:5173/ergheth')
     cy.get('p').should('have.text', 'Oops, no page exists here. Sending you back to the home page.')
   })
 })

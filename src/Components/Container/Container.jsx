@@ -3,35 +3,40 @@ import "./Container.css";
 import PropTypes from "prop-types";
 import Tile from "../Tile/Tile";
 
-export default function Container({ userSuspension, setSelectedSuspension }) {
+export default function Container({
+  userSuspension,
+  setSelectedSuspension,
+  loadingSus,
+}) {
   const [susTiles, setSusTiles] = useState([]);
-  const noSusMessage = (
-    <p className="add-new-mesg">
-      No suspension to view. Add a new suspension part by clicking the button
-      below.
-    </p>
-  );
+  const [dashboardMessage, setDashboardMessage] = useState("Loading your suspension...");
 
   useEffect(() => {
-    if (userSuspension) {
+    if (!userSuspension) return;
+    if (userSuspension.length > 0 && !loadingSus) {
+      setDashboardMessage(null);
       const suspensionTiles = userSuspension.map((sus) => {
         return (
           <Tile
             susDetails={sus}
             setSelectedSuspension={setSelectedSuspension}
-            id={`${sus.onBike.id}+${sus.susData.id}`}
-            key={`${sus.onBike.id}+${sus.susData.id}`}
+            id={sus.id}
+            key={sus.id}
           />
         );
       });
       setSusTiles(suspensionTiles);
+    } else if (loadingSus == "error") {
+      setDashboardMessage("An error occurred while loading your suspension. Please click the button below to try logging in again.");
+    } else if (!loadingSus && userSuspension.length <= 0) {
+      setDashboardMessage("No suspension to view. Add a new suspension part by clicking the button below.")
     }
     // eslint-disable-next-line
-  }, [userSuspension]);
+  }, [userSuspension, loadingSus]);
 
   return (
     <section className="container">
-      {(userSuspension === null || userSuspension.length === 0) && noSusMessage}
+      {dashboardMessage ? <p className="add-new-mesg">{dashboardMessage}</p> : null}
       {susTiles}
     </section>
   );
@@ -39,5 +44,6 @@ export default function Container({ userSuspension, setSelectedSuspension }) {
 
 Container.propTypes = {
   userSuspension: PropTypes.array,
-  setSelectedSuspension: PropTypes.func
+  setSelectedSuspension: PropTypes.func,
+  loadingSus: PropTypes.string,
 };
