@@ -9,7 +9,9 @@ export default function Tile({ susDetails, setSelectedSuspension, id }) {
   const [rebuildLifeBad, setRebuildLifeBad] = useState("");
 
   const rebuildLifePercentage = (susDetails.rebuildLife * 100).toFixed(0);
-  const lastRebuildDateDisplay = moment(susDetails.rebuildDate.toLocaleString()).format("ll")
+  const lastRebuildDateDisplay = moment(
+    susDetails.rebuildDate.slice(0, 10)
+  ).format("ll");
 
   const bikeDisplayMessage = () => {
     if (susDetails.onBike.brand_name && susDetails.onBike.model_name) {
@@ -51,7 +53,7 @@ export default function Tile({ susDetails, setSelectedSuspension, id }) {
         <p>Link to service resource</p>
       </a>
       <div className="tile-button-section">
-      <NavLink to={"/dashboard/delete"}>
+        <NavLink to={"/dashboard/delete"}>
           <button
             onClick={() => {
               setSelectedSuspension(id);
