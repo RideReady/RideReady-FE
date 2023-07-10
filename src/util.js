@@ -57,7 +57,7 @@ export const calculateRebuildLife = (
   let susBike;
   let ridesOnBike;
   let rideTimeSinceLastRebuild;
-  console.log(onBike);
+
   if (onBike.startsWith("b") && bikeOptions) {
     susBike = bikeOptions.find((bike) => bike.id === onBike);
     ridesOnBike = userRides.filter((ride) => ride.gear_id === susBike.id);
@@ -135,6 +135,7 @@ export const convertSuspensionFromDatabase = (sus, bikeOptions) => {
     rebuildLife: sus.rebuild_life,
     susData: foundSusInfo,
     dateCreated: sus.date_created,
+    lastRideCalculated: sus.last_ride_calculated,
   };
 
   return convertedSus;
@@ -149,7 +150,25 @@ export const convertSusToDatabaseFormat = (sus, userID) => {
     sus_data_id: sus.susData.id,
     on_bike_id: sus.onBike.id,
     date_created: new Date(),
+    last_ride_calculated: sus.lastRideCalculated
   };
 
   return susDataConverted;
+};
+
+export const isNewestRideAfterLastCalculated = (userRides, sus) => {
+  const lastRideCalculatedDate = sus.lastRideCalculated;
+  const newestRideOnBikeDate = filterRidesForSpecificBike(userRides, sus.onBike)[0].ride_date;
+
+  if (moment(newestRideOnBikeDate).isAfter(lastRideCalculatedDate)) {
+    return true;
+  } else {
+    return false;
+  }
+};
+
+// Could above functions be refactored to use this?
+export const filterRidesForSpecificBike = (userRides, onBike) => {
+  const filteredRides = userRides.filter((ride) => ride.gear_id === onBike.id);
+  return filteredRides;
 };

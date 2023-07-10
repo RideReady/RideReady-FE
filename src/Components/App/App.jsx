@@ -56,6 +56,7 @@ export default function App() {
               setSelectedSuspension={setSelectedSuspension}
               userBikes={userBikes}
               setUserBikes={setUserBikes}
+              userRides={userRides}
             />
           }
         />

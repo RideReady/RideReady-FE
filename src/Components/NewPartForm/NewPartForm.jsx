@@ -8,6 +8,7 @@ import {
   filterRideActivities,
   cleanRideData,
   convertSusToDatabaseFormat,
+  filterRidesForSpecificBike,
 } from "../../util";
 import { getUserActivities, postUserSuspensionToDatabase } from "../../Services/APICalls";
 import { useNavigate } from "react-router-dom";
@@ -159,7 +160,10 @@ export default function NewPartForm({
         selectedBike,
         userBikes
       ),
+      lastRideCalculated: filterRidesForSpecificBike(userRides, selectedBikeDetails)[0].ride_date
     };
+
+    console.log(newSuspensionDetails)
 
     const newSusPostData = convertSusToDatabaseFormat(newSuspensionDetails, userID)
 
