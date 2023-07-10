@@ -8,6 +8,7 @@ import {
   isOldestRideBeforeRebuild,
   filterRideActivities,
   cleanRideData,
+  filterRidesForSpecificBike
 } from "../../util";
 import {
   editUserSuspensionInDatabase,
@@ -29,6 +30,7 @@ export default function EditSus({
   userBikes,
   setUserBikes,
   changeErrorMessage,
+  userID
 }) {
   const [newRebuildDate, setNewRebuildDate] = useState("");
   const [editSusIndex, setEditSusIndex] = useState(null);
@@ -121,13 +123,18 @@ export default function EditSus({
       modifiedSus.onBike.id,
       userBikes
     );
+    const newestRideOnBikeDate = filterRidesForSpecificBike(
+      userRides,
+      modifiedSus.onBike
+    )[0].ride_date;
+    modifiedSus.lastRideCalculated = newestRideOnBikeDate;
 
     const susDataConvertedForDatabase = convertSusToDatabaseFormat(modifiedSus);
 
     editUserSuspensionInDatabase(susDataConvertedForDatabase)
       .then((result) => {
         console.log(result.message);
-        let newUserSusArr = userSuspension;
+        let newUserSusArr = JSON.parse(JSON.stringify(userSuspension, userID));
         newUserSusArr.splice(editSusIndex, 1, modifiedSus);
         setUserSuspension(newUserSusArr);
 
@@ -210,4 +217,5 @@ EditSus.propTypes = {
   userBikes: PropTypes.array,
   setUserBikes: PropTypes.func,
   changeErrorMessage: PropTypes.func,
+  userID: PropTypes.number
 };
