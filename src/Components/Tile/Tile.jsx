@@ -9,6 +9,7 @@ export default function Tile({ susDetails, setSelectedSuspension, id }) {
   const [rebuildLifeBad, setRebuildLifeBad] = useState("");
 
   const rebuildLifePercentage = (susDetails.rebuildLife * 100).toFixed(0);
+  const rebuildDate = moment(susDetails.rebuildDate).format("ll");
 
   const bikeDisplayMessage = () => {
     if (susDetails.onBike.brand_name && susDetails.onBike.model_name) {
@@ -45,7 +46,7 @@ export default function Tile({ susDetails, setSelectedSuspension, id }) {
       >
         {rebuildLifeMessage}
       </h3>
-      <p>{`Last serviced: ${susDetails.rebuildDate}`}</p>
+      <p>{`Last serviced: ${rebuildDate}`}</p>
       <a href={susDetails.susData.serviceLink}>
         <p>Link to service resource</p>
       </a>
