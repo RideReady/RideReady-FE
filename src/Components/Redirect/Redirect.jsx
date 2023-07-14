@@ -25,6 +25,8 @@ export default function Redirect({
   setUserRides,
   userRides,
   changeErrorMessage,
+  // userBikes,
+  // userID
 }) {
   const [userGear, setUserGear] = useState("");
   const navigate = useNavigate();
@@ -66,10 +68,14 @@ export default function Redirect({
         if (cleanedRides) {
           setUserRides(cleanedRides);
           setUserID(cleanedRides[0].user_id);
-          // window.localStorage.setItem(
-          //   "userRides",
-          //   JSON.stringify(cleanedRides)
-          // );
+          window.localStorage.setItem(
+            "userRides",
+            JSON.stringify(cleanedRides)
+          );
+          window.localStorage.setItem(
+            "userID",
+            JSON.stringify(cleanedRides[0].user_id)
+          );
         }
       })
       .catch(() => {
@@ -95,12 +101,16 @@ export default function Redirect({
       userGear.map((gearID) => getUserGearDetails(gearID, userAccessToken))
     )
       .then((details) => {
-        setUserBikes(
-          details.map((detail) => ({
+        
+          const userBikeDetails = details.map((detail) => ({
             id: detail.id,
             brand_name: detail.brand_name,
             model_name: detail.model_name,
           }))
+        setUserBikes(userBikeDetails)
+        window.localStorage.setItem(
+          "userBikes",
+          JSON.stringify(userBikeDetails)
         );
         navigate("/dashboard", { replace: true });
       })
@@ -139,4 +149,6 @@ Redirect.propTypes = {
   setUserRides: PropTypes.func,
   userRides: PropTypes.array,
   changeErrorMessage: PropTypes.func,
+  userBikes: PropTypes.array,
+  userID: PropTypes.string
 };

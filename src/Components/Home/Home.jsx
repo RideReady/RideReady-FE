@@ -10,10 +10,12 @@ export default function Home() {
   );
 
   useEffect(() => {
-    // window.localStorage.setItem("userAccessToken", JSON.stringify(null));
-    // window.localStorage.setItem("userRides", JSON.stringify(null));
-    // window.localStorage.setItem("userBikes", JSON.stringify(null));
-    // window.localStorage.setItem("selectedSuspension", JSON.stringify(null));
+    window.localStorage.setItem("userAccessToken", JSON.stringify(null));
+    window.localStorage.setItem("userRides", JSON.stringify(null));
+    window.localStorage.setItem("userBikes", JSON.stringify(null));
+    window.localStorage.setItem("selectedSuspension", JSON.stringify(null));
+    // window.localStorage.setItem("userSuspension", JSON.stringify(null));
+    window.localStorage.setItem("userID", JSON.stringify(null));
 
     if (window.location.href === "http://localhost:5173/") {
       setClientID(`${import.meta.env.VITE_CLIENT_ID_LOCAL}`);

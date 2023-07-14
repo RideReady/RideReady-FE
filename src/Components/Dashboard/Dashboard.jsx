@@ -22,6 +22,11 @@ export default function Dashboard({
   setSelectedSuspension,
   userBikes,
   userRides,
+  setUserBikes,
+  setUserRides,
+  userAccessToken,
+  setUserAccessToken,
+  setUserID
 }) {
   const [loadingSus, setLoadingSus] = useState("");
   const [buttonLink, setButtonLink] = useState("/dashboard/add-new-part");
@@ -29,14 +34,21 @@ export default function Dashboard({
   const navigate = useNavigate();
 
   useEffect(() => {
-    // if userID, userBikes, userRides are null, run api calls for each
-    // Currently changing button to return to homepage to login again
-    // Could also use caching?
-    if (!userBikes || !userRides || !userID) {
-      console.log(userBikes)
-      setButtonLink("/");
-      setButtonMsg("Return to login page");
-      setLoadingSus("error");
+    if (!userBikes) {
+      const loadedBikes = JSON.parse(localStorage.getItem("userBikes"));
+      setUserBikes(loadedBikes);
+    }
+    if (!userRides) {
+      const loadedRides = JSON.parse(localStorage.getItem("userRides"));
+      setUserRides(loadedRides);
+    }
+    if (!userAccessToken) {
+      const loadedToken = JSON.parse(localStorage.getItem("userAccessToken"));
+      setUserAccessToken(loadedToken);
+    } 
+    if (!userID) {
+      const loadedToken = JSON.parse(localStorage.getItem("userID"));
+      setUserID(loadedToken);
     } 
     // eslint-disable-next-line
   }, []);
@@ -147,4 +159,8 @@ Dashboard.propTypes = {
   userBikes: PropTypes.array,
   setUserBikes: PropTypes.func,
   userRides: PropTypes.array,
+  setUserRides: PropTypes.func,
+  userAccessToken: PropTypes.string,
+  setUserAccessToken: PropTypes.func,
+  setUserID: PropTypes.func
 };

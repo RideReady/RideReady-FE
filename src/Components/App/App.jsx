@@ -43,6 +43,8 @@ export default function App() {
               setUserRides={setUserRides}
               userRides={userRides}
               changeErrorMessage={changeErrorMessage}
+              userBikes={userBikes}
+              userId={userID}
             />
           }
         />
@@ -57,6 +59,10 @@ export default function App() {
               userBikes={userBikes}
               setUserBikes={setUserBikes}
               userRides={userRides}
+              setUserRides={setUserRides}
+              setUserAccessToken={setUserAccessToken}
+              userAccessToken={userAccessToken}
+              setUserID={setUserID}
             />
           }
         />
