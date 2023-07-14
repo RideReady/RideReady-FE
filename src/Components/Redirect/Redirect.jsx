@@ -33,7 +33,6 @@ export default function Redirect({
     if (testForDeniedPermission(window.location.search)) {
       changeErrorMessage(`Please allow this app access to all activity data on Strava's login screen. 
         You are being redirected to the home page.`);
-      navigate("/error", { replace: true });
       return;
     }
     const fetchedAuthToken = stripURLForToken(window.location.search);
@@ -66,11 +65,11 @@ export default function Redirect({
         const cleanedRides = cleanRideData(rideActivities);
         if (cleanedRides) {
           setUserRides(cleanedRides);
-          setUserID(cleanedRides[0].user_id)
-          window.localStorage.setItem(
-            "userRides",
-            JSON.stringify(cleanedRides)
-          );
+          setUserID(cleanedRides[0].user_id);
+          // window.localStorage.setItem(
+          //   "userRides",
+          //   JSON.stringify(cleanedRides)
+          // );
         }
       })
       .catch(() => {
@@ -103,13 +102,12 @@ export default function Redirect({
             model_name: detail.model_name,
           }))
         );
+        navigate("/dashboard", { replace: true });
       })
       .catch(() => {
         changeErrorMessage(`An error occurred while fetching your bike details. 
       Please return to the home page and try logging in again.`);
       });
-
-    navigate("/dashboard", { replace: true });
     // eslint-disable-next-line
   }, [userGear]);
 
@@ -140,5 +138,5 @@ Redirect.propTypes = {
   setUserBikes: PropTypes.func,
   setUserRides: PropTypes.func,
   userRides: PropTypes.array,
-  changeErrorMessage: PropTypes.func
+  changeErrorMessage: PropTypes.func,
 };

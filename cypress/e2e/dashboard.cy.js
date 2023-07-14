@@ -41,7 +41,7 @@ describe("dashboard", () => {
   });
 
   it("Should have a button to add suspension", () => {
-    cy.get("button").should("have.text", "Add new suspension");
+    cy.get("button").eq(0).should("have.text", "Add new suspension");
   });
 
   it("Should direct you to the AddNewPartForm on button click", () => {
@@ -102,7 +102,7 @@ describe("dashboard", () => {
 
     cy.get('p[class="add-new-mesg"]').should(
       "contain",
-      "An error occurred while loading your suspension"
+      "An error occurred while loading your data"
     );
   });
 
@@ -114,9 +114,9 @@ describe("dashboard", () => {
 
     cy.wait(1000);
 
-    cy.get("button").should("have.text", "Return to login page");
+    cy.get("button").eq(0).should("have.text", "Return to login page");
 
-    cy.get("button").click();
+    cy.get("button").eq(0).click();
 
     cy.url().should("eq", "http://localhost:5173/");
   });

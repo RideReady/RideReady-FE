@@ -27,7 +27,7 @@ export default function Container({
       });
       setSusTiles(suspensionTiles);
     } else if (loadingSus == "error") {
-      setDashboardMessage("An error occurred while loading your suspension. Please click the button below to try logging in again.");
+      setDashboardMessage("An error occurred while loading your data. Please click the button below to try logging in again.");
     } else if (!loadingSus && userSuspension.length <= 0) {
       setDashboardMessage("No suspension to view. Add a new suspension part by clicking the button below.")
     }

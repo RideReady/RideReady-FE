@@ -21,7 +21,6 @@ export default function Dashboard({
   setUserSuspension,
   setSelectedSuspension,
   userBikes,
-  // setUserBikes,
   userRides,
 }) {
   const [loadingSus, setLoadingSus] = useState("");
@@ -29,21 +28,18 @@ export default function Dashboard({
   const [buttonMsg, setButtonMsg] = useState("Add new suspension");
   const navigate = useNavigate();
 
-  // Need to replace this LS func with a call to Strava for bikes
-
-  // useEffect(() => {
-  //   if (userBikes === null) {
-  //     const loadedBikes = JSON.parse(localStorage.getItem("userBikes"));
-  //     if (loadedBikes) {
-  //       setUserBikes(loadedBikes);
-  //     } else {
-  //       setUserBikes([]);
-  //     }
-  //   } else if (userBikes) {
-  //     window.localStorage.setItem("userBikes", JSON.stringify(userBikes));
-  //   }
-  //   // eslint-disable-next-line
-  // }, []);
+  useEffect(() => {
+    // if userID, userBikes, userRides are null, run api calls for each
+    // Currently changing button to return to homepage to login again
+    // Could also use caching?
+    if (!userBikes || !userRides || !userID) {
+      console.log(userBikes)
+      setButtonLink("/");
+      setButtonMsg("Return to login page");
+      setLoadingSus("error");
+    } 
+    // eslint-disable-next-line
+  }, []);
 
   useEffect(() => {
     if (userID === null || userBikes === null) return;
@@ -75,8 +71,6 @@ export default function Dashboard({
   }, [userSuspension, userID, userBikes, setUserSuspension]);
 
   useEffect(() => {
-    // THIS NEEDS TO BE TESTED
-
     if (!userSuspension || !userRides || !userBikes) return;
     let userSusStateNeedsReset = false;
 
@@ -137,6 +131,10 @@ export default function Dashboard({
       <button id="dash-add-sus" onClick={() => navigate(buttonLink)}>
         {buttonMsg}
       </button>
+      {/* Feedback button */}
+      <a href="mailto:rickv85@gmail.com">
+        <button>Send feedback</button>
+      </a>
     </section>
   );
 }

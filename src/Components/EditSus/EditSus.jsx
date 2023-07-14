@@ -133,7 +133,7 @@ export default function EditSus({
 
     editUserSuspensionInDatabase(susDataConvertedForDatabase)
       .then((result) => {
-        console.log(result.message);
+        console.log(result);
         let newUserSusArr = JSON.parse(JSON.stringify(userSuspension, userID));
         newUserSusArr.splice(editSusIndex, 1, modifiedSus);
         setUserSuspension(newUserSusArr);
