@@ -8,11 +8,13 @@ import {
   isOldestRideBeforeRebuild,
   filterRideActivities,
   cleanRideData,
-  filterRidesForSpecificBike
+  filterRidesForSpecificBike,
+  convertSuspensionFromDatabase
 } from "../../util";
 import {
   editUserSuspensionInDatabase,
   getUserActivities,
+  loadUserSuspensionFromDatabase
 } from "../../Services/APICalls";
 import PropTypes from "prop-types";
 
@@ -30,7 +32,8 @@ export default function EditSus({
   userBikes,
   setUserBikes,
   changeErrorMessage,
-  userID
+  userID,
+  setUserID
 }) {
   const [newRebuildDate, setNewRebuildDate] = useState("");
   const [editSusIndex, setEditSusIndex] = useState(null);
@@ -60,12 +63,36 @@ export default function EditSus({
       );
       setSelectedSuspension(loadedSelection);
     }
-    if (!userSuspension) {
-      const loadedSus = JSON.parse(localStorage.getItem("userSuspension"));
-      setUserSuspension(loadedSus);
+    if (!userID) {
+      const loadedID = JSON.parse(
+        localStorage.getItem("userID")
+      );
+      setUserID(loadedID);
+    }
+    // USE DB GET CALL FOR THIS CONDITION
+
+    if (!userSuspension && userID) {
+      loadUserSuspensionFromDatabase(userID)
+        .then((result) => {
+          if (result.suspension && result.suspension.length > 0) {
+            const convertedDBSus = result.suspension.map((sus) =>
+              convertSuspensionFromDatabase(sus, userBikes)
+            );
+            console.log(`User suspension loaded from DB`, convertedDBSus);
+            setUserSuspension(convertedDBSus);
+          } else {
+            console.log(`No suspension loaded from DB for userID: ${userID}`);
+            setUserSuspension([]);
+          }
+        })
+        .catch((error) => {
+          alert(error);
+          setUserSuspension([]);
+        });
+      // setUserSuspension(loadedSus);
     }
     // eslint-disable-next-line
-  }, []);
+  }, [userBikes, userRides, userAccessToken, selectedSuspension, userID, userSuspension]);
 
   useEffect(() => {
     if (!selectedSuspension || !userSuspension) return;
@@ -217,5 +244,6 @@ EditSus.propTypes = {
   userBikes: PropTypes.array,
   setUserBikes: PropTypes.func,
   changeErrorMessage: PropTypes.func,
-  userID: PropTypes.number
+  userID: PropTypes.number,
+  setUserID: PropTypes.func,
 };
