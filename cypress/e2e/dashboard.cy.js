@@ -120,4 +120,39 @@ describe("dashboard", () => {
 
     cy.url().should("eq", "http://localhost:5173/");
   });
+
+  it("Should load user data from localStorage on a page reload and not crash", () => {
+    cy.intercept("GET", "http://localhost:5001/suspension/*", {
+      body: {
+        suspension: [
+          {
+            id: "8e2c847e-dd9c-44c6-91bc-6495c7eb803e",
+            user_id: 391197,
+            rebuild_life: 0.992804,
+            rebuild_date: "2023-06-01T06:00:00.000Z",
+            sus_data_id: 1,
+            on_bike_id: "b9082682",
+            date_created: "2023-06-27T06:00:00.000Z",
+          },
+        ],
+      },
+    });
+
+    cy.reload();
+
+    cy.wait(1000);
+
+    cy.get("h1").should("have.text", "Ride Ready");
+    cy.get("h2").should("have.text", "RockShox Fork");
+    cy.get("h3").eq(0).should("have.text", "on your Specialized Enduro");
+    cy.get("h3").eq(1).should("have.text", "99% service life remaining");
+    cy.get("h3").eq(2).should("have.text", `It's Ride Ready!`);
+    cy.get("p").eq(0).should("have.text", `Last serviced: Jun 1, 2023`);
+
+    cy.get("button").eq(0).should("have.text", "Delete suspension");
+    cy.get("button").eq(1).should("have.text", "Update service date");
+    cy.get("button").eq(2).should("have.text", "Add new suspension");
+    cy.get("button").eq(3).should("have.text", "Send feedback");
+  });
+
 });

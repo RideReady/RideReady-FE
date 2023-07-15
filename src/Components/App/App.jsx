@@ -114,6 +114,10 @@ export default function App() {
               userSuspension={userSuspension}
               setSelectedSuspension={setSelectedSuspension}
               selectedSuspension={selectedSuspension}
+              userID={userID}
+              setUserID={setUserID}
+              userBikes={userBikes}
+              setUserBikes={setUserBikes}
             />
           }
         />

@@ -1,33 +1,63 @@
 import { useState, useEffect } from "react";
 import "./DeleteSus.css";
 import { useNavigate } from "react-router-dom";
-import { findSusIndexByID } from "../../util";
+import { findSusIndexByID, convertSuspensionFromDatabase } from "../../util";
 import PropTypes from "prop-types";
-import { deleteUserSuspensionInDatabase } from "../../Services/APICalls";
+import {
+  deleteUserSuspensionInDatabase,
+  loadUserSuspensionFromDatabase,
+} from "../../Services/APICalls";
 
 export default function DeleteSus({
   setUserSuspension,
   userSuspension,
   setSelectedSuspension,
   selectedSuspension,
+  userID,
+  setUserID,
+  userBikes,
+  setUserBikes,
 }) {
   const [deleteSusIndex, setDeleteSusIndex] = useState(null);
   const [deleteSusDetails, setDeleteSusDetails] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {
+    if (!userBikes) {
+      const loadedBikes = JSON.parse(localStorage.getItem("userBikes"));
+      setUserBikes(loadedBikes);
+    }
     if (!selectedSuspension) {
       const loadedSelection = JSON.parse(
         localStorage.getItem("selectedSuspension")
       );
       setSelectedSuspension(loadedSelection);
     }
-    if (!userSuspension) {
-      const loadedSus = JSON.parse(localStorage.getItem("userSuspension"));
-      setUserSuspension(loadedSus);
+    if (!userID) {
+      const loadedID = JSON.parse(localStorage.getItem("userID"));
+      setUserID(loadedID);
+    }
+    if (!userSuspension && userID && userBikes) {
+      loadUserSuspensionFromDatabase(userID)
+        .then((result) => {
+          if (result.suspension && result.suspension.length > 0) {
+            const convertedDBSus = result.suspension.map((sus) =>
+              convertSuspensionFromDatabase(sus, userBikes)
+            );
+            console.log(`User suspension loaded from DB`, convertedDBSus);
+            setUserSuspension(convertedDBSus);
+          } else {
+            console.log(`No suspension loaded from DB for userID: ${userID}`);
+            setUserSuspension([]);
+          }
+        })
+        .catch((error) => {
+          alert(error);
+          setUserSuspension([]);
+        });
     }
     // eslint-disable-next-line
-  }, []);
+  }, [selectedSuspension, userID, userSuspension, userBikes]);
 
   useEffect(() => {
     if (!selectedSuspension || !userSuspension) return;
@@ -87,4 +117,8 @@ DeleteSus.propTypes = {
   userSuspension: PropTypes.array,
   setSelectedSuspension: PropTypes.func,
   selectedSuspension: PropTypes.string,
+  userID: PropTypes.number,
+  setUserID: PropTypes.func,
+  userBikes: PropTypes.array,
+  setUserBikes: PropTypes.func,
 };
