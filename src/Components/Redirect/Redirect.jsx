@@ -16,8 +16,6 @@ import "./Redirect.css";
 import PropTypes from "prop-types";
 
 export default function Redirect({
-  setUserAuthToken,
-  userAuthToken,
   setUserAccessToken,
   userAccessToken,
   setUserID,
@@ -27,6 +25,7 @@ export default function Redirect({
   changeErrorMessage
 }) {
   const [userGear, setUserGear] = useState("");
+  const [userAuthToken, setUserAuthToken] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -138,8 +137,6 @@ export default function Redirect({
 }
 
 Redirect.propTypes = {
-  setUserAuthToken: PropTypes.func,
-  userAuthToken: PropTypes.string,
   setUserAccessToken: PropTypes.func,
   userAccessToken: PropTypes.string,
   setUserID: PropTypes.func,

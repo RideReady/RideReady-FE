@@ -10,7 +10,6 @@ import EditSus from "../EditSus/EditSus";
 import DeleteSus from "../DeleteSus/DeleteSus";
 
 export default function App() {
-  const [userAuthToken, setUserAuthToken] = useState(null);
   const [userAccessToken, setUserAccessToken] = useState(null);
   const [userID, setUserID] = useState(null);
   const [userBikes, setUserBikes] = useState(null);
@@ -34,8 +33,6 @@ export default function App() {
           path="/redirect/*"
           element={
             <Redirect
-              setUserAuthToken={setUserAuthToken}
-              userAuthToken={userAuthToken}
               setUserAccessToken={setUserAccessToken}
               userAccessToken={userAccessToken}
               setUserID={setUserID}
