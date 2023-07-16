@@ -9,7 +9,6 @@ export default function Tile({ susDetails, setSelectedSuspension, id }) {
   const [rebuildLifeBad, setRebuildLifeBad] = useState("");
 
   let rebuildLifePercentage = (susDetails.rebuildLife * 100).toFixed(0);
-  // Could I use Math.floor?
   if (rebuildLifePercentage <= 0) {
     rebuildLifePercentage = 0;
   }

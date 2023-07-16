@@ -24,9 +24,7 @@ export default function Redirect({
   setUserBikes,
   setUserRides,
   userRides,
-  changeErrorMessage,
-  // userBikes,
-  // userID
+  changeErrorMessage
 }) {
   const [userGear, setUserGear] = useState("");
   const navigate = useNavigate();
@@ -148,7 +146,5 @@ Redirect.propTypes = {
   setUserBikes: PropTypes.func,
   setUserRides: PropTypes.func,
   userRides: PropTypes.array,
-  changeErrorMessage: PropTypes.func,
-  userBikes: PropTypes.array,
-  userID: PropTypes.string
+  changeErrorMessage: PropTypes.func
 };

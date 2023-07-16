@@ -43,8 +43,6 @@ export default function App() {
               setUserRides={setUserRides}
               userRides={userRides}
               changeErrorMessage={changeErrorMessage}
-              userBikes={userBikes}
-              userId={userID}
             />
           }
         />
