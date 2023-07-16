@@ -43,7 +43,7 @@ describe("EditSus", () => {
     });
 
     cy.wait(200);
-    cy.get('button[id="dash-add-sus"').click();
+    cy.get('button[id="dash-add-sus-btn"]').click();
 
     cy.wait(200);
     cy.get('select[name="bikeSelect"]').select(1);

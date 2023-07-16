@@ -62,7 +62,7 @@ describe("dashboard", () => {
 
     cy.wait(1000);
 
-    cy.get('button[id="dash-add-sus"').click();
+    cy.get('button[id="dash-add-sus-btn"]').click();
     cy.url().should("eq", "http://localhost:5173/dashboard/add-new-part");
   });
 

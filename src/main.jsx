@@ -5,7 +5,7 @@ import './index.css';
 import App from './Components/App/App';
 import { inject } from '@vercel/analytics';
 
-if (!window.Cypress && window.location.host !== 'localhost:5173') {
+if (window.location.host === 'www.ridereadybike.com') {
   inject();
 }
 
