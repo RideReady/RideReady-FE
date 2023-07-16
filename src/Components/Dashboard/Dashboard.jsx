@@ -26,7 +26,7 @@ export default function Dashboard({
   setUserRides,
   userAccessToken,
   setUserAccessToken,
-  setUserID
+  setUserID,
 }) {
   const [loadingSus, setLoadingSus] = useState("");
   const [buttonLink, setButtonLink] = useState("/dashboard/add-new-part");
@@ -45,11 +45,11 @@ export default function Dashboard({
     if (!userAccessToken) {
       const loadedToken = JSON.parse(localStorage.getItem("userAccessToken"));
       setUserAccessToken(loadedToken);
-    } 
+    }
     if (!userID) {
       const loadedToken = JSON.parse(localStorage.getItem("userID"));
       setUserID(loadedToken);
-    } 
+    }
     // eslint-disable-next-line
   }, []);
 
@@ -128,7 +128,7 @@ export default function Dashboard({
     });
 
     if (userSusStateNeedsReset) {
-      setUserSuspension(recalculatedUserSus)
+      setUserSuspension(recalculatedUserSus);
     }
   }, [userSuspension, userBikes, userRides, userID, setUserSuspension]);
 
@@ -140,13 +140,17 @@ export default function Dashboard({
         setSelectedSuspension={setSelectedSuspension}
         loadingSus={loadingSus}
       />
-      <button id="dash-add-sus" onClick={() => navigate(buttonLink)}>
+      <button id="dash-add-sus-btn" onClick={() => navigate(buttonLink)}>
         {buttonMsg}
       </button>
-      {/* Feedback button */}
-      <a href="mailto:rickv85@gmail.com">
-        <button>Send feedback</button>
-      </a>
+      <button id="dash-send-feedback-btn"
+        onClick={(e) => {
+          e.preventDefault();
+          window.location = "mailto:rickv85@gmail.com";
+        }}
+      >
+        Send feedback
+      </button>
     </section>
   );
 }
@@ -162,5 +166,5 @@ Dashboard.propTypes = {
   setUserRides: PropTypes.func,
   userAccessToken: PropTypes.string,
   setUserAccessToken: PropTypes.func,
-  setUserID: PropTypes.func
+  setUserID: PropTypes.func,
 };

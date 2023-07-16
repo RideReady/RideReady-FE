@@ -10,10 +10,12 @@ import {
   convertSusToDatabaseFormat,
   filterRidesForSpecificBike,
 } from "../../util";
-import { getUserActivities, postUserSuspensionToDatabase } from "../../Services/APICalls";
+import {
+  getUserActivities,
+  postUserSuspensionToDatabase,
+} from "../../Services/APICalls";
 import { useNavigate } from "react-router-dom";
-import { v4 as uuidv4 } from 'uuid';
-
+import { v4 as uuidv4 } from "uuid";
 
 export default function NewPartForm({
   userID,
@@ -139,7 +141,9 @@ export default function NewPartForm({
     // Add to utils - using in Util as helper for Dashboard func
     let selectedBikeDetails;
     if (bikeOptions) {
-      selectedBikeDetails = bikeOptions.find((bike) => bike.id === selectedBike);
+      selectedBikeDetails = bikeOptions.find(
+        (bike) => bike.id === selectedBike
+      );
     } else {
       selectedBikeDetails = null;
     }
@@ -150,7 +154,7 @@ export default function NewPartForm({
       onBike: selectedBikeDetails || {
         id: "unknownBike",
         brand_name: "Unknown",
-        model_name: "Bike"
+        model_name: "Bike",
       },
       rebuildDate: selectedRebuildDate,
       rebuildLife: calculateRebuildLife(
@@ -160,20 +164,26 @@ export default function NewPartForm({
         selectedBike,
         userBikes
       ),
-      lastRideCalculated: filterRidesForSpecificBike(userRides, selectedBikeDetails)[0].ride_date
+      lastRideCalculated: filterRidesForSpecificBike(
+        userRides,
+        selectedBikeDetails
+      )[0].ride_date,
     };
 
-    console.log(newSuspensionDetails)
+    console.log(newSuspensionDetails);
 
-    const newSusPostData = convertSusToDatabaseFormat(newSuspensionDetails, userID)
+    const newSusPostData = convertSusToDatabaseFormat(
+      newSuspensionDetails,
+      userID
+    );
 
     postUserSuspensionToDatabase(newSusPostData)
-    .then((response) => {
-      console.log(response)
-    })
-    .catch((error) => {
-      console.log(error)
-    })
+      .then((response) => {
+        console.log(response);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
 
     if (userSuspension) {
       setUserSuspension([...userSuspension, newSuspensionDetails]);
@@ -195,7 +205,15 @@ export default function NewPartForm({
 
   return (
     <section className="new-part-form-section">
-      <h1 className="site-logo">Ride Ready</h1>
+      <h1
+        id="new-part-site-logo"
+        className="site-logo"
+        onClick={() => {
+          navigate("/dashboard");
+        }}
+      >
+        Ride Ready
+      </h1>
       <form className="new-part-form">
         <label htmlFor="bikeSelect">Which bike is this part on?</label>
         <select

@@ -135,6 +135,12 @@ export default function EditSus({
     // eslint-disable-next-line
   }, [newRebuildDate, userRides]);
 
+  useEffect(() => {
+    if (selectedSuspension === null) {
+      navigate("/dashboard");
+    }
+  }, [selectedSuspension, navigate]);
+
   const handleSubmit = () => {
     if (!newRebuildDate) {
       setSubmitError(true);
@@ -142,7 +148,6 @@ export default function EditSus({
       return;
     }
 
-    // Deep copy creation using JSON to prevent changes to editSusDetails
     const modifiedSus = JSON.parse(JSON.stringify(editSusDetails));
     modifiedSus.rebuildDate = newRebuildDate;
     modifiedSus.rebuildLife = calculateRebuildLife(
@@ -167,9 +172,9 @@ export default function EditSus({
         newUserSusArr.splice(editSusIndex, 1, modifiedSus);
         setUserSuspension(newUserSusArr);
 
+        window.localStorage.setItem("selectedSuspension", JSON.stringify(null));
         setSelectedSuspension(null);
         setPagesFetched(fetchCount);
-        navigate("/dashboard");
       })
       .catch((error) => {
         console.log(error);
@@ -182,7 +187,19 @@ export default function EditSus({
 
   return (
     <section className="edit-part-form-section">
-      <h1 className="site-logo">Ride Ready</h1>
+      <h1
+        id="edit-sus-site-logo"
+        className="site-logo"
+        onClick={() => {
+          window.localStorage.setItem(
+            "selectedSuspension",
+            JSON.stringify(null)
+          );
+          setSelectedSuspension(null);
+        }}
+      >
+        Ride Ready
+      </h1>
       <div className="edit-sus-details">
         {editSusDetails && (
           <h2>{`Change rebuild date of the ${editSusDetails.susData.name}
@@ -204,8 +221,11 @@ export default function EditSus({
         <div className="edit-section-buttons">
           <button
             onClick={() => {
+              window.localStorage.setItem(
+                "selectedSuspension",
+                JSON.stringify(null)
+              );
               setSelectedSuspension(null);
-              navigate("/dashboard");
             }}
           >
             Back

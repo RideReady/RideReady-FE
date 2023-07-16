@@ -66,16 +66,22 @@ export default function DeleteSus({
     setDeleteSusIndex(index);
   }, [selectedSuspension, userSuspension]);
 
+  useEffect(() => {
+    if (selectedSuspension === null) {
+      navigate("/dashboard");
+    }
+  }, [selectedSuspension, navigate]);
+
   const handleDelete = () => {
     deleteUserSuspensionInDatabase(deleteSusDetails.id)
       .then((result) => {
         console.log(result);
-        let newUserSusArr = userSuspension;
+        let newUserSusArr = [...userSuspension];
         newUserSusArr.splice(deleteSusIndex, 1);
         setUserSuspension(newUserSusArr);
 
+        window.localStorage.setItem("selectedSuspension", JSON.stringify(null));
         setSelectedSuspension(null);
-        navigate("/dashboard");
       })
       .catch((error) => {
         console.log(error);
@@ -88,7 +94,19 @@ export default function DeleteSus({
 
   return (
     <section className="delete-part-form-section">
-      <h1 className="site-logo">Ride Ready</h1>
+      <h1
+        id="delete-sus-site-logo"
+        className="site-logo"
+        onClick={() => {
+          window.localStorage.setItem(
+            "selectedSuspension",
+            JSON.stringify(null)
+          );
+          setSelectedSuspension(null);
+        }}
+      >
+        Ride Ready
+      </h1>
       <div className="delete-sus-details">
         <h2>Are you sure you want to delete your:</h2>
         {deleteSusDetails && (
@@ -98,8 +116,11 @@ export default function DeleteSus({
         <div className="delete-section-buttons">
           <button
             onClick={() => {
+              window.localStorage.setItem(
+                "selectedSuspension",
+                JSON.stringify(null)
+              );
               setSelectedSuspension(null);
-              navigate("/dashboard");
             }}
           >
             Back
