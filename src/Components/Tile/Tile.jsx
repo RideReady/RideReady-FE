@@ -8,7 +8,11 @@ export default function Tile({ susDetails, setSelectedSuspension, id }) {
   const [rebuildLifeMessage, setRebuildLifeMessage] = useState("");
   const [rebuildLifeBad, setRebuildLifeBad] = useState("");
 
-  const rebuildLifePercentage = (susDetails.rebuildLife * 100).toFixed(0);
+  let rebuildLifePercentage = (susDetails.rebuildLife * 100).toFixed(0);
+  if (rebuildLifePercentage <= 0) {
+    rebuildLifePercentage = 0;
+  }
+
   const lastRebuildDateDisplay = moment(
     susDetails.rebuildDate.slice(0, 10)
   ).format("ll");
@@ -26,14 +30,9 @@ export default function Tile({ susDetails, setSelectedSuspension, id }) {
       setRebuildLifeMessage(`It's Ride Ready!`);
     } else if (rebuildLifePercentage <= 25 && rebuildLifePercentage >= 0) {
       setRebuildLifeMessage(`Get ready to rebuild soon!`);
-    } else if (rebuildLifePercentage < 0 && rebuildLifePercentage > -25) {
+    } else if (rebuildLifePercentage <= 0) {
       setRebuildLifeBad(true);
       setRebuildLifeMessage(`Overdue for rebuild!`);
-    } else if (rebuildLifePercentage <= -25) {
-      setRebuildLifeBad(true);
-      setRebuildLifeMessage(
-        `Way overdue for rebuild! Performance greatly decreased!`
-      );
     }
   }, [rebuildLifeMessage, rebuildLifePercentage]);
 

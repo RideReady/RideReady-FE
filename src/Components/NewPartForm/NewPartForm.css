@@ -39,4 +39,8 @@
 .error-wait-message {
   color: #F26419;
   font-weight: 700;
+}
+
+#new-part-site-logo {
+  cursor: pointer;
 }/*# sourceMappingURL=NewPartForm.css.map */

@@ -4,6 +4,7 @@ describe("EditSus", () => {
     cy.visit(
       "http://localhost:5173/redirect/exchange_token?state=&code=97dd82f961714a09adb14e47b242a23103c4c202&scope=read,activity:read_all"
     );
+
     cy.intercept("POST", `https://www.strava.com/oauth/token`, {
       statusCode: 200,
       body: {
@@ -42,7 +43,7 @@ describe("EditSus", () => {
     });
 
     cy.wait(200);
-    cy.get('button[id="dash-add-sus"').click();
+    cy.get('button[id="dash-add-sus-btn"]').click();
 
     cy.wait(200);
     cy.get('select[name="bikeSelect"]').select(1);
@@ -102,4 +103,5 @@ describe("EditSus", () => {
 
     cy.get("h2").eq(1).should("have.text", "Currently: Jan 1, 2023");
   });
+  
 });

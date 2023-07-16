@@ -23,7 +23,12 @@
   width: 90vw;
   height: 35vh;
 }
+
 .delete-section-buttons {
   @include centered(row, space-between);
   width: 50vw;
+}
+
+#delete-sus-site-logo {
+  cursor: pointer;
 }

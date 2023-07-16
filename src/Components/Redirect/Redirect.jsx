@@ -16,24 +16,22 @@ import "./Redirect.css";
 import PropTypes from "prop-types";
 
 export default function Redirect({
-  setUserAuthToken,
-  userAuthToken,
   setUserAccessToken,
   userAccessToken,
   setUserID,
   setUserBikes,
   setUserRides,
   userRides,
-  changeErrorMessage,
+  changeErrorMessage
 }) {
   const [userGear, setUserGear] = useState("");
+  const [userAuthToken, setUserAuthToken] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {
     if (testForDeniedPermission(window.location.search)) {
       changeErrorMessage(`Please allow this app access to all activity data on Strava's login screen. 
         You are being redirected to the home page.`);
-      navigate("/error", { replace: true });
       return;
     }
     const fetchedAuthToken = stripURLForToken(window.location.search);
@@ -66,10 +64,14 @@ export default function Redirect({
         const cleanedRides = cleanRideData(rideActivities);
         if (cleanedRides) {
           setUserRides(cleanedRides);
-          setUserID(cleanedRides[0].user_id)
+          setUserID(cleanedRides[0].user_id);
           window.localStorage.setItem(
             "userRides",
             JSON.stringify(cleanedRides)
+          );
+          window.localStorage.setItem(
+            "userID",
+            JSON.stringify(cleanedRides[0].user_id)
           );
         }
       })
@@ -96,20 +98,23 @@ export default function Redirect({
       userGear.map((gearID) => getUserGearDetails(gearID, userAccessToken))
     )
       .then((details) => {
-        setUserBikes(
-          details.map((detail) => ({
+        
+          const userBikeDetails = details.map((detail) => ({
             id: detail.id,
             brand_name: detail.brand_name,
             model_name: detail.model_name,
           }))
+        setUserBikes(userBikeDetails)
+        window.localStorage.setItem(
+          "userBikes",
+          JSON.stringify(userBikeDetails)
         );
+        navigate("/dashboard", { replace: true });
       })
       .catch(() => {
         changeErrorMessage(`An error occurred while fetching your bike details. 
       Please return to the home page and try logging in again.`);
       });
-
-    navigate("/dashboard", { replace: true });
     // eslint-disable-next-line
   }, [userGear]);
 
@@ -132,8 +137,6 @@ export default function Redirect({
 }
 
 Redirect.propTypes = {
-  setUserAuthToken: PropTypes.func,
-  userAuthToken: PropTypes.string,
   setUserAccessToken: PropTypes.func,
   userAccessToken: PropTypes.string,
   setUserID: PropTypes.func,

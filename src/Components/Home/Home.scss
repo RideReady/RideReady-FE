@@ -3,6 +3,7 @@
 .site-logo {
   @include logoText;
   font-size: 3.5rem;
+  cursor: default;
 }
 
 .home-page{

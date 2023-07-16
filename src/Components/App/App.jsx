@@ -10,7 +10,6 @@ import EditSus from "../EditSus/EditSus";
 import DeleteSus from "../DeleteSus/DeleteSus";
 
 export default function App() {
-  const [userAuthToken, setUserAuthToken] = useState(null);
   const [userAccessToken, setUserAccessToken] = useState(null);
   const [userID, setUserID] = useState(null);
   const [userBikes, setUserBikes] = useState(null);
@@ -34,8 +33,6 @@ export default function App() {
           path="/redirect/*"
           element={
             <Redirect
-              setUserAuthToken={setUserAuthToken}
-              userAuthToken={userAuthToken}
               setUserAccessToken={setUserAccessToken}
               userAccessToken={userAccessToken}
               setUserID={setUserID}
@@ -57,6 +54,10 @@ export default function App() {
               userBikes={userBikes}
               setUserBikes={setUserBikes}
               userRides={userRides}
+              setUserRides={setUserRides}
+              setUserAccessToken={setUserAccessToken}
+              userAccessToken={userAccessToken}
+              setUserID={setUserID}
             />
           }
         />
@@ -75,6 +76,7 @@ export default function App() {
               setUserRides={setUserRides}
               pagesFetched={pagesFetched}
               setPagesFetched={setPagesFetched}
+              setUserID={setUserID}
             />
           }
         />
@@ -96,6 +98,7 @@ export default function App() {
               setUserBikes={setUserBikes}
               changeErrorMessage={changeErrorMessage}
               userID={userID}
+              setUserID={setUserID}
             />
           }
         />
@@ -107,6 +110,10 @@ export default function App() {
               userSuspension={userSuspension}
               setSelectedSuspension={setSelectedSuspension}
               selectedSuspension={selectedSuspension}
+              userID={userID}
+              setUserID={setUserID}
+              userBikes={userBikes}
+              setUserBikes={setUserBikes}
             />
           }
         />

@@ -8,11 +8,13 @@ import {
   isOldestRideBeforeRebuild,
   filterRideActivities,
   cleanRideData,
-  filterRidesForSpecificBike
+  filterRidesForSpecificBike,
+  convertSuspensionFromDatabase,
 } from "../../util";
 import {
   editUserSuspensionInDatabase,
   getUserActivities,
+  loadUserSuspensionFromDatabase,
 } from "../../Services/APICalls";
 import PropTypes from "prop-types";
 
@@ -30,7 +32,8 @@ export default function EditSus({
   userBikes,
   setUserBikes,
   changeErrorMessage,
-  userID
+  userID,
+  setUserID,
 }) {
   const [newRebuildDate, setNewRebuildDate] = useState("");
   const [editSusIndex, setEditSusIndex] = useState(null);
@@ -60,12 +63,38 @@ export default function EditSus({
       );
       setSelectedSuspension(loadedSelection);
     }
-    if (!userSuspension) {
-      const loadedSus = JSON.parse(localStorage.getItem("userSuspension"));
-      setUserSuspension(loadedSus);
+    if (!userID) {
+      const loadedID = JSON.parse(localStorage.getItem("userID"));
+      setUserID(loadedID);
+    }
+    if (!userSuspension && userID && userBikes) {
+      loadUserSuspensionFromDatabase(userID)
+        .then((result) => {
+          if (result.suspension && result.suspension.length > 0) {
+            const convertedDBSus = result.suspension.map((sus) =>
+              convertSuspensionFromDatabase(sus, userBikes)
+            );
+            console.log(`User suspension loaded from DB`, convertedDBSus);
+            setUserSuspension(convertedDBSus);
+          } else {
+            console.log(`No suspension loaded from DB for userID: ${userID}`);
+            setUserSuspension([]);
+          }
+        })
+        .catch((error) => {
+          alert(error);
+          setUserSuspension([]);
+        });
     }
     // eslint-disable-next-line
-  }, []);
+  }, [
+    userBikes,
+    userRides,
+    userAccessToken,
+    selectedSuspension,
+    userID,
+    userSuspension,
+  ]);
 
   useEffect(() => {
     if (!selectedSuspension || !userSuspension) return;
@@ -106,6 +135,12 @@ export default function EditSus({
     // eslint-disable-next-line
   }, [newRebuildDate, userRides]);
 
+  useEffect(() => {
+    if (selectedSuspension === null) {
+      navigate("/dashboard");
+    }
+  }, [selectedSuspension, navigate]);
+
   const handleSubmit = () => {
     if (!newRebuildDate) {
       setSubmitError(true);
@@ -113,7 +148,6 @@ export default function EditSus({
       return;
     }
 
-    // Deep copy creation using JSON to prevent changes to editSusDetails
     const modifiedSus = JSON.parse(JSON.stringify(editSusDetails));
     modifiedSus.rebuildDate = newRebuildDate;
     modifiedSus.rebuildLife = calculateRebuildLife(
@@ -133,14 +167,14 @@ export default function EditSus({
 
     editUserSuspensionInDatabase(susDataConvertedForDatabase)
       .then((result) => {
-        console.log(result.message);
+        console.log(result);
         let newUserSusArr = JSON.parse(JSON.stringify(userSuspension, userID));
         newUserSusArr.splice(editSusIndex, 1, modifiedSus);
         setUserSuspension(newUserSusArr);
 
+        window.localStorage.setItem("selectedSuspension", JSON.stringify(null));
         setSelectedSuspension(null);
         setPagesFetched(fetchCount);
-        navigate("/dashboard");
       })
       .catch((error) => {
         console.log(error);
@@ -153,7 +187,19 @@ export default function EditSus({
 
   return (
     <section className="edit-part-form-section">
-      <h1 className="site-logo">Ride Ready</h1>
+      <h1
+        id="edit-sus-site-logo"
+        className="site-logo"
+        onClick={() => {
+          window.localStorage.setItem(
+            "selectedSuspension",
+            JSON.stringify(null)
+          );
+          setSelectedSuspension(null);
+        }}
+      >
+        Ride Ready
+      </h1>
       <div className="edit-sus-details">
         {editSusDetails && (
           <h2>{`Change rebuild date of the ${editSusDetails.susData.name}
@@ -175,8 +221,11 @@ export default function EditSus({
         <div className="edit-section-buttons">
           <button
             onClick={() => {
+              window.localStorage.setItem(
+                "selectedSuspension",
+                JSON.stringify(null)
+              );
               setSelectedSuspension(null);
-              navigate("/dashboard");
             }}
           >
             Back
@@ -217,5 +266,6 @@ EditSus.propTypes = {
   userBikes: PropTypes.array,
   setUserBikes: PropTypes.func,
   changeErrorMessage: PropTypes.func,
-  userID: PropTypes.number
+  userID: PropTypes.number,
+  setUserID: PropTypes.func,
 };

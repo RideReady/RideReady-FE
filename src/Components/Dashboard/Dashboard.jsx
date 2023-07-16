@@ -21,29 +21,37 @@ export default function Dashboard({
   setUserSuspension,
   setSelectedSuspension,
   userBikes,
-  // setUserBikes,
   userRides,
+  setUserBikes,
+  setUserRides,
+  userAccessToken,
+  setUserAccessToken,
+  setUserID,
 }) {
   const [loadingSus, setLoadingSus] = useState("");
   const [buttonLink, setButtonLink] = useState("/dashboard/add-new-part");
   const [buttonMsg, setButtonMsg] = useState("Add new suspension");
   const navigate = useNavigate();
 
-  // Need to replace this LS func with a call to Strava for bikes
-
-  // useEffect(() => {
-  //   if (userBikes === null) {
-  //     const loadedBikes = JSON.parse(localStorage.getItem("userBikes"));
-  //     if (loadedBikes) {
-  //       setUserBikes(loadedBikes);
-  //     } else {
-  //       setUserBikes([]);
-  //     }
-  //   } else if (userBikes) {
-  //     window.localStorage.setItem("userBikes", JSON.stringify(userBikes));
-  //   }
-  //   // eslint-disable-next-line
-  // }, []);
+  useEffect(() => {
+    if (!userBikes) {
+      const loadedBikes = JSON.parse(localStorage.getItem("userBikes"));
+      setUserBikes(loadedBikes);
+    }
+    if (!userRides) {
+      const loadedRides = JSON.parse(localStorage.getItem("userRides"));
+      setUserRides(loadedRides);
+    }
+    if (!userAccessToken) {
+      const loadedToken = JSON.parse(localStorage.getItem("userAccessToken"));
+      setUserAccessToken(loadedToken);
+    }
+    if (!userID) {
+      const loadedToken = JSON.parse(localStorage.getItem("userID"));
+      setUserID(loadedToken);
+    }
+    // eslint-disable-next-line
+  }, []);
 
   useEffect(() => {
     if (userID === null || userBikes === null) return;
@@ -75,8 +83,6 @@ export default function Dashboard({
   }, [userSuspension, userID, userBikes, setUserSuspension]);
 
   useEffect(() => {
-    // THIS NEEDS TO BE TESTED
-
     if (!userSuspension || !userRides || !userBikes) return;
     let userSusStateNeedsReset = false;
 
@@ -122,7 +128,7 @@ export default function Dashboard({
     });
 
     if (userSusStateNeedsReset) {
-      setUserSuspension(recalculatedUserSus)
+      setUserSuspension(recalculatedUserSus);
     }
   }, [userSuspension, userBikes, userRides, userID, setUserSuspension]);
 
@@ -134,8 +140,16 @@ export default function Dashboard({
         setSelectedSuspension={setSelectedSuspension}
         loadingSus={loadingSus}
       />
-      <button id="dash-add-sus" onClick={() => navigate(buttonLink)}>
+      <button id="dash-add-sus-btn" onClick={() => navigate(buttonLink)}>
         {buttonMsg}
+      </button>
+      <button id="dash-send-feedback-btn"
+        onClick={(e) => {
+          e.preventDefault();
+          window.location = "mailto:rickv85@gmail.com";
+        }}
+      >
+        Send feedback
       </button>
     </section>
   );
@@ -149,4 +163,8 @@ Dashboard.propTypes = {
   userBikes: PropTypes.array,
   setUserBikes: PropTypes.func,
   userRides: PropTypes.array,
+  setUserRides: PropTypes.func,
+  userAccessToken: PropTypes.string,
+  setUserAccessToken: PropTypes.func,
+  setUserID: PropTypes.func,
 };

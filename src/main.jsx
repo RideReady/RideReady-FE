@@ -4,8 +4,10 @@ import { BrowserRouter } from "react-router-dom";
 import './index.css';
 import App from './Components/App/App';
 import { inject } from '@vercel/analytics';
- 
-inject();
+
+if (window.location.host === 'www.ridereadybike.com') {
+  inject();
+}
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
