@@ -9,10 +9,12 @@ import {
   cleanRideData,
   convertSusToDatabaseFormat,
   filterRidesForSpecificBike,
+  convertSuspensionFromDatabase
 } from "../../util";
 import {
   getUserActivities,
   postUserSuspensionToDatabase,
+  loadUserSuspensionFromDatabase
 } from "../../Services/APICalls";
 import { useNavigate } from "react-router-dom";
 import { v4 as uuidv4 } from "uuid";
@@ -30,6 +32,7 @@ export default function NewPartForm({
   pagesFetched,
   setPagesFetched,
   changeErrorMessage,
+  setUserID
 }) {
   const [bikeOptions, setBikeOptions] = useState(userBikes);
   const [bikeDropdownOptions, setBikeDropdownOptions] = useState([]);
@@ -56,8 +59,31 @@ export default function NewPartForm({
       const loadedToken = JSON.parse(localStorage.getItem("userAccessToken"));
       setUserAccessToken(loadedToken);
     }
+    if (!userID) {
+      const loadedID = JSON.parse(localStorage.getItem("userID"));
+      setUserID(loadedID);
+    }
+    if (!userSuspension && userID && userBikes) {
+      loadUserSuspensionFromDatabase(userID)
+        .then((result) => {
+          if (result.suspension && result.suspension.length > 0) {
+            const convertedDBSus = result.suspension.map((sus) =>
+              convertSuspensionFromDatabase(sus, userBikes)
+            );
+            console.log(`User suspension loaded from DB`, convertedDBSus);
+            setUserSuspension(convertedDBSus);
+          } else {
+            console.log(`No suspension loaded from DB for userID: ${userID}`);
+            setUserSuspension([]);
+          }
+        })
+        .catch((error) => {
+          alert(error);
+          setUserSuspension([]);
+        });
+    }
     // eslint-disable-next-line
-  }, []);
+  }, [userRides, userBikes, userAccessToken, userID, userSuspension]);
 
   useEffect(() => {
     if (bikeOptions) {
@@ -282,4 +308,5 @@ NewPartForm.propTypes = {
   pagesFetched: PropTypes.number,
   setPagesFetched: PropTypes.func,
   changeErrorMessage: PropTypes.func,
+  setUserID: PropTypes.func
 };
