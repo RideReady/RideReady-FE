@@ -52,6 +52,7 @@ export default function DeleteSus({
           }
         })
         .catch((error) => {
+          // ADD POPUP
           alert(error);
           setUserSuspension([]);
         });
@@ -85,7 +86,7 @@ export default function DeleteSus({
       })
       .catch((error) => {
         console.log(error);
-        // Replace with more user friendly notification
+        // ADD POPUP
         alert(
           "There was an issue deleting your suspension. Please wait a moment then submit your request again."
         );

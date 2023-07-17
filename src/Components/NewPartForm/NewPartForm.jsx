@@ -78,6 +78,7 @@ export default function NewPartForm({
           }
         })
         .catch((error) => {
+          // ADD POPUP 
           alert(error);
           setUserSuspension([]);
         });
@@ -206,27 +207,28 @@ export default function NewPartForm({
     postUserSuspensionToDatabase(newSusPostData)
       .then((response) => {
         console.log(response);
+
+        if (userSuspension) {
+          setUserSuspension([...userSuspension, newSuspensionDetails]);
+          window.localStorage.setItem(
+            "userSuspension",
+            JSON.stringify([...userSuspension, newSuspensionDetails])
+          );
+        } else {
+          setUserSuspension([newSuspensionDetails]);
+          window.localStorage.setItem(
+            "userSuspension",
+            JSON.stringify([newSuspensionDetails])
+          );
+        }
+    
+        setPagesFetched(fetchCount);
+        navigate("/dashboard");
       })
       .catch((error) => {
+        // ADD POPUP 
         console.log(error);
       });
-
-    if (userSuspension) {
-      setUserSuspension([...userSuspension, newSuspensionDetails]);
-      window.localStorage.setItem(
-        "userSuspension",
-        JSON.stringify([...userSuspension, newSuspensionDetails])
-      );
-    } else {
-      setUserSuspension([newSuspensionDetails]);
-      window.localStorage.setItem(
-        "userSuspension",
-        JSON.stringify([newSuspensionDetails])
-      );
-    }
-
-    setPagesFetched(fetchCount);
-    navigate("/dashboard");
   };
 
   return (

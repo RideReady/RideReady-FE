@@ -82,6 +82,7 @@ export default function EditSus({
           }
         })
         .catch((error) => {
+          // ADD POPUP
           alert(error);
           setUserSuspension([]);
         });
@@ -178,7 +179,7 @@ export default function EditSus({
       })
       .catch((error) => {
         console.log(error);
-        // Replace with more user friendly notification
+        // ADD POPUP
         alert(
           "There was an issue modifying your suspension rebuild date. Please wait a moment then submit your request again."
         );
