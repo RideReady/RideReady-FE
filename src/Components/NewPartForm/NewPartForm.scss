@@ -38,3 +38,7 @@
 #new-part-site-logo {
   cursor: pointer;
 }
+
+#newPartErrorModal[open] {
+  @include errorModal;
+}

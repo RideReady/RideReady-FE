@@ -25,3 +25,21 @@ $mainFont: 'Kalam', cursive;
   font-size: $size;
   font-weight: 400;
 }
+
+@mixin errorModal {
+  height: 50vh;
+  width: 50vw;
+  background-color: $lightOrange;
+  border-radius: 20px;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  @include centered(column, center);
+  white-space: pre-wrap;
+  text-align: center;
+  font-family: $mainFont;
+  font-weight: 600;
+  font-size: 20px;
+  color: darkblue;
+}

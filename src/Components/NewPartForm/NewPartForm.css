@@ -43,4 +43,25 @@
 
 #new-part-site-logo {
   cursor: pointer;
+}
+
+#newPartErrorModal[open] {
+  height: 50vh;
+  width: 50vw;
+  background-color: #F6AE2D;
+  border-radius: 20px;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  white-space: pre-wrap;
+  text-align: center;
+  font-family: "Kalam", cursive;
+  font-weight: 600;
+  font-size: 20px;
+  color: darkblue;
 }/*# sourceMappingURL=NewPartForm.css.map */
