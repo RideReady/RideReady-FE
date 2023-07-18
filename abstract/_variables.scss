@@ -27,9 +27,9 @@ $mainFont: 'Kalam', cursive;
 }
 
 @mixin errorModal {
-  height: 50vh;
-  width: 50vw;
-  background-color: $lightOrange;
+  height: fit-content;
+  width: 100vw;
+  background-color: $darkBlue;
   border-radius: 20px;
   position: fixed;
   top: 50%;
@@ -41,5 +41,6 @@ $mainFont: 'Kalam', cursive;
   font-family: $mainFont;
   font-weight: 600;
   font-size: 20px;
-  color: darkblue;
+  padding: 20px;
+  color: $lightOrange;
 }

@@ -83,13 +83,12 @@ export default function NewPartForm({
         .catch((error) => {
           console.log(error);
           setErrorModalMessage(
-            `There was an error loading your suspension from the database.\n${error}`
+            `There was an error loading your suspension from the database. Please try reloading the page by clicking the button below.`
           );
           newPartErrorModal.showModal();
           setTimeout(() => {
             newPartErrorModal.close();
-          }, 2500);
-          setUserSuspension([]);
+          }, 10000);
         });
     }
     // eslint-disable-next-line
@@ -235,8 +234,14 @@ export default function NewPartForm({
         navigate("/dashboard");
       })
       .catch((error) => {
-        // ADD POPUP
         console.log(error);
+        setErrorModalMessage(
+          `There was an error posting your suspension update to the database. Please try reloading the page by clicking the button below.`
+        );
+        newPartErrorModal.showModal();
+        setTimeout(() => {
+          newPartErrorModal.close();
+        }, 10000);
       });
   };
 
@@ -302,7 +307,10 @@ export default function NewPartForm({
           This could take up to 15 seconds
         </p>
       )}
-      <dialog id="newPartErrorModal">{errorModalMessage}</dialog>
+      <dialog id="newPartErrorModal">
+        {errorModalMessage}
+        <button id="reloadButton" onClick={() => window.location.reload()}>Reload</button>
+      </dialog>
     </section>
   );
 }
