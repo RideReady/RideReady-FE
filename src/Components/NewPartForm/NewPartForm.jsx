@@ -236,7 +236,7 @@ export default function NewPartForm({
       .catch((error) => {
         console.log(error);
         setErrorModalMessage(
-          `There was an error posting your suspension update to the database. Please try reloading the page by clicking the button below.`
+          `There was an error posting your suspension update to the database. Please try reloading the page by clicking the button below and try your request again.`
         );
         newPartErrorModal.showModal();
         setTimeout(() => {
@@ -309,7 +309,9 @@ export default function NewPartForm({
       )}
       <dialog id="newPartErrorModal">
         {errorModalMessage}
-        <button id="reloadButton" onClick={() => window.location.reload()}>Reload</button>
+        <button id="reloadButton" onClick={() => window.location.reload()}>
+          Reload
+        </button>
       </dialog>
     </section>
   );
