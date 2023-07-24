@@ -37,4 +37,53 @@
 
 #delete-sus-site-logo {
   cursor: pointer;
+}
+
+#deleteSusErrorModal[open] {
+  height: -moz-fit-content;
+  height: fit-content;
+  width: 100vw;
+  background-color: #2F4858;
+  border-radius: 20px;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  white-space: pre-wrap;
+  text-align: center;
+  font-family: "Kalam", cursive;
+  font-weight: 600;
+  font-size: 20px;
+  padding: 20px;
+  color: #F6AE2D;
+}
+
+@media only screen and (min-width: 860px) {
+  #deleteSusErrorModal[open] {
+    height: -moz-fit-content;
+    height: fit-content;
+    width: 100vw;
+    background-color: #2F4858;
+    border-radius: 20px;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    white-space: pre-wrap;
+    text-align: center;
+    font-family: "Kalam", cursive;
+    font-weight: 600;
+    font-size: 20px;
+    padding: 20px;
+    color: #F6AE2D;
+    width: 50vw;
+  }
 }/*# sourceMappingURL=DeleteSus.css.map */

@@ -148,12 +148,6 @@ export default function EditSus({
     // eslint-disable-next-line
   }, [newRebuildDate, userRides]);
 
-  // useEffect(() => {
-  //   if (selectedSuspension === null) {
-  //     navigate("/dashboard");
-  //   }
-  // }, [selectedSuspension, navigate]);
-
   const handleSubmit = () => {
     if (!newRebuildDate) {
       setSubmitError(true);

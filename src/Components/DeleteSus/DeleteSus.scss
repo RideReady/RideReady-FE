@@ -32,3 +32,14 @@
 #delete-sus-site-logo {
   cursor: pointer;
 }
+
+#deleteSusErrorModal[open] {
+  @include errorModal;
+}
+
+@media only screen and (min-width: 860px) {
+  #deleteSusErrorModal[open] {
+    @include errorModal;
+    width: 50vw;
+  }
+}

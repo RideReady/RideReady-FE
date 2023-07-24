@@ -44,6 +44,7 @@ describe('deleteSus', () => {
     cy.get('input[name="lastRebuild"]').type('2023-01-01')
     cy.wait(200)
     cy.get('button').eq(1).click()
+    cy.wait(200)
   })
 
   it('Should navigate to the delete sus page when button is clicked on tile', () => {
@@ -60,6 +61,13 @@ describe('deleteSus', () => {
   })
 
   it('Should delete the selected tile and navigate to the dashboard', () => {
+    cy.intercept("DELETE", "http://localhost:5001/suspension/*", {
+      statusCode: 200,
+      // Not sure why I needed this to be stringified but was
+      // going to catch block without it
+      body: JSON.stringify("Suspension deleted successfully"),
+    });
+
     cy.get('button').eq(0).click()
 
     cy.get('button').eq(1).click()
