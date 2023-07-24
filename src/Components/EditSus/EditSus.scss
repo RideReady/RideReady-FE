@@ -28,3 +28,14 @@
 #edit-sus-site-logo {
   cursor: pointer;
 }
+
+#editSusErrorModal[open] {
+  @include errorModal;
+}
+
+@media only screen and (min-width: 860px) {
+  #editSusErrorModal[open] {
+    @include errorModal;
+    width: 50vw;
+  }
+}

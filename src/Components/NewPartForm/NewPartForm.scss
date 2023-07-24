@@ -38,3 +38,18 @@
 #new-part-site-logo {
   cursor: pointer;
 }
+
+#newPartErrorModal[open] {
+  @include errorModal;
+}
+
+#reloadButton {
+  margin: 20px;
+}
+
+@media only screen and (min-width: 860px) {
+  #newPartErrorModal[open] {
+    @include errorModal;
+    width: 50vw;
+  }
+}

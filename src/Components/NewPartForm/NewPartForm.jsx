@@ -9,12 +9,12 @@ import {
   cleanRideData,
   convertSusToDatabaseFormat,
   filterRidesForSpecificBike,
-  convertSuspensionFromDatabase
+  convertSuspensionFromDatabase,
 } from "../../util";
 import {
   getUserActivities,
   postUserSuspensionToDatabase,
-  loadUserSuspensionFromDatabase
+  loadUserSuspensionFromDatabase,
 } from "../../Services/APICalls";
 import { useNavigate } from "react-router-dom";
 import { v4 as uuidv4 } from "uuid";
@@ -32,7 +32,7 @@ export default function NewPartForm({
   pagesFetched,
   setPagesFetched,
   changeErrorMessage,
-  setUserID
+  setUserID,
 }) {
   const [bikeOptions, setBikeOptions] = useState(userBikes);
   const [bikeDropdownOptions, setBikeDropdownOptions] = useState([]);
@@ -43,7 +43,10 @@ export default function NewPartForm({
   const [fetchCount, setFetchCount] = useState(pagesFetched);
   const [submitDisabled, setSubmitDisabled] = useState(false);
   const [submitError, setSubmitError] = useState(false);
+  const [errorModalMessage, setErrorModalMessage] = useState("");
+
   const navigate = useNavigate();
+  const newPartErrorModal = document.getElementById("newPartErrorModal");
 
   useEffect(() => {
     if (!userBikes) {
@@ -78,8 +81,14 @@ export default function NewPartForm({
           }
         })
         .catch((error) => {
-          alert(error);
-          setUserSuspension([]);
+          console.log(error);
+          setErrorModalMessage(
+            `There was an error loading your suspension from the database. Please try reloading the page by clicking the button below.`
+          );
+          newPartErrorModal.showModal();
+          setTimeout(() => {
+            newPartErrorModal.close();
+          }, 10000);
         });
     }
     // eslint-disable-next-line
@@ -206,27 +215,34 @@ export default function NewPartForm({
     postUserSuspensionToDatabase(newSusPostData)
       .then((response) => {
         console.log(response);
+
+        if (userSuspension) {
+          setUserSuspension([...userSuspension, newSuspensionDetails]);
+          window.localStorage.setItem(
+            "userSuspension",
+            JSON.stringify([...userSuspension, newSuspensionDetails])
+          );
+        } else {
+          setUserSuspension([newSuspensionDetails]);
+          window.localStorage.setItem(
+            "userSuspension",
+            JSON.stringify([newSuspensionDetails])
+          );
+        }
+
+        setPagesFetched(fetchCount);
+        navigate("/dashboard");
       })
       .catch((error) => {
         console.log(error);
+        setErrorModalMessage(
+          `There was an error posting your suspension update to the database. Please try reloading the page by clicking the button below and try your request again.`
+        );
+        newPartErrorModal.showModal();
+        setTimeout(() => {
+          newPartErrorModal.close();
+        }, 10000);
       });
-
-    if (userSuspension) {
-      setUserSuspension([...userSuspension, newSuspensionDetails]);
-      window.localStorage.setItem(
-        "userSuspension",
-        JSON.stringify([...userSuspension, newSuspensionDetails])
-      );
-    } else {
-      setUserSuspension([newSuspensionDetails]);
-      window.localStorage.setItem(
-        "userSuspension",
-        JSON.stringify([newSuspensionDetails])
-      );
-    }
-
-    setPagesFetched(fetchCount);
-    navigate("/dashboard");
   };
 
   return (
@@ -291,6 +307,12 @@ export default function NewPartForm({
           This could take up to 15 seconds
         </p>
       )}
+      <dialog id="newPartErrorModal">
+        {errorModalMessage}
+        <button id="reloadButton" onClick={() => window.location.reload()}>
+          Reload
+        </button>
+      </dialog>
     </section>
   );
 }
@@ -308,5 +330,5 @@ NewPartForm.propTypes = {
   pagesFetched: PropTypes.number,
   setPagesFetched: PropTypes.func,
   changeErrorMessage: PropTypes.func,
-  setUserID: PropTypes.func
+  setUserID: PropTypes.func,
 };

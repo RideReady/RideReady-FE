@@ -94,6 +94,22 @@ describe("EditSus", () => {
       body: "Error updating suspension: errorDetails",
     });
 
+    cy.intercept(
+      "GET",
+      `https://www.strava.com/api/v3/athlete/activities?page=*`,
+      {
+        fixture: "rideData.json",
+      }
+    );
+
+    cy.intercept("GET", `https://www.strava.com/api/v3/gear/b9082682`, {
+      fixture: "EnduroData.json",
+    });
+
+    cy.intercept("GET", `https://www.strava.com/api/v3/gear/b1979857`, {
+      fixture: "AllezData.json",
+    });
+
     cy.get("button").eq(1).click();
 
     cy.get("input").type("2022-10-10");
@@ -102,6 +118,12 @@ describe("EditSus", () => {
     cy.url().should("eq", "http://localhost:5173/dashboard/edit");
 
     cy.get("h2").eq(1).should("have.text", "Currently: Jan 1, 2023");
+
+    cy.get("dialog[id='editSusErrorModal']").should("be.visible");
+
+    cy.get("dialog[id='editSusErrorModal']").should(
+      "contain",
+      "There was an issue modifying your suspension rebuild date. Please try reloading the page by clicking the button below and try your request again."
+    );
   });
-  
 });

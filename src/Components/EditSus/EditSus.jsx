@@ -42,7 +42,10 @@ export default function EditSus({
   const [fetchCount, setFetchCount] = useState(pagesFetched);
   const [submitDisabled, setSubmitDisabled] = useState(false);
   const [submitError, setSubmitError] = useState(false);
+  const [errorModalMessage, setErrorModalMessage] = useState("");
+
   const navigate = useNavigate();
+  const editSusErrorModal = document.getElementById("editSusErrorModal");
 
   useEffect(() => {
     if (!userBikes) {
@@ -61,7 +64,11 @@ export default function EditSus({
       const loadedSelection = JSON.parse(
         localStorage.getItem("selectedSuspension")
       );
-      setSelectedSuspension(loadedSelection);
+      if (loadedSelection === null) {
+        navigate("/dashboard");
+      } else {
+        setSelectedSuspension(loadedSelection);
+      }
     }
     if (!userID) {
       const loadedID = JSON.parse(localStorage.getItem("userID"));
@@ -82,8 +89,14 @@ export default function EditSus({
           }
         })
         .catch((error) => {
-          alert(error);
-          setUserSuspension([]);
+          console.log(error);
+          setErrorModalMessage(
+            `There was an error loading your suspension from the database. Please try reloading the page by clicking the button below.`
+          );
+          editSusErrorModal.showModal();
+          setTimeout(() => {
+            editSusErrorModal.close();
+          }, 10000);
         });
     }
     // eslint-disable-next-line
@@ -135,12 +148,6 @@ export default function EditSus({
     // eslint-disable-next-line
   }, [newRebuildDate, userRides]);
 
-  useEffect(() => {
-    if (selectedSuspension === null) {
-      navigate("/dashboard");
-    }
-  }, [selectedSuspension, navigate]);
-
   const handleSubmit = () => {
     if (!newRebuildDate) {
       setSubmitError(true);
@@ -178,10 +185,13 @@ export default function EditSus({
       })
       .catch((error) => {
         console.log(error);
-        // Replace with more user friendly notification
-        alert(
-          "There was an issue modifying your suspension rebuild date. Please wait a moment then submit your request again."
+        setErrorModalMessage(
+          `There was an issue modifying your suspension rebuild date. Please try reloading the page by clicking the button below and try your request again.`
         );
+        editSusErrorModal.showModal();
+        setTimeout(() => {
+          editSusErrorModal.close();
+        }, 10000);
       });
   };
 
@@ -248,6 +258,12 @@ export default function EditSus({
         )}
       </div>
       <div className="edit-spacer"></div>
+      <dialog id="editSusErrorModal">
+        {errorModalMessage}
+        <button id="reloadButton" onClick={() => window.location.reload()}>
+          Reload
+        </button>
+      </dialog>
     </section>
   );
 }
