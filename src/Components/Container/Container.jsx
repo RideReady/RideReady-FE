@@ -7,9 +7,20 @@ export default function Container({
   userSuspension,
   setSelectedSuspension,
   loadingSus,
+  userRides,
 }) {
   const [susTiles, setSusTiles] = useState([]);
-  const [dashboardMessage, setDashboardMessage] = useState("Loading your suspension...");
+  const [dashboardMessage, setDashboardMessage] = useState(
+    "Loading your suspension..."
+  );
+
+  useEffect(() => {
+    if (userRides.length <= 0) {
+      setDashboardMessage(
+        "No rides detected in your Strava account. At least one ride is needed to calculate your suspension life."
+      );
+    }
+  }, [userRides]);
 
   useEffect(() => {
     if (!userSuspension) return;
@@ -27,16 +38,22 @@ export default function Container({
       });
       setSusTiles(suspensionTiles);
     } else if (loadingSus == "error") {
-      setDashboardMessage("An error occurred while loading your data. Please click the button below to try logging in again.");
+      setDashboardMessage(
+        "An error occurred while loading your data. Please click the button below to try logging in again."
+      );
     } else if (!loadingSus && userSuspension.length <= 0) {
-      setDashboardMessage("No suspension to view. Add a new suspension part by clicking the button below.")
+      setDashboardMessage(
+        "No suspension to view. Add a new suspension part by clicking the button below."
+      );
     }
     // eslint-disable-next-line
   }, [userSuspension, loadingSus]);
 
   return (
     <section className="container">
-      {dashboardMessage ? <p className="add-new-mesg">{dashboardMessage}</p> : null}
+      {dashboardMessage ? (
+        <p className="add-new-mesg">{dashboardMessage}</p>
+      ) : null}
       {susTiles}
     </section>
   );
@@ -46,4 +63,5 @@ Container.propTypes = {
   userSuspension: PropTypes.array,
   setSelectedSuspension: PropTypes.func,
   loadingSus: PropTypes.string,
+  userRides: PropTypes.array,
 };

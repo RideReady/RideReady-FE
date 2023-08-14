@@ -139,6 +139,7 @@ export default function Dashboard({
         userSuspension={userSuspension}
         setSelectedSuspension={setSelectedSuspension}
         loadingSus={loadingSus}
+        userRides={userRides}
       />
       <button id="dash-add-sus-btn" onClick={() => navigate(buttonLink)}>
         {buttonMsg}
