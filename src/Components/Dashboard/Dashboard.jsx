@@ -54,6 +54,13 @@ export default function Dashboard({
   }, []);
 
   useEffect(() => {
+    if (userRides.length <= 0) {
+      setButtonLink("/");
+      setButtonMsg("Return to login page");
+    }
+  }, [userRides])
+
+  useEffect(() => {
     if (userID === null || userBikes === null) return;
     if (!userSuspension) {
       setLoadingSus("loading");
@@ -144,7 +151,8 @@ export default function Dashboard({
       <button id="dash-add-sus-btn" onClick={() => navigate(buttonLink)}>
         {buttonMsg}
       </button>
-      <button id="dash-send-feedback-btn"
+      <button
+        id="dash-send-feedback-btn"
         onClick={(e) => {
           e.preventDefault();
           window.location = "mailto:rickv85@gmail.com";
