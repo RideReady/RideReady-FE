@@ -150,7 +150,7 @@ export const convertSusToDatabaseFormat = (sus, userID) => {
     sus_data_id: sus.susData.id,
     on_bike_id: sus.onBike.id,
     date_created: new Date(),
-    last_ride_calculated: sus.lastRideCalculated
+    last_ride_calculated: sus.lastRideCalculated,
   };
 
   return susDataConverted;
@@ -158,7 +158,10 @@ export const convertSusToDatabaseFormat = (sus, userID) => {
 
 export const isNewestRideAfterLastCalculated = (userRides, sus) => {
   const lastRideCalculatedDate = sus.lastRideCalculated;
-  const newestRideOnBikeDate = filterRidesForSpecificBike(userRides, sus.onBike)[0].ride_date;
+  const newestRideOnBikeDate = filterRidesForSpecificBike(
+    userRides,
+    sus.onBike
+  )[0].ride_date;
 
   if (moment(newestRideOnBikeDate).isAfter(lastRideCalculatedDate)) {
     return true;
@@ -169,6 +172,12 @@ export const isNewestRideAfterLastCalculated = (userRides, sus) => {
 
 // Could above functions be refactored to use this?
 export const filterRidesForSpecificBike = (userRides, onBike) => {
-  const filteredRides = userRides.filter((ride) => ride.gear_id === onBike.id);
+  let filteredRides;
+  console.log(onBike)
+  if (onBike.id !== "unknownBike") {
+    filteredRides = userRides.filter((ride) => ride.gear_id === onBike.id);
+  } else {
+    filteredRides = userRides;
+  }
   return filteredRides;
 };

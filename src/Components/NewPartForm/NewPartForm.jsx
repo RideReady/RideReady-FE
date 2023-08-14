@@ -175,22 +175,24 @@ export default function NewPartForm({
 
     // Add to utils - using in Util as helper for Dashboard func
     let selectedBikeDetails;
-    if (bikeOptions) {
+    if (bikeOptions && selectedBike !== "0") {
       selectedBikeDetails = bikeOptions.find(
         (bike) => bike.id === selectedBike
       );
     } else {
-      selectedBikeDetails = null;
+      selectedBikeDetails = {
+        id: "unknownBike",
+        brand_name: "Unknown",
+        model_name: "Bike",
+      };
     }
+
+    console.log(selectedBikeDetails)
 
     const newSuspensionDetails = {
       id: uuidv4(),
       susData: selectedSuspensionData,
-      onBike: selectedBikeDetails || {
-        id: "unknownBike",
-        brand_name: "Unknown",
-        model_name: "Bike",
-      },
+      onBike: selectedBikeDetails,
       rebuildDate: selectedRebuildDate,
       rebuildLife: calculateRebuildLife(
         selectedSus,
