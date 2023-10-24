@@ -26,7 +26,7 @@ export default function Home() {
     <section className="home-page">
       <div className="home-content">
         <h1 className="site-logo">Ride Ready</h1>
-        <h2 className="tag-line">Your personal suspension manager</h2>
+        <h2 className="tag-line">Mountain Bike Suspension Service Life Tracker</h2>
         <button onClick={loginUser}>Log in with Strava</button>
         <p className="notes">
           <b>Important notes about this app:</b> You must have a Strava account
