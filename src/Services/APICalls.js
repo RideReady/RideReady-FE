@@ -4,10 +4,10 @@ export const getAccessToken = (userAuthToken) => {
   let clientID = `${import.meta.env.VITE_CLIENT_ID}`;
   let clientSecret = `${import.meta.env.VITE_CLIENT_SECRET}`;
 
-  if (window.location.href.startsWith("http://localhost:5173/redirect/")) {
-    clientID = `${import.meta.env.VITE_CLIENT_ID_LOCAL}`;
-    clientSecret = `${import.meta.env.VITE_CLIENT_SECRET_LOCAL}`;
-  }
+  // if (window.location.href.startsWith("http://localhost:5173/redirect/")) {
+  //   clientID = `${import.meta.env.VITE_CLIENT_ID_LOCAL}`;
+  //   clientSecret = `${import.meta.env.VITE_CLIENT_SECRET_LOCAL}`;
+  // }
 
   return fetch(`https://www.strava.com/oauth/token`, {
     method: "POST",
