@@ -73,13 +73,8 @@ export const getUserGearDetails = (id, userAccessToken) => {
 // Heroku BE Database API Calls
 
 export const loadUserSuspensionFromDatabase = (userID) => {
-  let url;
-  if (window.location.href.startsWith("http://localhost:5173")) {
-    url = `http://localhost:5001/suspension/${userID}`;
-  } else {
-    url = `https://rideready-be.herokuapp.com/suspension/${userID}`;
-  }
-  return fetch(url).then((response) => {
+  const dbUrl = import.meta.env.VITE_DB_URL;
+  return fetch(`${dbUrl}${userID}`).then((response) => {
     if (response.ok) {
       return response.json();
     }
@@ -88,13 +83,8 @@ export const loadUserSuspensionFromDatabase = (userID) => {
 };
 
 export const postUserSuspensionToDatabase = (newSus) => {
-  let url;
-  if (window.location.href.startsWith("http://localhost:5173")) {
-    url = `http://localhost:5001/suspension`;
-  } else {
-    url = `https://rideready-be.herokuapp.com/suspension`;
-  }
-  return fetch(url, {
+  const dbUrl = import.meta.env.VITE_DB_URL;
+  return fetch(dbUrl, {
     method: "POST",
     headers: { "Content-Type": "application/JSON" },
     body: JSON.stringify(newSus),
@@ -107,13 +97,8 @@ export const postUserSuspensionToDatabase = (newSus) => {
 };
 
 export const editUserSuspensionInDatabase = (susToEdit) => {
-  let url;
-  if (window.location.href.startsWith("http://localhost:5173")) {
-    url = `http://localhost:5001/suspension/${susToEdit.id}`;
-  } else {
-    url = `https://rideready-be.herokuapp.com/suspension/${susToEdit.id}`;
-  }
-  return fetch(url, {
+  const dbUrl = import.meta.env.VITE_DB_URL;
+  return fetch(`${dbUrl}${susToEdit.id}`, {
     method: "PATCH",
     headers: { "Content-Type": "application/JSON" },
     body: JSON.stringify(susToEdit),
@@ -127,13 +112,8 @@ export const editUserSuspensionInDatabase = (susToEdit) => {
 }
 
 export const deleteUserSuspensionInDatabase = (susToDeleteId) => {
-  let url;
-  if (window.location.href.startsWith("http://localhost:5173")) {
-    url = `http://localhost:5001/suspension/${susToDeleteId}`;
-  } else {
-    url = `https://rideready-be.herokuapp.com/suspension/${susToDeleteId}`;
-  }
-  return fetch(url, {
+  const dbUrl = import.meta.env.VITE_DB_URL;
+  return fetch(`${dbUrl}${susToDeleteId}`, {
     method: "DELETE"
   }).then((response) => {
     if (response.ok) {

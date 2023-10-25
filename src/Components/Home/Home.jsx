@@ -3,7 +3,7 @@ import "./Home.css";
 
 export default function Home() {
   const clientID = import.meta.env.VITE_CLIENT_ID;
-  const redirectUrl= import.meta.env.VITE_REDIRECT_URL;
+  const redirectUrl = import.meta.env.VITE_REDIRECT_URL;
 
   useEffect(() => {
     window.localStorage.clear();
