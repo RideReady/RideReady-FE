@@ -24,6 +24,10 @@ describe("Redirect", () => {
     cy.intercept("GET", `https://www.strava.com/api/v3/gear/b1979857`, {
       fixture: "AllezData.json",
     });
+
+    cy.intercept("GET", "http://localhost:5001/suspension/*", {
+      body: [],
+    });
   });
 
   it("Should display site title, gif and message", () => {

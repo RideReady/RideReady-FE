@@ -6,7 +6,7 @@ describe('Home', () => {
     
   it('Should display the site title, tagline and login button', () => {
     cy.get('h1').should('have.text', 'Ride Ready')
-    cy.get('h2').should('have.text', 'Your personal suspension manager')
+    cy.get('h2').should('have.text', 'Mountain Bike Suspension Service Life Tracker')
     cy.get('button').should('have.text', 'Log in with Strava')
   })
 

@@ -1,6 +1,20 @@
 /* global cy, describe, beforeEach, it */
 describe("EditSus", () => {
   beforeEach(() => {
+    cy.intercept(
+      'GET',
+      /https:\/\/www\.strava\.com\/api\/v3\/athlete\/activities\?page=\d+&per_page=200/,
+      { fixture: 'rideData.json' }
+    ).as('stravaApi');
+
+    cy.intercept("GET", /https:\/\/www\.strava\.com\/api\/v3\/gear\/b[0-9a-zA-Z]+/, (req) => {
+      if (req.url.endsWith('b9082682')) {
+        req.reply({ fixture: 'EnduroData.json' });
+      } else if (req.url.endsWith('b1979857')) {
+        req.reply({ fixture: 'AllezData.json' });
+      }
+    }).as("stravaGearApi");
+
     cy.visit(
       "http://localhost:5173/redirect/exchange_token?state=&code=97dd82f961714a09adb14e47b242a23103c4c202&scope=read,activity:read_all"
     );
@@ -26,21 +40,21 @@ describe("EditSus", () => {
       body: { message: `Suspension testSusId updated successfully` },
     });
 
-    cy.intercept(
-      "GET",
-      `https://www.strava.com/api/v3/athlete/activities?page=*`,
-      {
-        fixture: "rideData.json",
-      }
-    );
+    // cy.intercept(
+    //   "GET",
+    //   `https://www.strava.com/api/v3/athlete/activities?page=*`,
+    //   {
+    //     fixture: "rideData.json",
+    //   }
+    // );
 
-    cy.intercept("GET", `https://www.strava.com/api/v3/gear/b9082682`, {
-      fixture: "EnduroData.json",
-    });
+    // cy.intercept("GET", `https://www.strava.com/api/v3/gear/b9082682`, {
+    //   fixture: "EnduroData.json",
+    // });
 
-    cy.intercept("GET", `https://www.strava.com/api/v3/gear/b1979857`, {
-      fixture: "AllezData.json",
-    });
+    // cy.intercept("GET", `https://www.strava.com/api/v3/gear/b1979857`, {
+    //   fixture: "AllezData.json",
+    // });
 
     cy.wait(200);
     cy.get('button[id="dash-add-sus-btn"]').click();
@@ -50,7 +64,7 @@ describe("EditSus", () => {
     cy.wait(200);
     cy.get('select[name="suspensionSelect"]').select("RockShox Fork");
     cy.wait(200);
-    cy.get('input[name="lastRebuild"]').type("2023-01-01");
+    cy.get('input[name="lastRebuild"]').type("2023-06-01");
     cy.wait(200);
     cy.get("button").eq(1).click();
   });
@@ -94,30 +108,14 @@ describe("EditSus", () => {
       body: "Error updating suspension: errorDetails",
     });
 
-    cy.intercept(
-      "GET",
-      `https://www.strava.com/api/v3/athlete/activities?page=*`,
-      {
-        fixture: "rideData.json",
-      }
-    );
-
-    cy.intercept("GET", `https://www.strava.com/api/v3/gear/b9082682`, {
-      fixture: "EnduroData.json",
-    });
-
-    cy.intercept("GET", `https://www.strava.com/api/v3/gear/b1979857`, {
-      fixture: "AllezData.json",
-    });
-
     cy.get("button").eq(1).click();
 
-    cy.get("input").type("2022-10-10");
+    cy.get("input").type("2023-10-10");
     cy.get("button").eq(1).click();
 
     cy.url().should("eq", "http://localhost:5173/dashboard/edit");
 
-    cy.get("h2").eq(1).should("have.text", "Currently: Jan 1, 2023");
+    cy.get("h2").eq(1).should("have.text", "Currently: Jun 1, 2023");
 
     cy.get("dialog[id='editSusErrorModal']").should("be.visible");
 
