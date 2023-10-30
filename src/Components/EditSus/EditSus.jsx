@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import "./EditSus.css";
 import { useNavigate } from "react-router-dom";
 import { convertSusToDatabaseFormat, findSusIndexByID } from "../../util";
@@ -38,8 +38,9 @@ export default function EditSus({
   const [newRebuildDate, setNewRebuildDate] = useState("");
   const [editSusIndex, setEditSusIndex] = useState(null);
   const [editSusDetails, setEditSusDetails] = useState(null);
-  const [fetchPageNumber, setFetchPageNumber] = useState(pagesFetched);
-  const [fetchCount, setFetchCount] = useState(pagesFetched);
+  const fetchPageNum = useRef(pagesFetched);
+  const lastLoadedPageNum = useRef(pagesFetched);
+  const [loadingRides, setLoadingRides] = useState(false);
   const [submitDisabled, setSubmitDisabled] = useState(false);
   const [submitError, setSubmitError] = useState(false);
   const [errorModalMessage, setErrorModalMessage] = useState("");
@@ -119,14 +120,22 @@ export default function EditSus({
   useEffect(() => {
     let moreRidesNeeded;
     if (newRebuildDate) {
-      moreRidesNeeded = isOldestRideBeforeRebuild(userRides, newRebuildDate);
+      if (isOldestRideBeforeRebuild(userRides, newRebuildDate)) {
+        moreRidesNeeded = false;
+      } else {
+        moreRidesNeeded = true;
+      }
     }
-    if (moreRidesNeeded === false) {
-      if (fetchCount !== fetchPageNumber) return;
-      if (fetchCount > 10) return;
+    if (moreRidesNeeded) {
+      if (
+        lastLoadedPageNum.current !== fetchPageNum.current ||
+        lastLoadedPageNum.current > 10
+      )
+        return;
+      setLoadingRides(true);
       setSubmitDisabled(true);
-      setFetchPageNumber(fetchPageNumber + 1);
-      getUserActivities(fetchPageNumber, userAccessToken)
+      fetchPageNum.current = fetchPageNum.current + 1;
+      getUserActivities(fetchPageNum.current, userAccessToken)
         .then((activities) => {
           const rideActivities = filterRideActivities(activities);
           const cleanedRides = cleanRideData(rideActivities);
@@ -137,7 +146,8 @@ export default function EditSus({
               JSON.stringify([...userRides, ...cleanedRides])
             );
           }
-          setFetchCount(fetchCount + 1);
+          lastLoadedPageNum.current = lastLoadedPageNum.current + 1;
+          setLoadingRides(false);
           setSubmitDisabled(false);
         })
         .catch(() => {
@@ -181,7 +191,7 @@ export default function EditSus({
 
         window.localStorage.setItem("selectedSuspension", JSON.stringify(null));
         setSelectedSuspension(null);
-        setPagesFetched(fetchCount);
+        setPagesFetched(lastLoadedPageNum.current);
       })
       .catch((error) => {
         console.log(error);
@@ -249,7 +259,7 @@ export default function EditSus({
             Please fill out all forms before submitting
           </p>
         )}
-        {fetchCount !== fetchPageNumber && (
+        {loadingRides && (
           <p className="error-wait-message">
             Please wait for data to load.
             <br />
