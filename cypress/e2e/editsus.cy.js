@@ -1,60 +1,48 @@
 /* global cy, describe, beforeEach, it */
 describe("EditSus", () => {
   beforeEach(() => {
-    cy.intercept(
-      'GET',
-      /https:\/\/www\.strava\.com\/api\/v3\/athlete\/activities\?page=\d+&per_page=200/,
-      { fixture: 'rideData.json' }
-    ).as('stravaApi');
-
-    cy.intercept("GET", /https:\/\/www\.strava\.com\/api\/v3\/gear\/b[0-9a-zA-Z]+/, (req) => {
-      if (req.url.endsWith('b9082682')) {
-        req.reply({ fixture: 'EnduroData.json' });
-      } else if (req.url.endsWith('b1979857')) {
-        req.reply({ fixture: 'AllezData.json' });
-      }
-    }).as("stravaGearApi");
-
-    cy.visit(
-      "http://localhost:5173/redirect/exchange_token?state=&code=97dd82f961714a09adb14e47b242a23103c4c202&scope=read,activity:read_all"
-    );
-
+    // Create default intercepts
     cy.intercept("POST", `https://www.strava.com/oauth/token`, {
       statusCode: 200,
       body: {
         access_token: "accessToken",
       },
-    });
+    }).as("stravaPostAuthToken");
+
+    cy.intercept(
+      "GET",
+      `https://www.strava.com/api/v3/athlete/activities?page=*`,
+      {
+        fixture: "RideData.json",
+      }
+    ).as("stravaRideApi");
+
+    cy.intercept("GET", `https://www.strava.com/api/v3/gear/b9082682`, {
+      fixture: "EnduroData.json",
+    }).as("stravaGearApiEnduro");
+
+    cy.intercept("GET", `https://www.strava.com/api/v3/gear/b1979857`, {
+      fixture: "AllezData.json",
+    }).as("stravaGearApiAllez");
 
     cy.intercept("GET", "http://localhost:5001/suspension/*", {
-      body: [],
-    });
+      body: { suspension: [] },
+    }).as("localDbGetSuspension");
 
     cy.intercept("POST", "http://localhost:5001/suspension", {
       statusCode: 201,
       body: JSON.stringify("New suspension added to DB: newSusData from test"),
-    });
+    }).as("localDbPostSuspension");
 
     cy.intercept("PATCH", "http://localhost:5001/suspension/*", {
       statusCode: 200,
       body: { message: `Suspension testSusId updated successfully` },
-    });
+    }).as("localDbPatchSuspension");
 
-    // cy.intercept(
-    //   "GET",
-    //   `https://www.strava.com/api/v3/athlete/activities?page=*`,
-    //   {
-    //     fixture: "rideData.json",
-    //   }
-    // );
-
-    // cy.intercept("GET", `https://www.strava.com/api/v3/gear/b9082682`, {
-    //   fixture: "EnduroData.json",
-    // });
-
-    // cy.intercept("GET", `https://www.strava.com/api/v3/gear/b1979857`, {
-    //   fixture: "AllezData.json",
-    // });
+    // Start test set up
+    cy.visit(
+      "http://localhost:5173/redirect/exchange_token?state=&code=97dd82f961714a09adb14e47b242a23103c4c202&scope=read,activity:read_all"
+    );
 
     cy.wait(200);
     cy.get('button[id="dash-add-sus-btn"]').click();

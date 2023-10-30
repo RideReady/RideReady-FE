@@ -1,33 +1,35 @@
 /* global cy, describe, beforeEach, it */
 describe("Redirect", () => {
   beforeEach(() => {
-    cy.visit("http://localhost:5173/redirect");
+    // Create default intercepts
     cy.intercept("POST", `https://www.strava.com/oauth/token`, {
       statusCode: 200,
       body: {
         access_token: "accessToken",
       },
-    });
+    }).as("stravaPostAuthToken");
 
     cy.intercept(
       "GET",
-      `https://www.strava.com/api/v3/athlete/activities?page=1&per_page=200`,
+      `https://www.strava.com/api/v3/athlete/activities?page=*`,
       {
-        fixture: "rideData.json",
+        fixture: "RideData.json",
       }
-    );
+    ).as("stravaRideApi");
 
     cy.intercept("GET", `https://www.strava.com/api/v3/gear/b9082682`, {
       fixture: "EnduroData.json",
-    });
+    }).as("stravaGearApiEnduro");
 
     cy.intercept("GET", `https://www.strava.com/api/v3/gear/b1979857`, {
       fixture: "AllezData.json",
-    });
+    }).as("stravaGearApiAllez");
 
     cy.intercept("GET", "http://localhost:5001/suspension/*", {
-      body: [],
-    });
+      body: { suspension: [] },
+    }).as("localDbGetSuspension");
+
+    cy.visit("http://localhost:5173/redirect");
   });
 
   it("Should display site title, gif and message", () => {

@@ -68,32 +68,12 @@ describe("add-new-part", () => {
   });
 
   it("Should create a new suspension part on the dashboard when all inputs are filled out", () => {
-    cy.visit(
-      "http://localhost:5173/redirect/exchange_token?state=&code=97dd82f961714a09adb14e47b242a23103c4c202&scope=read,activity:read_all"
-    );
     cy.intercept("POST", `https://www.strava.com/oauth/token`, {
       statusCode: 200,
       body: {
         access_token: "accessToken",
       },
-    });
-
-    cy.intercept("GET", "http://localhost:5001/suspension/*", {
-      body: [],
-    });
-
-    cy.intercept("POST", "http://localhost:5001/suspension", {
-      statusCode: 201,
-      body: JSON.stringify("New suspension added to DB: newSusData from test"),
-    });
-
-    cy.intercept(
-      "GET",
-      `https://www.strava.com/api/v3/athlete/activities?page=1&per_page=200`,
-      {
-        fixture: "RideData.json",
-      }
-    );
+    }).as("stravaPostAuthToken");
 
     cy.intercept(
       "GET",
@@ -101,15 +81,28 @@ describe("add-new-part", () => {
       {
         fixture: "RideData.json",
       }
-    );
+    ).as("stravaRideApi");
 
     cy.intercept("GET", `https://www.strava.com/api/v3/gear/b9082682`, {
       fixture: "EnduroData.json",
-    });
+    }).as("stravaGearApiEnduro");
 
     cy.intercept("GET", `https://www.strava.com/api/v3/gear/b1979857`, {
       fixture: "AllezData.json",
-    });
+    }).as("stravaGearApiAllez");
+
+    cy.intercept("GET", "http://localhost:5001/suspension/*", {
+      body: { suspension: [] },
+    }).as("localDbGetSuspension");
+
+    cy.intercept("POST", "http://localhost:5001/suspension", {
+      statusCode: 201,
+      body: JSON.stringify("New suspension added to DB: newSusData from test"),
+    }).as("localDbPostSuspension");
+
+    cy.visit(
+      "http://localhost:5173/redirect/exchange_token?state=&code=97dd82f961714a09adb14e47b242a23103c4c202&scope=read,activity:read_all"
+    );
 
     cy.get('button[id="dash-add-sus-btn"]').click();
 

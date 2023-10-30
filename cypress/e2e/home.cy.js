@@ -11,7 +11,7 @@ describe('Home', () => {
   })
 
   it('Should show an error on a bad url request', () => {
-    cy.visit('http://localhost:5173/ergheth')
+    cy.visit('http://localhost:5173/badurlrequest')
     cy.get('p').should('have.text', 'Oops, no page exists here. Sending you back to the home page.')
   })
 })
