@@ -54,7 +54,7 @@ Built in 6 days for a Turing School of Software Mod 3 Showcase project. This req
 1. Fork the Repo from the [Repository](https://github.com/RickV85/Ride-Ready)
 2. Clone the repo
    ```sh
-   git clone git@github.com:RickV85/Ride-Ready.git
+   git clone git@github.com:RickV85/RideReady-FE.git
    ```
 3. Install NPM packages
    ```sh
