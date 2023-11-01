@@ -79,13 +79,9 @@ export const getUserGearDetails = (id, userAccessToken) => {
 
 // CSRF added to BE 10.31.23
 
-// NEED TO REFACTOR THESE URLS TO NOT USE /SUSPENSION AND
-// UPDATE PROD AND DEV ENV VARS
-
 export const getCsrfToken = () => {
-  // const dbUrl = import.meta.env.VITE_DB_URL;
-  // Change below hard code, and change above var to be base URL, add /suspension where needed below
-  return fetch(`http://localhost:5001/csrf-token`, {
+  const dbUrl = import.meta.env.VITE_DB_URL;
+  return fetch(`${dbUrl}/csrf-token`, {
     method: "GET",
     credentials: "include",
   }).then((response) => {
@@ -98,7 +94,7 @@ export const getCsrfToken = () => {
 
 export const loadUserSuspensionFromDatabase = (userID) => {
   const dbUrl = import.meta.env.VITE_DB_URL;
-  return fetch(`${dbUrl}${userID}`, {
+  return fetch(`${dbUrl}/suspension/${userID}`, {
     method: "GET",
     credentials: "include",
   }).then((response) => {
@@ -111,7 +107,7 @@ export const loadUserSuspensionFromDatabase = (userID) => {
 
 export const postUserSuspensionToDatabase = (newSus, csrfToken) => {
   const dbUrl = import.meta.env.VITE_DB_URL;
-  return fetch(dbUrl, {
+  return fetch(`${dbUrl}/suspension/`, {
     method: "POST",
     headers: { "content-type": "application/json" },
     credentials: "include",
@@ -126,7 +122,7 @@ export const postUserSuspensionToDatabase = (newSus, csrfToken) => {
 
 export const editUserSuspensionInDatabase = (susToEdit, csrfToken) => {
   const dbUrl = import.meta.env.VITE_DB_URL;
-  return fetch(`${dbUrl}${susToEdit.id}`, {
+  return fetch(`${dbUrl}/suspension/${susToEdit.id}`, {
     method: "PATCH",
     headers: {
       "content-type": "application/json",
@@ -144,7 +140,7 @@ export const editUserSuspensionInDatabase = (susToEdit, csrfToken) => {
 
 export const deleteUserSuspensionInDatabase = (susToDeleteId, csrfToken) => {
   const dbUrl = import.meta.env.VITE_DB_URL;
-  return fetch(`${dbUrl}${susToDeleteId}`, {
+  return fetch(`${dbUrl}/suspension/${susToDeleteId}`, {
     method: "DELETE",
     headers: {
       "content-type": "application/json",
