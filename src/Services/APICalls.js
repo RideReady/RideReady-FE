@@ -115,7 +115,7 @@ export const postUserSuspensionToDatabase = (newSus, csrfToken) => {
     method: "POST",
     headers: { "content-type": "application/json" },
     credentials: "include",
-    body: JSON.stringify({_csrf: csrfToken, sus: newSus}),
+    body: JSON.stringify({ _csrf: csrfToken, sus: newSus }),
   }).then((response) => {
     if (response.ok) {
       return response.json();
@@ -124,8 +124,7 @@ export const postUserSuspensionToDatabase = (newSus, csrfToken) => {
   });
 };
 
-// FIRST CSRF REQ -------------
-export const editUserSuspensionInDatabase = async (susToEdit, csrfToken) => {
+export const editUserSuspensionInDatabase = (susToEdit, csrfToken) => {
   const dbUrl = import.meta.env.VITE_DB_URL;
   return fetch(`${dbUrl}${susToEdit.id}`, {
     method: "PATCH",
@@ -133,7 +132,7 @@ export const editUserSuspensionInDatabase = async (susToEdit, csrfToken) => {
       "content-type": "application/json",
     },
     credentials: "include",
-    body: JSON.stringify({_csrf: csrfToken, sus: susToEdit}),
+    body: JSON.stringify({ _csrf: csrfToken, sus: susToEdit }),
   }).then((response) => {
     if (response.ok) {
       return response.json();
@@ -143,10 +142,15 @@ export const editUserSuspensionInDatabase = async (susToEdit, csrfToken) => {
   });
 };
 
-export const deleteUserSuspensionInDatabase = (susToDeleteId) => {
+export const deleteUserSuspensionInDatabase = (susToDeleteId, csrfToken) => {
   const dbUrl = import.meta.env.VITE_DB_URL;
   return fetch(`${dbUrl}${susToDeleteId}`, {
     method: "DELETE",
+    headers: {
+      "content-type": "application/json",
+    },
+    credentials: "include",
+    body: JSON.stringify({ _csrf: csrfToken }),
   }).then((response) => {
     if (response.ok) {
       return response.json();

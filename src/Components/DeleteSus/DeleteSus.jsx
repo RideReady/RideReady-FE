@@ -82,7 +82,7 @@ export default function DeleteSus({
   }, [selectedSuspension, userSuspension]);
 
   const handleDelete = () => {
-    deleteUserSuspensionInDatabase(deleteSusDetails.id)
+    deleteUserSuspensionInDatabase(deleteSusDetails.id, csrfToken)
       .then((result) => {
         console.log(result);
         let newUserSusArr = [...userSuspension];
