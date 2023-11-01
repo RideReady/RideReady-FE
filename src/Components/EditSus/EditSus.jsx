@@ -25,6 +25,7 @@ export default function EditSus({
   selectedSuspension,
   userAccessToken,
   setUserAccessToken,
+  csrfToken,
   userRides,
   setUserRides,
   pagesFetched,
@@ -182,7 +183,7 @@ export default function EditSus({
 
     const susDataConvertedForDatabase = convertSusToDatabaseFormat(modifiedSus);
 
-    editUserSuspensionInDatabase(susDataConvertedForDatabase)
+    editUserSuspensionInDatabase(susDataConvertedForDatabase, csrfToken)
       .then((result) => {
         console.log(result);
         let newUserSusArr = JSON.parse(JSON.stringify(userSuspension, userID));
@@ -285,6 +286,7 @@ EditSus.propTypes = {
   selectedSuspension: PropTypes.string,
   userAccessToken: PropTypes.string,
   setUserAccessToken: PropTypes.func,
+  csrfToken: PropTypes.string,
   userRides: PropTypes.array,
   setUserRides: PropTypes.func,
   pagesFetched: PropTypes.number,

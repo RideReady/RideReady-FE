@@ -11,7 +11,7 @@ export const getAccessToken = (userAuthToken) => {
 
   return fetch(`https://www.strava.com/oauth/token`, {
     method: "POST",
-    headers: { "Content-Type": "application/JSON" },
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
       client_id: clientID,
       client_secret: clientSecret,
@@ -28,18 +28,18 @@ export const getAccessToken = (userAuthToken) => {
 
 // Not using this but may in down the road, works for
 // fetching all user information
-export const getUserDetails = (userAccessToken) => {
-  return fetch("https://www.strava.com/api/v3/athlete", {
-    headers: {
-      Authorization: `Bearer ${userAccessToken}`,
-    },
-  }).then((response) => {
-    if (response.ok) {
-      return response.json();
-    }
-    throw new Error();
-  });
-};
+// export const getUserDetails = (userAccessToken) => {
+//   return fetch("https://www.strava.com/api/v3/athlete", {
+//     headers: {
+//       Authorization: `Bearer ${userAccessToken}`,
+//     },
+//   }).then((response) => {
+//     if (response.ok) {
+//       return response.json();
+//     }
+//     throw new Error();
+//   });
+// };
 
 export const getUserActivities = (pageNum, userAccessToken) => {
   return fetch(
@@ -72,9 +72,36 @@ export const getUserGearDetails = (id, userAccessToken) => {
 
 // Heroku BE Database API Calls
 
+// Must have `credentials: "include"` in header of
+// all requests to maintain same Express session
+// All req besides GET need to send the csrfToken
+// in the body of the req
+
+// CSRF added to BE 10.31.23
+
+// NEED TO REFACTOR THESE URLS TO NOT USE /SUSPENSION AND
+// UPDATE PROD AND DEV ENV VARS
+
+export const getCsrfToken = () => {
+  // const dbUrl = import.meta.env.VITE_DB_URL;
+  // Change below hard code, and change above var to be base URL, add /suspension where needed below
+  return fetch(`http://localhost:5001/csrf-token`, {
+    method: "GET",
+    credentials: "include",
+  }).then((response) => {
+    if (response.ok) {
+      return response.json();
+    }
+    throw new Error();
+  });
+};
+
 export const loadUserSuspensionFromDatabase = (userID) => {
   const dbUrl = import.meta.env.VITE_DB_URL;
-  return fetch(`${dbUrl}${userID}`).then((response) => {
+  return fetch(`${dbUrl}${userID}`, {
+    method: "GET",
+    credentials: "include",
+  }).then((response) => {
     if (response.ok) {
       return response.json();
     }
@@ -86,7 +113,7 @@ export const postUserSuspensionToDatabase = (newSus) => {
   const dbUrl = import.meta.env.VITE_DB_URL;
   return fetch(dbUrl, {
     method: "POST",
-    headers: { "Content-Type": "application/JSON" },
+    headers: { "content-type": "application/json" },
     body: JSON.stringify(newSus),
   }).then((response) => {
     if (response.ok) {
@@ -96,30 +123,34 @@ export const postUserSuspensionToDatabase = (newSus) => {
   });
 };
 
-export const editUserSuspensionInDatabase = (susToEdit) => {
+// FIRST CSRF REQ -------------
+export const editUserSuspensionInDatabase = async (susToEdit, csrfToken) => {
   const dbUrl = import.meta.env.VITE_DB_URL;
   return fetch(`${dbUrl}${susToEdit.id}`, {
     method: "PATCH",
-    headers: { "Content-Type": "application/JSON" },
-    body: JSON.stringify(susToEdit),
+    headers: {
+      "content-type": "application/json",
+    },
+    credentials: "include",
+    body: JSON.stringify({_csrf: csrfToken, sus: susToEdit}),
   }).then((response) => {
     if (response.ok) {
       return response.json();
     } else {
       throw new Error();
     }
-  })
-}
+  });
+};
 
 export const deleteUserSuspensionInDatabase = (susToDeleteId) => {
   const dbUrl = import.meta.env.VITE_DB_URL;
   return fetch(`${dbUrl}${susToDeleteId}`, {
-    method: "DELETE"
+    method: "DELETE",
   }).then((response) => {
     if (response.ok) {
       return response.json();
     } else {
       throw new Error();
     }
-  })
-}
+  });
+};

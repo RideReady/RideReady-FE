@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   getAccessToken,
+  getCsrfToken,
   getUserActivities,
   getUserGearDetails,
 } from "../../Services/APICalls";
@@ -18,11 +19,13 @@ import PropTypes from "prop-types";
 export default function Redirect({
   setUserAccessToken,
   userAccessToken,
+  changeCsrfToken,
+  csrfToken,
   setUserID,
   setUserBikes,
   setUserRides,
   userRides,
-  changeErrorMessage
+  changeErrorMessage,
 }) {
   const [userGear, setUserGear] = useState("");
   const [userAuthToken, setUserAuthToken] = useState(null);
@@ -55,6 +58,19 @@ export default function Redirect({
       });
     // eslint-disable-next-line
   }, [userAuthToken]);
+
+  useEffect(() => {
+    if (!userAccessToken || csrfToken) return;
+    getCsrfToken().then((data) => {
+      if (data) {
+        changeCsrfToken(data.csrfToken);
+      }
+    }).catch(() => {
+      changeErrorMessage(`An error occurred while authenticating with database.
+      Please return to the home page and try logging in again`)
+    });
+    // eslint-disable-next-line
+  }, [userAccessToken]);
 
   useEffect(() => {
     if (!userAccessToken) return;
@@ -98,13 +114,12 @@ export default function Redirect({
       userGear.map((gearID) => getUserGearDetails(gearID, userAccessToken))
     )
       .then((details) => {
-        
-          const userBikeDetails = details.map((detail) => ({
-            id: detail.id,
-            brand_name: detail.brand_name,
-            model_name: detail.model_name,
-          }))
-        setUserBikes(userBikeDetails)
+        const userBikeDetails = details.map((detail) => ({
+          id: detail.id,
+          brand_name: detail.brand_name,
+          model_name: detail.model_name,
+        }));
+        setUserBikes(userBikeDetails);
         window.localStorage.setItem(
           "userBikes",
           JSON.stringify(userBikeDetails)
@@ -139,9 +154,11 @@ export default function Redirect({
 Redirect.propTypes = {
   setUserAccessToken: PropTypes.func,
   userAccessToken: PropTypes.string,
+  changeCsrfToken: PropTypes.func,
+  csrfToken:PropTypes.string,
   setUserID: PropTypes.func,
   setUserBikes: PropTypes.func,
   setUserRides: PropTypes.func,
   userRides: PropTypes.array,
-  changeErrorMessage: PropTypes.func
+  changeErrorMessage: PropTypes.func,
 };

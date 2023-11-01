@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Route, Routes, useNavigate } from "react-router-dom";
 import "./App.css";
 import Home from "../Home/Home";
@@ -11,6 +11,7 @@ import DeleteSus from "../DeleteSus/DeleteSus";
 
 export default function App() {
   const [userAccessToken, setUserAccessToken] = useState(null);
+  const csrfToken = useRef("");
   const [userID, setUserID] = useState(null);
   const [userBikes, setUserBikes] = useState(null);
   const [userRides, setUserRides] = useState(null);
@@ -25,6 +26,10 @@ export default function App() {
     navigate("/error", { replace: true });
   };
 
+  const changeCsrfToken = (token) => {
+    csrfToken.current = token;
+  };
+
   return (
     <main className="app-background">
       <Routes>
@@ -35,6 +40,8 @@ export default function App() {
             <Redirect
               setUserAccessToken={setUserAccessToken}
               userAccessToken={userAccessToken}
+              changeCsrfToken={changeCsrfToken}
+              csrfToken={csrfToken.current}
               setUserID={setUserID}
               setUserBikes={setUserBikes}
               setUserRides={setUserRides}
@@ -90,6 +97,7 @@ export default function App() {
               selectedSuspension={selectedSuspension}
               userAccessToken={userAccessToken}
               setUserAccessToken={setUserAccessToken}
+              csrfToken={csrfToken.current}
               userRides={userRides}
               setUserRides={setUserRides}
               pagesFetched={pagesFetched}
