@@ -33,6 +33,8 @@ export default function NewPartForm({
   setPagesFetched,
   changeErrorMessage,
   setUserID,
+  csrfToken,
+  changeCsrfToken,
 }) {
   const [bikeOptions, setBikeOptions] = useState(userBikes);
   const [bikeDropdownOptions, setBikeDropdownOptions] = useState([]);
@@ -65,6 +67,10 @@ export default function NewPartForm({
     if (!userID) {
       const loadedID = JSON.parse(localStorage.getItem("userID"));
       setUserID(loadedID);
+    }
+    if (!csrfToken) {
+      const loadedCsrfToken = JSON.parse(localStorage.getItem("csrfToken"));
+      changeCsrfToken(loadedCsrfToken);
     }
     if (!userSuspension && userID && userBikes) {
       loadUserSuspensionFromDatabase(userID)
@@ -333,4 +339,6 @@ NewPartForm.propTypes = {
   setPagesFetched: PropTypes.func,
   changeErrorMessage: PropTypes.func,
   setUserID: PropTypes.func,
+  csrfToken: PropTypes.string,
+  changeCsrfToken: PropTypes.func,
 };

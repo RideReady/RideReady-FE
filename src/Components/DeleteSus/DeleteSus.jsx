@@ -17,6 +17,8 @@ export default function DeleteSus({
   setUserID,
   userBikes,
   setUserBikes,
+  csrfToken,
+  changeCsrfToken,
 }) {
   const [deleteSusIndex, setDeleteSusIndex] = useState(null);
   const [deleteSusDetails, setDeleteSusDetails] = useState(null);
@@ -39,6 +41,10 @@ export default function DeleteSus({
     if (!userID) {
       const loadedID = JSON.parse(localStorage.getItem("userID"));
       setUserID(loadedID);
+    }
+    if (!csrfToken) {
+      const loadedCsrfToken = JSON.parse(localStorage.getItem("csrfToken"));
+      changeCsrfToken(loadedCsrfToken);
     }
     if (!userSuspension && userID && userBikes) {
       loadUserSuspensionFromDatabase(userID)
@@ -157,4 +163,6 @@ DeleteSus.propTypes = {
   setUserID: PropTypes.func,
   userBikes: PropTypes.array,
   setUserBikes: PropTypes.func,
+  csrfToken: PropTypes.string,
+  changeCsrfToken: PropTypes.func,
 };

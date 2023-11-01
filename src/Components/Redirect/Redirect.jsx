@@ -19,13 +19,13 @@ import PropTypes from "prop-types";
 export default function Redirect({
   setUserAccessToken,
   userAccessToken,
-  changeCsrfToken,
-  csrfToken,
   setUserID,
   setUserBikes,
   setUserRides,
   userRides,
   changeErrorMessage,
+  csrfToken,
+  changeCsrfToken,
 }) {
   const [userGear, setUserGear] = useState("");
   const [userAuthToken, setUserAuthToken] = useState(null);
@@ -158,11 +158,11 @@ export default function Redirect({
 Redirect.propTypes = {
   setUserAccessToken: PropTypes.func,
   userAccessToken: PropTypes.string,
-  changeCsrfToken: PropTypes.func,
-  csrfToken:PropTypes.string,
   setUserID: PropTypes.func,
   setUserBikes: PropTypes.func,
   setUserRides: PropTypes.func,
   userRides: PropTypes.array,
   changeErrorMessage: PropTypes.func,
+  csrfToken:PropTypes.string,
+  changeCsrfToken: PropTypes.func,
 };

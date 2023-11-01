@@ -52,7 +52,6 @@ export default function Dashboard({
       const loadedToken = JSON.parse(localStorage.getItem("userID"));
       setUserID(loadedToken);
     }
-
     if (!csrfToken) {
       const loadedCsrfToken = JSON.parse(localStorage.getItem("csrfToken"));
       changeCsrfToken(loadedCsrfToken);

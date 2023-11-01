@@ -40,13 +40,13 @@ export default function App() {
             <Redirect
               setUserAccessToken={setUserAccessToken}
               userAccessToken={userAccessToken}
-              changeCsrfToken={changeCsrfToken}
-              csrfToken={csrfToken.current}
               setUserID={setUserID}
               setUserBikes={setUserBikes}
               setUserRides={setUserRides}
               userRides={userRides}
               changeErrorMessage={changeErrorMessage}
+              csrfToken={csrfToken.current}
+              changeCsrfToken={changeCsrfToken}
             />
           }
         />
@@ -86,6 +86,8 @@ export default function App() {
               pagesFetched={pagesFetched}
               setPagesFetched={setPagesFetched}
               setUserID={setUserID}
+              csrfToken={csrfToken.current}
+              changeCsrfToken={changeCsrfToken}
             />
           }
         />
@@ -99,7 +101,6 @@ export default function App() {
               selectedSuspension={selectedSuspension}
               userAccessToken={userAccessToken}
               setUserAccessToken={setUserAccessToken}
-              csrfToken={csrfToken.current}
               userRides={userRides}
               setUserRides={setUserRides}
               pagesFetched={pagesFetched}
@@ -109,6 +110,8 @@ export default function App() {
               changeErrorMessage={changeErrorMessage}
               userID={userID}
               setUserID={setUserID}
+              csrfToken={csrfToken.current}
+              changeCsrfToken={changeCsrfToken}
             />
           }
         />
@@ -124,6 +127,8 @@ export default function App() {
               setUserID={setUserID}
               userBikes={userBikes}
               setUserBikes={setUserBikes}
+              csrfToken={csrfToken.current}
+              changeCsrfToken={changeCsrfToken}
             />
           }
         />
