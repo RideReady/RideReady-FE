@@ -55,6 +55,7 @@ export default function App() {
           element={
             <Dashboard
               userID={userID}
+              setUserID={setUserID}
               userSuspension={userSuspension}
               setUserSuspension={setUserSuspension}
               setSelectedSuspension={setSelectedSuspension}
@@ -62,9 +63,10 @@ export default function App() {
               setUserBikes={setUserBikes}
               userRides={userRides}
               setUserRides={setUserRides}
-              setUserAccessToken={setUserAccessToken}
               userAccessToken={userAccessToken}
-              setUserID={setUserID}
+              setUserAccessToken={setUserAccessToken}
+              csrfToken={csrfToken.current}
+              changeCsrfToken={changeCsrfToken}
             />
           }
         />

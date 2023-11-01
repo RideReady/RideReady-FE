@@ -15,7 +15,7 @@ export default function Container({
   );
 
   useEffect(() => {
-    if (userRides.length <= 0) {
+    if (userRides && userRides.length <= 0) {
       setDashboardMessage(
         "No rides detected in your Strava account. At least one ride is needed to calculate your suspension life."
       );

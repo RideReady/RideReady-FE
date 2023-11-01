@@ -64,6 +64,10 @@ export default function Redirect({
     getCsrfToken().then((data) => {
       if (data) {
         changeCsrfToken(data.csrfToken);
+        window.localStorage.setItem(
+          "csrfToken",
+          JSON.stringify(data.csrfToken)
+        );
       }
     }).catch(() => {
       changeErrorMessage(`An error occurred while authenticating with database.

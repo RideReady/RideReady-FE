@@ -114,6 +114,7 @@ export const postUserSuspensionToDatabase = (newSus) => {
   return fetch(dbUrl, {
     method: "POST",
     headers: { "content-type": "application/json" },
+    credentials: "include",
     body: JSON.stringify(newSus),
   }).then((response) => {
     if (response.ok) {
