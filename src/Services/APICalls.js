@@ -11,7 +11,7 @@ export const getAccessToken = (userAuthToken) => {
 
   return fetch(`https://www.strava.com/oauth/token`, {
     method: "POST",
-    headers: { "Content-Type": "application/JSON" },
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
       client_id: clientID,
       client_secret: clientSecret,
@@ -28,18 +28,18 @@ export const getAccessToken = (userAuthToken) => {
 
 // Not using this but may in down the road, works for
 // fetching all user information
-export const getUserDetails = (userAccessToken) => {
-  return fetch("https://www.strava.com/api/v3/athlete", {
-    headers: {
-      Authorization: `Bearer ${userAccessToken}`,
-    },
-  }).then((response) => {
-    if (response.ok) {
-      return response.json();
-    }
-    throw new Error();
-  });
-};
+// export const getUserDetails = (userAccessToken) => {
+//   return fetch("https://www.strava.com/api/v3/athlete", {
+//     headers: {
+//       Authorization: `Bearer ${userAccessToken}`,
+//     },
+//   }).then((response) => {
+//     if (response.ok) {
+//       return response.json();
+//     }
+//     throw new Error();
+//   });
+// };
 
 export const getUserActivities = (pageNum, userAccessToken) => {
   return fetch(
@@ -72,9 +72,32 @@ export const getUserGearDetails = (id, userAccessToken) => {
 
 // Heroku BE Database API Calls
 
+// Must have `credentials: "include"` in header of
+// all requests to maintain same Express session
+// All req besides GET need to send the csrfToken
+// in the body of the req
+
+// CSRF added to BE 10.31.23
+
+export const getCsrfToken = () => {
+  const dbUrl = import.meta.env.VITE_DB_URL;
+  return fetch(`${dbUrl}/csrf-token`, {
+    method: "GET",
+    credentials: "include",
+  }).then((response) => {
+    if (response.ok) {
+      return response.json();
+    }
+    throw new Error();
+  });
+};
+
 export const loadUserSuspensionFromDatabase = (userID) => {
   const dbUrl = import.meta.env.VITE_DB_URL;
-  return fetch(`${dbUrl}${userID}`).then((response) => {
+  return fetch(`${dbUrl}/suspension/${userID}`, {
+    method: "GET",
+    credentials: "include",
+  }).then((response) => {
     if (response.ok) {
       return response.json();
     }
@@ -82,12 +105,13 @@ export const loadUserSuspensionFromDatabase = (userID) => {
   });
 };
 
-export const postUserSuspensionToDatabase = (newSus) => {
+export const postUserSuspensionToDatabase = (newSus, csrfToken) => {
   const dbUrl = import.meta.env.VITE_DB_URL;
-  return fetch(dbUrl, {
+  return fetch(`${dbUrl}/suspension/`, {
     method: "POST",
-    headers: { "Content-Type": "application/JSON" },
-    body: JSON.stringify(newSus),
+    headers: { "content-type": "application/json" },
+    credentials: "include",
+    body: JSON.stringify({ _csrf: csrfToken, sus: newSus }),
   }).then((response) => {
     if (response.ok) {
       return response.json();
@@ -96,30 +120,38 @@ export const postUserSuspensionToDatabase = (newSus) => {
   });
 };
 
-export const editUserSuspensionInDatabase = (susToEdit) => {
+export const editUserSuspensionInDatabase = (susToEdit, csrfToken) => {
   const dbUrl = import.meta.env.VITE_DB_URL;
-  return fetch(`${dbUrl}${susToEdit.id}`, {
+  return fetch(`${dbUrl}/suspension/${susToEdit.id}`, {
     method: "PATCH",
-    headers: { "Content-Type": "application/JSON" },
-    body: JSON.stringify(susToEdit),
+    headers: {
+      "content-type": "application/json",
+    },
+    credentials: "include",
+    body: JSON.stringify({ _csrf: csrfToken, sus: susToEdit }),
   }).then((response) => {
     if (response.ok) {
       return response.json();
     } else {
       throw new Error();
     }
-  })
-}
+  });
+};
 
-export const deleteUserSuspensionInDatabase = (susToDeleteId) => {
+export const deleteUserSuspensionInDatabase = (susToDeleteId, csrfToken) => {
   const dbUrl = import.meta.env.VITE_DB_URL;
-  return fetch(`${dbUrl}${susToDeleteId}`, {
-    method: "DELETE"
+  return fetch(`${dbUrl}/suspension/${susToDeleteId}`, {
+    method: "DELETE",
+    headers: {
+      "content-type": "application/json",
+    },
+    credentials: "include",
+    body: JSON.stringify({ _csrf: csrfToken }),
   }).then((response) => {
     if (response.ok) {
       return response.json();
     } else {
       throw new Error();
     }
-  })
-}
+  });
+};

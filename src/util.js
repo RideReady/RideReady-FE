@@ -46,6 +46,7 @@ export const getGearIDNumbers = (userRides) => {
   return gearNumbers;
 };
 
+// Could this be refactored to use filterRidesForSpecificBike?
 export const calculateRebuildLife = (
   newSus,
   rebuildDate,
@@ -170,7 +171,6 @@ export const isNewestRideAfterLastCalculated = (userRides, sus) => {
   }
 };
 
-// Could above functions be refactored to use this?
 export const filterRidesForSpecificBike = (userRides, onBike) => {
   let filteredRides;
   console.log(onBike)
@@ -181,3 +181,26 @@ export const filterRidesForSpecificBike = (userRides, onBike) => {
   }
   return filteredRides;
 };
+
+export const generateBikeTypeString = (frameTypeIdFromStrava) => {
+  switch (frameTypeIdFromStrava) {
+    case 1 : return "Mountain Bike";
+    case 2 : return "Cross Bike";
+    case 3 : return "Road Bike";
+    case 4 : return "TT Bike";
+    case 5 : return "Gravel Bike";
+    default : return "Unknown Bike Type";
+  }
+}
+
+export const sortUserSuspensionByBikeId = (susArr) => {
+  const sortedSusArr = susArr.toSorted((a, b) => {
+    if (a.onBike.id < b.onBike.id) {
+      return -1;
+    } else if (a.onBike.id > b.onBike.id) {
+      return 1;
+    }
+    return 0;
+  });
+  return sortedSusArr;
+}

@@ -13,10 +13,12 @@ import {
   isNewestRideAfterLastCalculated,
   filterRidesForSpecificBike,
   convertSusToDatabaseFormat,
+  sortUserSuspensionByBikeId,
 } from "../../util";
 
 export default function Dashboard({
   userID,
+  setUserID,
   userSuspension,
   setUserSuspension,
   setSelectedSuspension,
@@ -26,7 +28,8 @@ export default function Dashboard({
   setUserRides,
   userAccessToken,
   setUserAccessToken,
-  setUserID,
+  csrfToken,
+  changeCsrfToken,
 }) {
   const [loadingSus, setLoadingSus] = useState("");
   const [buttonLink, setButtonLink] = useState("/dashboard/add-new-part");
@@ -50,15 +53,19 @@ export default function Dashboard({
       const loadedToken = JSON.parse(localStorage.getItem("userID"));
       setUserID(loadedToken);
     }
+    if (!csrfToken) {
+      const loadedCsrfToken = JSON.parse(localStorage.getItem("csrfToken"));
+      changeCsrfToken(loadedCsrfToken);
+    }
     // eslint-disable-next-line
   }, []);
 
   useEffect(() => {
-    if (userRides.length <= 0) {
+    if (userRides && userRides.length <= 0) {
       setButtonLink("/");
       setButtonMsg("Return to login page");
     }
-  }, [userRides])
+  }, [userRides]);
 
   useEffect(() => {
     if (userID === null || userBikes === null) return;
@@ -71,13 +78,13 @@ export default function Dashboard({
               convertSuspensionFromDatabase(sus, userBikes)
             );
             console.log(`User suspension loaded from DB`, convertedDBSus);
-            setUserSuspension(convertedDBSus);
-            setLoadingSus("");
+            const sortedDbSus = sortUserSuspensionByBikeId(convertedDBSus);
+            setUserSuspension(sortedDbSus);
           } else {
             console.log(`No suspension loaded from DB for userID: ${userID}`);
             setUserSuspension([]);
-            setLoadingSus("");
           }
+          setLoadingSus("");
         })
         .catch((error) => {
           console.log(error);
@@ -117,7 +124,7 @@ export default function Dashboard({
         updatedSus.lastRideCalculated = newestRideOnBikeDate;
 
         const susDataToPatch = convertSusToDatabaseFormat(updatedSus, userID);
-        editUserSuspensionInDatabase(susDataToPatch)
+        editUserSuspensionInDatabase(susDataToPatch, csrfToken)
           .then((result) => {
             console.log(result);
           })
@@ -137,7 +144,7 @@ export default function Dashboard({
     if (userSusStateNeedsReset) {
       setUserSuspension(recalculatedUserSus);
     }
-  }, [userSuspension, userBikes, userRides, userID, setUserSuspension]);
+  }, [userSuspension, userBikes, userRides, userID, setUserSuspension, csrfToken]);
 
   return (
     <section className="dashboard">
@@ -166,6 +173,7 @@ export default function Dashboard({
 
 Dashboard.propTypes = {
   userID: PropTypes.number,
+  setUserID: PropTypes.func,
   userSuspension: PropTypes.array,
   setUserSuspension: PropTypes.func,
   setSelectedSuspension: PropTypes.func,
@@ -175,5 +183,6 @@ Dashboard.propTypes = {
   setUserRides: PropTypes.func,
   userAccessToken: PropTypes.string,
   setUserAccessToken: PropTypes.func,
-  setUserID: PropTypes.func,
+  csrfToken: PropTypes.string,
+  changeCsrfToken: PropTypes.func,
 };

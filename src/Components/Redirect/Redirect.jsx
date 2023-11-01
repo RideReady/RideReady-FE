@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   getAccessToken,
+  getCsrfToken,
   getUserActivities,
   getUserGearDetails,
 } from "../../Services/APICalls";
@@ -11,6 +12,7 @@ import {
   filterRideActivities,
   getGearIDNumbers,
   cleanRideData,
+  generateBikeTypeString
 } from "../../util.js";
 import "./Redirect.css";
 import PropTypes from "prop-types";
@@ -22,7 +24,9 @@ export default function Redirect({
   setUserBikes,
   setUserRides,
   userRides,
-  changeErrorMessage
+  changeErrorMessage,
+  csrfToken,
+  changeCsrfToken,
 }) {
   const [userGear, setUserGear] = useState("");
   const [userAuthToken, setUserAuthToken] = useState(null);
@@ -55,6 +59,25 @@ export default function Redirect({
       });
     // eslint-disable-next-line
   }, [userAuthToken]);
+
+  useEffect(() => {
+    if (!userAccessToken || csrfToken) return;
+    getCsrfToken()
+      .then((data) => {
+        if (data) {
+          changeCsrfToken(data.csrfToken);
+          window.localStorage.setItem(
+            "csrfToken",
+            JSON.stringify(data.csrfToken)
+          );
+        }
+      })
+      .catch(() => {
+        changeErrorMessage(`An error occurred while authenticating with database.
+      Please return to the home page and try logging in again`);
+      });
+    // eslint-disable-next-line
+  }, [userAccessToken]);
 
   useEffect(() => {
     if (!userAccessToken) return;
@@ -98,13 +121,18 @@ export default function Redirect({
       userGear.map((gearID) => getUserGearDetails(gearID, userAccessToken))
     )
       .then((details) => {
-        
-          const userBikeDetails = details.map((detail) => ({
-            id: detail.id,
-            brand_name: detail.brand_name,
-            model_name: detail.model_name,
-          }))
-        setUserBikes(userBikeDetails)
+        const userBikeDetails = details.map((detail) => {
+          const frameType = generateBikeTypeString(detail.frame_type);
+          return ({
+          id: detail.id,
+          name: detail.name,
+          brand_name: detail.brand_name ? detail.brand_name : "",
+          model_name: detail.model_name
+            ? detail.model_name
+            : detail.name,
+          frame_type : frameType,
+        })});
+        setUserBikes(userBikeDetails);
         window.localStorage.setItem(
           "userBikes",
           JSON.stringify(userBikeDetails)
@@ -143,5 +171,7 @@ Redirect.propTypes = {
   setUserBikes: PropTypes.func,
   setUserRides: PropTypes.func,
   userRides: PropTypes.array,
-  changeErrorMessage: PropTypes.func
+  changeErrorMessage: PropTypes.func,
+  csrfToken: PropTypes.string,
+  changeCsrfToken: PropTypes.func,
 };

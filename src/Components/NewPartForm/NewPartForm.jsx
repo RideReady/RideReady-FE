@@ -33,6 +33,8 @@ export default function NewPartForm({
   setPagesFetched,
   changeErrorMessage,
   setUserID,
+  csrfToken,
+  changeCsrfToken,
 }) {
   const [bikeOptions, setBikeOptions] = useState(userBikes);
   const [bikeDropdownOptions, setBikeDropdownOptions] = useState([]);
@@ -65,6 +67,10 @@ export default function NewPartForm({
     if (!userID) {
       const loadedID = JSON.parse(localStorage.getItem("userID"));
       setUserID(loadedID);
+    }
+    if (!csrfToken) {
+      const loadedCsrfToken = JSON.parse(localStorage.getItem("csrfToken"));
+      changeCsrfToken(loadedCsrfToken);
     }
     if (!userSuspension && userID && userBikes) {
       loadUserSuspensionFromDatabase(userID)
@@ -99,7 +105,7 @@ export default function NewPartForm({
       const bikeSelects = bikeOptions.map((bike) => {
         return (
           <option key={bike.id} value={bike.id}>
-            {bike.brand_name} {bike.model_name}
+            {`"${bike.name}" - ${bike.brand_name} ${bike.model_name} - ${bike.frame_type}`}
           </option>
         );
       });
@@ -112,7 +118,7 @@ export default function NewPartForm({
     } else {
       setBikeDropdownOptions([
         <option key={0} value={0}>
-          Unlisted bike (uses all rides available)
+          Unlisted bike - uses all rides available
         </option>,
       ]);
     }
@@ -168,12 +174,10 @@ export default function NewPartForm({
       return;
     }
 
-    // Add to utils - using in Util as helper for Dashboard func
     const selectedSuspensionData = suspensionData.find(
       (sus) => sus.id === +selectedSus
     );
 
-    // Add to utils - using in Util as helper for Dashboard func
     let selectedBikeDetails;
     if (bikeOptions && selectedBike !== "0") {
       selectedBikeDetails = bikeOptions.find(
@@ -214,7 +218,7 @@ export default function NewPartForm({
       userID
     );
 
-    postUserSuspensionToDatabase(newSusPostData)
+    postUserSuspensionToDatabase(newSusPostData, csrfToken)
       .then((response) => {
         console.log(response);
 
@@ -333,4 +337,6 @@ NewPartForm.propTypes = {
   setPagesFetched: PropTypes.func,
   changeErrorMessage: PropTypes.func,
   setUserID: PropTypes.func,
+  csrfToken: PropTypes.string,
+  changeCsrfToken: PropTypes.func,
 };
