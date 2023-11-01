@@ -192,3 +192,15 @@ export const generateBikeTypeString = (frameTypeIdFromStrava) => {
     default : return "Unknown Bike Type";
   }
 }
+
+export const sortUserSuspensionByBikeId = (susArr) => {
+  const sortedSusArr = susArr.toSorted((a, b) => {
+    if (a.onBike.id < b.onBike.id) {
+      return -1;
+    } else if (a.onBike.id > b.onBike.id) {
+      return 1;
+    }
+    return 0;
+  });
+  return sortedSusArr;
+}

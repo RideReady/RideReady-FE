@@ -13,6 +13,7 @@ import {
   isNewestRideAfterLastCalculated,
   filterRidesForSpecificBike,
   convertSusToDatabaseFormat,
+  sortUserSuspensionByBikeId,
 } from "../../util";
 
 export default function Dashboard({
@@ -77,13 +78,13 @@ export default function Dashboard({
               convertSuspensionFromDatabase(sus, userBikes)
             );
             console.log(`User suspension loaded from DB`, convertedDBSus);
-            setUserSuspension(convertedDBSus);
-            setLoadingSus("");
+            const sortedDbSus = sortUserSuspensionByBikeId(convertedDBSus);
+            setUserSuspension(sortedDbSus);
           } else {
             console.log(`No suspension loaded from DB for userID: ${userID}`);
             setUserSuspension([]);
-            setLoadingSus("");
           }
+          setLoadingSus("");
         })
         .catch((error) => {
           console.log(error);

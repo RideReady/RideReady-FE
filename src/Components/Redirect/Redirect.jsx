@@ -121,7 +121,6 @@ export default function Redirect({
       userGear.map((gearID) => getUserGearDetails(gearID, userAccessToken))
     )
       .then((details) => {
-        console.log(details);
         const userBikeDetails = details.map((detail) => {
           const frameType = generateBikeTypeString(detail.frame_type);
           return ({
