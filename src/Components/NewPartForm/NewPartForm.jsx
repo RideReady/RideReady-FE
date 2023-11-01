@@ -105,7 +105,7 @@ export default function NewPartForm({
       const bikeSelects = bikeOptions.map((bike) => {
         return (
           <option key={bike.id} value={bike.id}>
-            {bike.brand_name} {bike.model_name}
+            {`"${bike.name}" - ${bike.brand_name} ${bike.model_name} - ${bike.frame_type}`}
           </option>
         );
       });

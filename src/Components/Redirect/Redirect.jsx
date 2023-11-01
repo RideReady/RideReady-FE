@@ -12,6 +12,7 @@ import {
   filterRideActivities,
   getGearIDNumbers,
   cleanRideData,
+  generateBikeTypeString
 } from "../../util.js";
 import "./Redirect.css";
 import PropTypes from "prop-types";
@@ -61,18 +62,20 @@ export default function Redirect({
 
   useEffect(() => {
     if (!userAccessToken || csrfToken) return;
-    getCsrfToken().then((data) => {
-      if (data) {
-        changeCsrfToken(data.csrfToken);
-        window.localStorage.setItem(
-          "csrfToken",
-          JSON.stringify(data.csrfToken)
-        );
-      }
-    }).catch(() => {
-      changeErrorMessage(`An error occurred while authenticating with database.
-      Please return to the home page and try logging in again`)
-    });
+    getCsrfToken()
+      .then((data) => {
+        if (data) {
+          changeCsrfToken(data.csrfToken);
+          window.localStorage.setItem(
+            "csrfToken",
+            JSON.stringify(data.csrfToken)
+          );
+        }
+      })
+      .catch(() => {
+        changeErrorMessage(`An error occurred while authenticating with database.
+      Please return to the home page and try logging in again`);
+      });
     // eslint-disable-next-line
   }, [userAccessToken]);
 
@@ -118,11 +121,18 @@ export default function Redirect({
       userGear.map((gearID) => getUserGearDetails(gearID, userAccessToken))
     )
       .then((details) => {
-        const userBikeDetails = details.map((detail) => ({
+        console.log(details);
+        const userBikeDetails = details.map((detail) => {
+          const frameType = generateBikeTypeString(detail.frame_type);
+          return ({
           id: detail.id,
-          brand_name: detail.brand_name ? detail.brand_name : "Unknown brand",
-          model_name: detail.model_name ? detail.brand_name : "Unknown model",
-        }));
+          name: detail.name,
+          brand_name: detail.brand_name ? detail.brand_name : "",
+          model_name: detail.model_name
+            ? detail.model_name
+            : detail.name,
+          frame_type : frameType,
+        })});
         setUserBikes(userBikeDetails);
         window.localStorage.setItem(
           "userBikes",
@@ -163,6 +173,6 @@ Redirect.propTypes = {
   setUserRides: PropTypes.func,
   userRides: PropTypes.array,
   changeErrorMessage: PropTypes.func,
-  csrfToken:PropTypes.string,
+  csrfToken: PropTypes.string,
   changeCsrfToken: PropTypes.func,
 };
