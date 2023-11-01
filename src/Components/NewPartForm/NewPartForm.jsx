@@ -174,12 +174,10 @@ export default function NewPartForm({
       return;
     }
 
-    // Add to utils - using in Util as helper for Dashboard func
     const selectedSuspensionData = suspensionData.find(
       (sus) => sus.id === +selectedSus
     );
 
-    // Add to utils - using in Util as helper for Dashboard func
     let selectedBikeDetails;
     if (bikeOptions && selectedBike !== "0") {
       selectedBikeDetails = bikeOptions.find(
@@ -220,7 +218,7 @@ export default function NewPartForm({
       userID
     );
 
-    postUserSuspensionToDatabase(newSusPostData)
+    postUserSuspensionToDatabase(newSusPostData, csrfToken)
       .then((response) => {
         console.log(response);
 

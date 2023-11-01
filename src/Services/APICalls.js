@@ -109,13 +109,13 @@ export const loadUserSuspensionFromDatabase = (userID) => {
   });
 };
 
-export const postUserSuspensionToDatabase = (newSus) => {
+export const postUserSuspensionToDatabase = (newSus, csrfToken) => {
   const dbUrl = import.meta.env.VITE_DB_URL;
   return fetch(dbUrl, {
     method: "POST",
     headers: { "content-type": "application/json" },
     credentials: "include",
-    body: JSON.stringify(newSus),
+    body: JSON.stringify({_csrf: csrfToken, sus: newSus}),
   }).then((response) => {
     if (response.ok) {
       return response.json();
