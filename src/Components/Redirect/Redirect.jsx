@@ -120,8 +120,8 @@ export default function Redirect({
       .then((details) => {
         const userBikeDetails = details.map((detail) => ({
           id: detail.id,
-          brand_name: detail.brand_name,
-          model_name: detail.model_name,
+          brand_name: detail.brand_name ? detail.brand_name : "Unknown brand",
+          model_name: detail.model_name ? detail.brand_name : "Unknown model",
         }));
         setUserBikes(userBikeDetails);
         window.localStorage.setItem(

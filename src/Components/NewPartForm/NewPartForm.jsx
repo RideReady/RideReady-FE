@@ -118,7 +118,7 @@ export default function NewPartForm({
     } else {
       setBikeDropdownOptions([
         <option key={0} value={0}>
-          Unlisted bike (uses all rides available)
+          Unlisted bike - uses all rides available
         </option>,
       ]);
     }
