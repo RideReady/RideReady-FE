@@ -27,6 +27,7 @@
 [Installation Instructions](#installation-instructions) ~
 [Deployed Link](#deployed-link) ~
 [Preview of App](#preview-of-app) ~
+[Backend Repo](https://github.com/RickV85/RideReady-FE) ~
 [Technologies](#technologies)
 
 </div>
