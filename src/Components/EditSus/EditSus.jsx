@@ -34,8 +34,6 @@ export default function EditSus({
   changeErrorMessage,
   userID,
   setUserID,
-  csrfToken,
-  changeCsrfToken,
 }) {
   const [newRebuildDate, setNewRebuildDate] = useState("");
   const [editSusIndex, setEditSusIndex] = useState(null);
@@ -76,10 +74,6 @@ export default function EditSus({
     if (!userID) {
       const loadedID = JSON.parse(localStorage.getItem("userID"));
       setUserID(loadedID);
-    }
-    if (!csrfToken) {
-      const loadedCsrfToken = JSON.parse(localStorage.getItem("csrfToken"));
-      changeCsrfToken(loadedCsrfToken);
     }
     if (!userSuspension && userID && userBikes) {
       loadUserSuspensionFromDatabase(userID)
@@ -188,7 +182,7 @@ export default function EditSus({
 
     const susDataConvertedForDatabase = convertSusToDatabaseFormat(modifiedSus);
 
-    editUserSuspensionInDatabase(susDataConvertedForDatabase, csrfToken)
+    editUserSuspensionInDatabase(susDataConvertedForDatabase)
       .then((result) => {
         console.log(result);
         let newUserSusArr = JSON.parse(JSON.stringify(userSuspension, userID));
@@ -300,6 +294,4 @@ EditSus.propTypes = {
   changeErrorMessage: PropTypes.func,
   userID: PropTypes.number,
   setUserID: PropTypes.func,
-  csrfToken: PropTypes.string,
-  changeCsrfToken: PropTypes.func,
 };

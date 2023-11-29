@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   getAccessToken,
-  getCsrfToken,
   getUserActivities,
   getUserGearDetails,
 } from "../../Services/APICalls";
@@ -25,8 +24,6 @@ export default function Redirect({
   setUserRides,
   userRides,
   changeErrorMessage,
-  csrfToken,
-  changeCsrfToken,
 }) {
   const [userGear, setUserGear] = useState("");
   const [userAuthToken, setUserAuthToken] = useState(null);
@@ -59,25 +56,6 @@ export default function Redirect({
       });
     // eslint-disable-next-line
   }, [userAuthToken]);
-
-  useEffect(() => {
-    if (!userAccessToken || csrfToken) return;
-    getCsrfToken()
-      .then((data) => {
-        if (data) {
-          changeCsrfToken(data.csrfToken);
-          window.localStorage.setItem(
-            "csrfToken",
-            JSON.stringify(data.csrfToken)
-          );
-        }
-      })
-      .catch(() => {
-        changeErrorMessage(`An error occurred while authenticating with database.
-      Please return to the home page and try logging in again`);
-      });
-    // eslint-disable-next-line
-  }, [userAccessToken]);
 
   useEffect(() => {
     if (!userAccessToken) return;
@@ -172,6 +150,4 @@ Redirect.propTypes = {
   setUserRides: PropTypes.func,
   userRides: PropTypes.array,
   changeErrorMessage: PropTypes.func,
-  csrfToken: PropTypes.string,
-  changeCsrfToken: PropTypes.func,
 };
