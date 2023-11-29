@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState } from "react";
 import { Route, Routes, useNavigate } from "react-router-dom";
 import "./App.css";
 import Home from "../Home/Home";
@@ -11,7 +11,6 @@ import DeleteSus from "../DeleteSus/DeleteSus";
 
 export default function App() {
   const [userAccessToken, setUserAccessToken] = useState(null);
-  const csrfToken = useRef("");
   const [userID, setUserID] = useState(null);
   const [userBikes, setUserBikes] = useState(null);
   const [userRides, setUserRides] = useState(null);
@@ -24,10 +23,6 @@ export default function App() {
   const changeErrorMessage = (errorMessage) => {
     setErrorMessage(errorMessage);
     navigate("/error", { replace: true });
-  };
-
-  const changeCsrfToken = (token) => {
-    csrfToken.current = token;
   };
 
   return (
@@ -45,8 +40,6 @@ export default function App() {
               setUserRides={setUserRides}
               userRides={userRides}
               changeErrorMessage={changeErrorMessage}
-              csrfToken={csrfToken.current}
-              changeCsrfToken={changeCsrfToken}
             />
           }
         />
@@ -65,8 +58,6 @@ export default function App() {
               setUserRides={setUserRides}
               userAccessToken={userAccessToken}
               setUserAccessToken={setUserAccessToken}
-              csrfToken={csrfToken.current}
-              changeCsrfToken={changeCsrfToken}
             />
           }
         />
@@ -86,8 +77,6 @@ export default function App() {
               pagesFetched={pagesFetched}
               setPagesFetched={setPagesFetched}
               setUserID={setUserID}
-              csrfToken={csrfToken.current}
-              changeCsrfToken={changeCsrfToken}
             />
           }
         />
@@ -110,8 +99,6 @@ export default function App() {
               changeErrorMessage={changeErrorMessage}
               userID={userID}
               setUserID={setUserID}
-              csrfToken={csrfToken.current}
-              changeCsrfToken={changeCsrfToken}
             />
           }
         />
@@ -127,8 +114,6 @@ export default function App() {
               setUserID={setUserID}
               userBikes={userBikes}
               setUserBikes={setUserBikes}
-              csrfToken={csrfToken.current}
-              changeCsrfToken={changeCsrfToken}
             />
           }
         />

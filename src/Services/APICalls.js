@@ -4,11 +4,6 @@ export const getAccessToken = (userAuthToken) => {
   let clientID = `${import.meta.env.VITE_CLIENT_ID}`;
   let clientSecret = `${import.meta.env.VITE_CLIENT_SECRET}`;
 
-  // if (window.location.href.startsWith("http://localhost:5173/redirect/")) {
-  //   clientID = `${import.meta.env.VITE_CLIENT_ID_LOCAL}`;
-  //   clientSecret = `${import.meta.env.VITE_CLIENT_SECRET_LOCAL}`;
-  // }
-
   return fetch(`https://www.strava.com/oauth/token`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -75,22 +70,9 @@ export const getUserGearDetails = (id, userAccessToken) => {
 // Must have `credentials: "include"` in header of
 // all requests to maintain same Express session
 // All req besides GET need to send the csrfToken
-// in the body of the req
+// in the cookie of the req
 
 // CSRF added to BE 10.31.23
-
-export const getCsrfToken = () => {
-  const dbUrl = import.meta.env.VITE_DB_URL;
-  return fetch(`${dbUrl}/csrf-token`, {
-    method: "GET",
-    credentials: "include",
-  }).then((response) => {
-    if (response.ok) {
-      return response.json();
-    }
-    throw new Error();
-  });
-};
 
 export const loadUserSuspensionFromDatabase = (userID) => {
   const dbUrl = import.meta.env.VITE_DB_URL;
@@ -105,13 +87,13 @@ export const loadUserSuspensionFromDatabase = (userID) => {
   });
 };
 
-export const postUserSuspensionToDatabase = (newSus, csrfToken) => {
+export const postUserSuspensionToDatabase = (newSus) => {
   const dbUrl = import.meta.env.VITE_DB_URL;
   return fetch(`${dbUrl}/suspension/`, {
     method: "POST",
     headers: { "content-type": "application/json" },
     credentials: "include",
-    body: JSON.stringify({ _csrf: csrfToken, sus: newSus }),
+    body: JSON.stringify({ sus: newSus }),
   }).then((response) => {
     if (response.ok) {
       return response.json();
@@ -120,7 +102,7 @@ export const postUserSuspensionToDatabase = (newSus, csrfToken) => {
   });
 };
 
-export const editUserSuspensionInDatabase = (susToEdit, csrfToken) => {
+export const editUserSuspensionInDatabase = (susToEdit) => {
   const dbUrl = import.meta.env.VITE_DB_URL;
   return fetch(`${dbUrl}/suspension/${susToEdit.id}`, {
     method: "PATCH",
@@ -128,7 +110,7 @@ export const editUserSuspensionInDatabase = (susToEdit, csrfToken) => {
       "content-type": "application/json",
     },
     credentials: "include",
-    body: JSON.stringify({ _csrf: csrfToken, sus: susToEdit }),
+    body: JSON.stringify({ sus: susToEdit }),
   }).then((response) => {
     if (response.ok) {
       return response.json();
@@ -138,15 +120,14 @@ export const editUserSuspensionInDatabase = (susToEdit, csrfToken) => {
   });
 };
 
-export const deleteUserSuspensionInDatabase = (susToDeleteId, csrfToken) => {
+export const deleteUserSuspensionInDatabase = (susToDeleteId) => {
   const dbUrl = import.meta.env.VITE_DB_URL;
   return fetch(`${dbUrl}/suspension/${susToDeleteId}`, {
     method: "DELETE",
     headers: {
       "content-type": "application/json",
     },
-    credentials: "include",
-    body: JSON.stringify({ _csrf: csrfToken }),
+    credentials: "include"
   }).then((response) => {
     if (response.ok) {
       return response.json();

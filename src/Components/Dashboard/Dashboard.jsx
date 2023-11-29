@@ -28,8 +28,6 @@ export default function Dashboard({
   setUserRides,
   userAccessToken,
   setUserAccessToken,
-  csrfToken,
-  changeCsrfToken,
 }) {
   const [loadingSus, setLoadingSus] = useState("");
   const [buttonLink, setButtonLink] = useState("/dashboard/add-new-part");
@@ -52,10 +50,6 @@ export default function Dashboard({
     if (!userID) {
       const loadedToken = JSON.parse(localStorage.getItem("userID"));
       setUserID(loadedToken);
-    }
-    if (!csrfToken) {
-      const loadedCsrfToken = JSON.parse(localStorage.getItem("csrfToken"));
-      changeCsrfToken(loadedCsrfToken);
     }
     // eslint-disable-next-line
   }, []);
@@ -124,7 +118,7 @@ export default function Dashboard({
         updatedSus.lastRideCalculated = newestRideOnBikeDate;
 
         const susDataToPatch = convertSusToDatabaseFormat(updatedSus, userID);
-        editUserSuspensionInDatabase(susDataToPatch, csrfToken)
+        editUserSuspensionInDatabase(susDataToPatch)
           .then((result) => {
             console.log(result);
           })
@@ -144,7 +138,7 @@ export default function Dashboard({
     if (userSusStateNeedsReset) {
       setUserSuspension(recalculatedUserSus);
     }
-  }, [userSuspension, userBikes, userRides, userID, setUserSuspension, csrfToken]);
+  }, [userSuspension, userBikes, userRides, userID, setUserSuspension]);
 
   return (
     <section className="dashboard">
@@ -183,6 +177,4 @@ Dashboard.propTypes = {
   setUserRides: PropTypes.func,
   userAccessToken: PropTypes.string,
   setUserAccessToken: PropTypes.func,
-  csrfToken: PropTypes.string,
-  changeCsrfToken: PropTypes.func,
 };
