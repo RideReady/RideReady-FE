@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Route, Routes, useNavigate } from "react-router-dom";
 import "./App.css";
 import Home from "../Home/Home";
@@ -18,11 +18,16 @@ export default function App() {
   const [selectedSuspension, setSelectedSuspension] = useState(null);
   const [errorMessage, setErrorMessage] = useState("");
   const [pagesFetched, setPagesFetched] = useState(1);
+  const dashboardInitialized = useRef(false);
   const navigate = useNavigate();
 
   const changeErrorMessage = (errorMessage) => {
     setErrorMessage(errorMessage);
     navigate("/error", { replace: true });
+  };
+
+  const setDashboardInitialized = (state) => {
+    dashboardInitialized.current = state;
   };
 
   return (
@@ -58,6 +63,8 @@ export default function App() {
               setUserRides={setUserRides}
               userAccessToken={userAccessToken}
               setUserAccessToken={setUserAccessToken}
+              dashboardInitialized={dashboardInitialized}
+              setDashboardInitialized={setDashboardInitialized}
             />
           }
         />

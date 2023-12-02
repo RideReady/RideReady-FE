@@ -11,7 +11,7 @@ import {
   filterRideActivities,
   getGearIDNumbers,
   cleanRideData,
-  generateBikeTypeString
+  formatBikeDetails,
 } from "../../util.js";
 import "./Redirect.css";
 import PropTypes from "prop-types";
@@ -25,7 +25,6 @@ export default function Redirect({
   userRides,
   changeErrorMessage,
 }) {
-  const [userGear, setUserGear] = useState("");
   const [userAuthToken, setUserAuthToken] = useState(null);
   const navigate = useNavigate();
 
@@ -61,8 +60,7 @@ export default function Redirect({
     if (!userAccessToken) return;
     getUserActivities(1, userAccessToken)
       .then((activities) => {
-        const rideActivities = filterRideActivities(activities);
-        const cleanedRides = cleanRideData(rideActivities);
+        const cleanedRides = cleanRideData(filterRideActivities(activities));
         if (cleanedRides) {
           setUserRides(cleanedRides);
           setUserID(cleanedRides[0].user_id);
@@ -85,44 +83,29 @@ export default function Redirect({
 
   useEffect(() => {
     if (!userRides) return;
-    if (getGearIDNumbers(userRides).length === 0) {
+    const userGear = getGearIDNumbers(userRides);
+    if (userGear.length === 0) {
       navigate("/dashboard", { replace: true });
     } else {
-      setUserGear(getGearIDNumbers(userRides));
+      Promise.all(
+        userGear.map((gearID) => getUserGearDetails(gearID, userAccessToken))
+      )
+        .then((gearDetails) => {
+          const formattedBikeDetails = formatBikeDetails(gearDetails);
+          setUserBikes(formattedBikeDetails);
+          window.localStorage.setItem(
+            "userBikes",
+            JSON.stringify(formattedBikeDetails)
+          );
+          navigate("/dashboard", { replace: true });
+        })
+        .catch(() => {
+          changeErrorMessage(`An error occurred while fetching your bike details. 
+      Please return to the home page and try logging in again.`);
+        });
     }
     // eslint-disable-next-line
   }, [userRides]);
-
-  useEffect(() => {
-    if (userGear <= 0 || !userGear) return;
-    Promise.all(
-      userGear.map((gearID) => getUserGearDetails(gearID, userAccessToken))
-    )
-      .then((details) => {
-        const userBikeDetails = details.map((detail) => {
-          const frameType = generateBikeTypeString(detail.frame_type);
-          return ({
-          id: detail.id,
-          name: detail.name,
-          brand_name: detail.brand_name ? detail.brand_name : "",
-          model_name: detail.model_name
-            ? detail.model_name
-            : detail.name,
-          frame_type : frameType,
-        })});
-        setUserBikes(userBikeDetails);
-        window.localStorage.setItem(
-          "userBikes",
-          JSON.stringify(userBikeDetails)
-        );
-        navigate("/dashboard", { replace: true });
-      })
-      .catch(() => {
-        changeErrorMessage(`An error occurred while fetching your bike details. 
-      Please return to the home page and try logging in again.`);
-      });
-    // eslint-disable-next-line
-  }, [userGear]);
 
   return (
     <section className="home-page">
