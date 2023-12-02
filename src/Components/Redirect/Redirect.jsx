@@ -11,7 +11,7 @@ import {
   filterRideActivities,
   getGearIDNumbers,
   cleanRideData,
-  generateBikeTypeString,
+  formatBikeDetails,
 } from "../../util.js";
 import "./Redirect.css";
 import PropTypes from "prop-types";
@@ -29,6 +29,7 @@ export default function Redirect({
   const navigate = useNavigate();
 
   useEffect(() => {
+    console.log("useEffect 1 Fired")
     if (testForDeniedPermission(window.location.search)) {
       changeErrorMessage(`Please allow this app access to all activity data on Strava's login screen. 
         You are being redirected to the home page.`);
@@ -39,6 +40,7 @@ export default function Redirect({
   }, [changeErrorMessage]);
 
   useEffect(() => {
+    console.log("useEffect 2 Fired")
     if (!userAuthToken) return;
     getAccessToken(userAuthToken)
       .then((data) => {
@@ -56,6 +58,7 @@ export default function Redirect({
   }, [userAuthToken]);
 
   useEffect(() => {
+    console.log("useEffect 3 Fired")
     if (!userAccessToken) return;
     getUserActivities(1, userAccessToken)
       .then((activities) => {
@@ -81,6 +84,7 @@ export default function Redirect({
   }, [userAccessToken]);
 
   useEffect(() => {
+    console.log("useEffect 4 Fired")
     if (!userRides) return;
     const userGear = getGearIDNumbers(userRides);
     if (userGear.length === 0) {
@@ -89,20 +93,12 @@ export default function Redirect({
       Promise.all(
         userGear.map((gearID) => getUserGearDetails(gearID, userAccessToken))
       )
-        .then((details) => {
-          const userBikeDetails = details.map((detail) => {
-            return {
-              id: detail.id,
-              name: detail.name,
-              brand_name: detail.brand_name ? detail.brand_name : "",
-              model_name: detail.model_name ? detail.model_name : detail.name,
-              frame_type: generateBikeTypeString(detail.frame_type),
-            };
-          });
-          setUserBikes(userBikeDetails);
+        .then((gearDetails) => {
+          const formattedBikeDetails = formatBikeDetails(gearDetails);
+          setUserBikes(formattedBikeDetails);
           window.localStorage.setItem(
             "userBikes",
-            JSON.stringify(userBikeDetails)
+            JSON.stringify(formattedBikeDetails)
           );
           navigate("/dashboard", { replace: true });
         })

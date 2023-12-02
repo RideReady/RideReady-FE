@@ -65,9 +65,15 @@ export const calculateRebuildLife = (
   }
   // For known bikes, ridesOnBike is true. Else use all userRides.
   if (ridesOnBike) {
-    rideTimeSinceLastRebuild = calculateRideTimeSinceLastRebuild(ridesOnBike, rebuildDate);
+    rideTimeSinceLastRebuild = calculateRideTimeSinceLastRebuild(
+      ridesOnBike,
+      rebuildDate
+    );
   } else {
-    rideTimeSinceLastRebuild = calculateRideTimeSinceLastRebuild(userRides, rebuildDate);
+    rideTimeSinceLastRebuild = calculateRideTimeSinceLastRebuild(
+      userRides,
+      rebuildDate
+    );
   }
   const hoursSinceLastRebuild = rideTimeSinceLastRebuild / 3600;
   const percentRebuildLifeRemaining =
@@ -179,16 +185,34 @@ export const filterRidesForSpecificBike = (userRides, onBike) => {
   return filteredRides;
 };
 
+export const formatBikeDetails = (fetchedGearDetails) => {
+  return fetchedGearDetails.map((detail) => {
+    return {
+      id: detail.id,
+      name: detail.name,
+      brand_name: detail.brand_name ? detail.brand_name : "",
+      model_name: detail.model_name ? detail.model_name : detail.name,
+      frame_type: generateBikeTypeString(detail.frame_type),
+    };
+  });
+};
+
 export const generateBikeTypeString = (frameTypeIdFromStrava) => {
   switch (frameTypeIdFromStrava) {
-    case 1 : return "Mountain Bike";
-    case 2 : return "Cross Bike";
-    case 3 : return "Road Bike";
-    case 4 : return "TT Bike";
-    case 5 : return "Gravel Bike";
-    default : return "Unknown Bike Type";
+    case 1:
+      return "Mountain Bike";
+    case 2:
+      return "Cross Bike";
+    case 3:
+      return "Road Bike";
+    case 4:
+      return "TT Bike";
+    case 5:
+      return "Gravel Bike";
+    default:
+      return "Unknown Bike Type";
   }
-}
+};
 
 export const sortUserSuspensionByBikeId = (susArr) => {
   const sortedSusArr = susArr.toSorted((a, b) => {
@@ -200,4 +224,4 @@ export const sortUserSuspensionByBikeId = (susArr) => {
     return 0;
   });
   return sortedSusArr;
-}
+};
