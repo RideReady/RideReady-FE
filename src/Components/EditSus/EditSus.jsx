@@ -120,11 +120,7 @@ export default function EditSus({
   useEffect(() => {
     let moreRidesNeeded;
     if (newRebuildDate) {
-      if (isOldestRideBeforeRebuild(userRides, newRebuildDate)) {
-        moreRidesNeeded = false;
-      } else {
-        moreRidesNeeded = true;
-      }
+      moreRidesNeeded = isOldestRideBeforeRebuild(userRides, newRebuildDate);
     }
     if (moreRidesNeeded) {
       if (

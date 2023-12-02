@@ -99,7 +99,7 @@ export const isOldestRideBeforeRebuild = (rides, rebuildDate) => {
     }
     return oldest;
   }, today);
-  const lastRideBeforeRebuild = moment(oldestRideDate).isBefore(rebuildDate);
+  const lastRideBeforeRebuild = moment(oldestRideDate).isAfter(rebuildDate);
   return lastRideBeforeRebuild;
 };
 

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { suspensionData } from "../../SuspensionData";
 import "./NewPartForm.css";
 import PropTypes from "prop-types";
@@ -39,8 +39,10 @@ export default function NewPartForm({
   const [selectedBike, setSelectedBike] = useState("");
   const [selectedSus, setSelectedSus] = useState("");
   const [selectedRebuildDate, setSelectedRebuildDate] = useState("");
-  const [fetchPageNumber, setFetchPageNumber] = useState(pagesFetched);
-  const [fetchCount, setFetchCount] = useState(pagesFetched);
+  // const [fetchPageNumber, setFetchPageNumber] = useState(pagesFetched);
+  // const [fetchCount, setFetchCount] = useState(pagesFetched);
+  const fetchPageNum = useRef(pagesFetched);
+  const lastLoadedPageNum = useRef(pagesFetched);
   const [submitDisabled, setSubmitDisabled] = useState(false);
   const [submitError, setSubmitError] = useState(false);
   const [errorModalMessage, setErrorModalMessage] = useState("");
@@ -134,12 +136,15 @@ export default function NewPartForm({
         selectedRebuildDate
       );
     }
-    if (moreRidesNeeded === false) {
-      if (fetchCount !== fetchPageNumber) return;
-      if (fetchCount > 10) return;
+    if (moreRidesNeeded) {
+      if (
+        lastLoadedPageNum.current !== fetchPageNum.current ||
+        lastLoadedPageNum.current > 10
+      ) 
+        return;
       setSubmitDisabled(true);
-      setFetchPageNumber(fetchPageNumber + 1);
-      getUserActivities(fetchPageNumber, userAccessToken)
+      fetchPageNum.current += 1;
+      getUserActivities(fetchPageNum.current, userAccessToken)
         .then((activities) => {
           const rideActivities = filterRideActivities(activities);
           const cleanedRides = cleanRideData(rideActivities);
@@ -150,7 +155,7 @@ export default function NewPartForm({
               JSON.stringify([...userRides, ...cleanedRides])
             );
           }
-          setFetchCount(fetchCount + 1);
+          lastLoadedPageNum.current += 1;
           setSubmitDisabled(false);
         })
         .catch(() => {
@@ -230,7 +235,7 @@ export default function NewPartForm({
           );
         }
 
-        setPagesFetched(fetchCount);
+        setPagesFetched(lastLoadedPageNum.current);
         navigate("/dashboard");
       })
       .catch((error) => {
@@ -300,7 +305,7 @@ export default function NewPartForm({
           Please fill out all forms before submitting
         </p>
       )}
-      {fetchCount !== fetchPageNumber && (
+      {fetchPageNum.current !== lastLoadedPageNum.current && (
         <p className="error-wait-message">
           Please wait for data to load.
           <br />
