@@ -63,27 +63,25 @@ export const calculateRebuildLife = (
     susBike = bikeOptions.find((bike) => bike.id === onBike);
     ridesOnBike = userRides.filter((ride) => ride.gear_id === susBike.id);
   }
-  // For known bikes, ridesOnBike is now true
+  // For known bikes, ridesOnBike is true. Else use all userRides.
   if (ridesOnBike) {
-    rideTimeSinceLastRebuild = ridesOnBike.reduce((total, ride) => {
-      if (moment(ride.ride_date).isAfter(rebuildDate)) {
-        total += ride.ride_duration;
-      }
-      return total;
-    }, 0);
-    // For unknownBike, ridesOnBike is false
+    rideTimeSinceLastRebuild = calculateRideTimeSinceLastRebuild(ridesOnBike, rebuildDate);
   } else {
-    rideTimeSinceLastRebuild = userRides.reduce((total, ride) => {
-      if (moment(ride.ride_date).isAfter(rebuildDate)) {
-        total += ride.ride_duration;
-      }
-      return total;
-    }, 0);
+    rideTimeSinceLastRebuild = calculateRideTimeSinceLastRebuild(userRides, rebuildDate);
   }
   const hoursSinceLastRebuild = rideTimeSinceLastRebuild / 3600;
   const percentRebuildLifeRemaining =
     1 - hoursSinceLastRebuild / suspension.rebuildInt;
   return percentRebuildLifeRemaining;
+};
+
+export const calculateRideTimeSinceLastRebuild = (rides, rebuildDate) => {
+  return rides.reduce((total, ride) => {
+    if (moment(ride.ride_date).isAfter(rebuildDate)) {
+      total += ride.ride_duration;
+    }
+    return total;
+  }, 0);
 };
 
 export const isOldestRideBeforeRebuild = (rides, rebuildDate) => {
