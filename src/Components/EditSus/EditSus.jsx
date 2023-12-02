@@ -130,7 +130,7 @@ export default function EditSus({
         return;
       setLoadingRides(true);
       setSubmitDisabled(true);
-      fetchPageNum.current = fetchPageNum.current + 1;
+      fetchPageNum.current += 1;
       getUserActivities(fetchPageNum.current, userAccessToken)
         .then((activities) => {
           const rideActivities = filterRideActivities(activities);
@@ -142,7 +142,7 @@ export default function EditSus({
               JSON.stringify([...userRides, ...cleanedRides])
             );
           }
-          lastLoadedPageNum.current = lastLoadedPageNum.current + 1;
+          lastLoadedPageNum.current += 1;
           setLoadingRides(false);
           setSubmitDisabled(false);
         })

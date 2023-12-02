@@ -41,6 +41,7 @@ export default function NewPartForm({
   const [selectedRebuildDate, setSelectedRebuildDate] = useState("");
   const fetchPageNum = useRef(pagesFetched);
   const lastLoadedPageNum = useRef(pagesFetched);
+  const [loadingRides, setLoadingRides] = useState(false);
   const [submitDisabled, setSubmitDisabled] = useState(false);
   const [submitError, setSubmitError] = useState(false);
   const [errorModalMessage, setErrorModalMessage] = useState("");
@@ -140,6 +141,7 @@ export default function NewPartForm({
         lastLoadedPageNum.current > 10
       ) 
         return;
+      setLoadingRides(true);
       setSubmitDisabled(true);
       fetchPageNum.current += 1;
       getUserActivities(fetchPageNum.current, userAccessToken)
@@ -154,6 +156,7 @@ export default function NewPartForm({
             );
           }
           lastLoadedPageNum.current += 1;
+          setLoadingRides(false);
           setSubmitDisabled(false);
         })
         .catch(() => {
@@ -303,7 +306,7 @@ export default function NewPartForm({
           Please fill out all forms before submitting
         </p>
       )}
-      {fetchPageNum.current !== lastLoadedPageNum.current && (
+      {loadingRides && (
         <p className="error-wait-message">
           Please wait for data to load.
           <br />
