@@ -95,7 +95,6 @@ export default function Dashboard({
     let userSusStateNeedsReset = false;
 
     const recalculatedUserSus = userSuspension.map((sus) => {
-      console.log(sus);
       const susNeedsRecalc = isNewestRideAfterLastCalculated(userRides, sus);
       if (susNeedsRecalc === true) {
         console.log(`${sus.id} needs recalculation`);

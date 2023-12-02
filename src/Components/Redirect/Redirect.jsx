@@ -37,8 +37,7 @@ export default function Redirect({
     }
     const fetchedAuthToken = stripURLForToken(window.location.search);
     setUserAuthToken(fetchedAuthToken);
-    // eslint-disable-next-line
-  }, []);
+  }, [changeErrorMessage]);
 
   useEffect(() => {
     if (!userAuthToken) return;

@@ -173,7 +173,6 @@ export const isNewestRideAfterLastCalculated = (userRides, sus) => {
 
 export const filterRidesForSpecificBike = (userRides, onBike) => {
   let filteredRides;
-  console.log(onBike)
   if (onBike.id !== "unknownBike") {
     filteredRides = userRides.filter((ride) => ride.gear_id === onBike.id);
   } else {
