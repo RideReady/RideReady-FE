@@ -28,6 +28,8 @@ export default function Dashboard({
   setUserRides,
   userAccessToken,
   setUserAccessToken,
+  dashboardInitialized,
+  setDashboardInitialized,
 }) {
   const [loadingSus, setLoadingSus] = useState("");
   const [buttonLink, setButtonLink] = useState("/dashboard/add-new-part");
@@ -63,7 +65,7 @@ export default function Dashboard({
 
   useEffect(() => {
     if (userID === null || userBikes === null) return;
-    if (!userSuspension) {
+    if (!userSuspension && dashboardInitialized.current === false) {
       setLoadingSus("loading");
       loadUserSuspensionFromDatabase(userID)
         .then((result) => {
@@ -88,10 +90,11 @@ export default function Dashboard({
           setButtonMsg("Return to login page");
         });
     }
-  }, [userSuspension, userID, userBikes, setUserSuspension]);
+  }, [userSuspension, userID, userBikes, setUserSuspension, dashboardInitialized]);
 
   useEffect(() => {
     if (!userSuspension || !userRides || !userBikes) return;
+    if (dashboardInitialized.current === false) return;
     let userSusStateNeedsReset = false;
 
     const recalculatedUserSus = userSuspension.map((sus) => {
@@ -137,7 +140,16 @@ export default function Dashboard({
     if (userSusStateNeedsReset) {
       setUserSuspension(recalculatedUserSus);
     }
-  }, [userSuspension, userBikes, userRides, userID, setUserSuspension]);
+    setDashboardInitialized(true);
+  }, [
+    userSuspension,
+    userBikes,
+    userRides,
+    userID,
+    setUserSuspension,
+    dashboardInitialized,
+    setDashboardInitialized,
+  ]);
 
   return (
     <section className="dashboard">
@@ -176,4 +188,6 @@ Dashboard.propTypes = {
   setUserRides: PropTypes.func,
   userAccessToken: PropTypes.string,
   setUserAccessToken: PropTypes.func,
+  dashboardInitialized: PropTypes.object,
+  setDashboardInitialized: PropTypes.func,
 };
