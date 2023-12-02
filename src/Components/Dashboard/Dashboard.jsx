@@ -90,7 +90,13 @@ export default function Dashboard({
           setButtonMsg("Return to login page");
         });
     }
-  }, [userSuspension, userID, userBikes, setUserSuspension, dashboardInitialized]);
+  }, [
+    userSuspension,
+    userID,
+    userBikes,
+    setUserSuspension,
+    dashboardInitialized,
+  ]);
 
   useEffect(() => {
     if (!userSuspension || !userRides || !userBikes) return;
