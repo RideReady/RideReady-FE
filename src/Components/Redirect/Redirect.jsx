@@ -59,8 +59,7 @@ export default function Redirect({
     if (!userAccessToken) return;
     getUserActivities(1, userAccessToken)
       .then((activities) => {
-        const rideActivities = filterRideActivities(activities);
-        const cleanedRides = cleanRideData(rideActivities);
+        const cleanedRides = cleanRideData(filterRideActivities(activities));
         if (cleanedRides) {
           setUserRides(cleanedRides);
           setUserID(cleanedRides[0].user_id);
@@ -92,13 +91,12 @@ export default function Redirect({
       )
         .then((details) => {
           const userBikeDetails = details.map((detail) => {
-            const frameType = generateBikeTypeString(detail.frame_type);
             return {
               id: detail.id,
               name: detail.name,
               brand_name: detail.brand_name ? detail.brand_name : "",
               model_name: detail.model_name ? detail.model_name : detail.name,
-              frame_type: frameType,
+              frame_type: generateBikeTypeString(detail.frame_type),
             };
           });
           setUserBikes(userBikeDetails);
