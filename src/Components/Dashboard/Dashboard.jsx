@@ -100,7 +100,7 @@ export default function Dashboard({
 
   useEffect(() => {
     if (!userSuspension || !userRides || !userBikes) return;
-    if (dashboardInitialized.current === false) return;
+    if (dashboardInitialized.current === true) return;
     let userSusStateNeedsReset = false;
 
     const recalculatedUserSus = userSuspension.map((sus) => {
