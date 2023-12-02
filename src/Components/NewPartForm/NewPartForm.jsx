@@ -39,8 +39,6 @@ export default function NewPartForm({
   const [selectedBike, setSelectedBike] = useState("");
   const [selectedSus, setSelectedSus] = useState("");
   const [selectedRebuildDate, setSelectedRebuildDate] = useState("");
-  // const [fetchPageNumber, setFetchPageNumber] = useState(pagesFetched);
-  // const [fetchCount, setFetchCount] = useState(pagesFetched);
   const fetchPageNum = useRef(pagesFetched);
   const lastLoadedPageNum = useRef(pagesFetched);
   const [submitDisabled, setSubmitDisabled] = useState(false);
