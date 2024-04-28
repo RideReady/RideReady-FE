@@ -59,6 +59,7 @@ export const calculateRebuildLife = (
   let ridesOnBike;
   let rideTimeSinceLastRebuild;
 
+  // b prefix comes from Strava, otherwise its unknown
   if (onBike.startsWith("b") && bikeOptions) {
     susBike = bikeOptions.find((bike) => bike.id === onBike);
     ridesOnBike = userRides.filter((ride) => ride.gear_id === susBike.id);

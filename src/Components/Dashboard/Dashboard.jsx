@@ -106,6 +106,9 @@ export default function Dashboard({
     const recalculatedUserSus = userSuspension.map((sus) => {
       const susNeedsRecalc = isNewestRideAfterLastCalculated(userRides, sus);
       if (susNeedsRecalc === true) {
+        // Issue - When this recalculates, it is not fetching rides all the way back to the rebuildDate,
+        // seems to only be using what is initially fetched on login (last 200 activities) and then
+        // incorrectly calculating based on that
         console.log(`${sus.id} needs recalculation`);
         userSusStateNeedsReset = true;
         const newRebuildLife = calculateRebuildLife(
