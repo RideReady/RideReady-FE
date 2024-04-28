@@ -1,5 +1,6 @@
 import moment from "moment";
 import { suspensionData } from "./SuspensionData";
+import { getUserActivities } from "./Services/APICalls";
 
 export const testForDeniedPermission = (url) => {
   if (url.split("&")[1] === "error=access_denied") {
@@ -225,4 +226,50 @@ export const sortUserSuspensionByBikeId = (susArr) => {
     return 0;
   });
   return sortedSusArr;
+};
+
+export const fetchMoreRidesIfNeeded = (
+  rebuildDate,
+  userRideState,
+  setUserRideState,
+  lastLoadedPageNumRef,
+  fetchPageNumRef,
+  setLoadingRidesState,
+  setSubmitDisabledState,
+  userAccessToken,
+  setErrorMessageState
+) => {
+  let moreRidesNeeded;
+  if (rebuildDate) {
+    moreRidesNeeded = isOldestRideBeforeRebuild(userRideState, rebuildDate);
+  }
+  if (moreRidesNeeded) {
+    if (
+      lastLoadedPageNumRef.current !== fetchPageNumRef.current ||
+      lastLoadedPageNumRef.current > 10
+    )
+      return;
+    setLoadingRidesState(true);
+    setSubmitDisabledState(true);
+    fetchPageNumRef.current += 1;
+    getUserActivities(fetchPageNumRef.current, userAccessToken)
+      .then((activities) => {
+        const rideActivities = filterRideActivities(activities);
+        const cleanedRides = cleanRideData(rideActivities);
+        if (cleanedRides) {
+          setUserRideState([...userRideState, ...cleanedRides]);
+          window.localStorage.setItem(
+            "userRides",
+            JSON.stringify([...userRideState, ...cleanedRides])
+          );
+        }
+        lastLoadedPageNumRef.current += 1;
+        setLoadingRidesState(false);
+        setSubmitDisabledState(false);
+      })
+      .catch(() => {
+        setErrorMessageState(`An error occurred while fetching your rides. 
+      Please return to the home page and try logging in again.`);
+      });
+  }
 };
