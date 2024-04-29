@@ -237,8 +237,18 @@ export const fetchMoreRidesIfNeeded = (
   setLoadingRidesState,
   setSubmitDisabledState,
   userAccessToken,
-  setErrorMessageState
+  setErrorMsgState
 ) => {
+  console.log(
+    {rebuildDate},
+    {userRideState},
+    {lastLoadedPageNumRef},
+    {fetchPageNumRef},
+    {setLoadingRidesState},
+    {setSubmitDisabledState},
+    {userAccessToken},
+    {setErrorMsgState}
+  );
   let moreRidesNeeded;
   if (rebuildDate) {
     moreRidesNeeded = isOldestRideBeforeRebuild(userRideState, rebuildDate);
@@ -268,7 +278,7 @@ export const fetchMoreRidesIfNeeded = (
         setSubmitDisabledState(false);
       })
       .catch(() => {
-        setErrorMessageState(`An error occurred while fetching your rides. 
+        setErrorMsgState(`An error occurred while fetching your rides. 
       Please return to the home page and try logging in again.`);
       });
   }

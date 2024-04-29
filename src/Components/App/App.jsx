@@ -103,7 +103,6 @@ export default function App() {
               setPagesFetched={setPagesFetched}
               userBikes={userBikes}
               setUserBikes={setUserBikes}
-              changeErrorMessage={changeErrorMessage}
               userID={userID}
               setUserID={setUserID}
             />

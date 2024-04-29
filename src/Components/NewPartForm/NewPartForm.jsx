@@ -4,15 +4,12 @@ import "./NewPartForm.css";
 import PropTypes from "prop-types";
 import {
   calculateRebuildLife,
-  isOldestRideBeforeRebuild,
-  filterRideActivities,
-  cleanRideData,
   convertSusToDatabaseFormat,
   filterRidesForSpecificBike,
   convertSuspensionFromDatabase,
+  fetchMoreRidesIfNeeded,
 } from "../../util";
 import {
-  getUserActivities,
   postUserSuspensionToDatabase,
   loadUserSuspensionFromDatabase,
 } from "../../Services/APICalls";
@@ -31,7 +28,6 @@ export default function NewPartForm({
   setUserRides,
   pagesFetched,
   setPagesFetched,
-  changeErrorMessage,
   setUserID,
 }) {
   const [bikeOptions, setBikeOptions] = useState(userBikes);
@@ -128,41 +124,18 @@ export default function NewPartForm({
   });
 
   useEffect(() => {
-    let moreRidesNeeded;
-    if (selectedRebuildDate) {
-      moreRidesNeeded = isOldestRideBeforeRebuild(
+    if(selectedRebuildDate) {
+      fetchMoreRidesIfNeeded(
+        selectedRebuildDate,
         userRides,
-        selectedRebuildDate
+        setUserRides,
+        lastLoadedPageNum,
+        fetchPageNum,
+        setLoadingRides,
+        setSubmitDisabled,
+        userAccessToken,
+        setErrorModalMessage
       );
-    }
-    if (moreRidesNeeded) {
-      if (
-        lastLoadedPageNum.current !== fetchPageNum.current ||
-        lastLoadedPageNum.current > 10
-      ) 
-        return;
-      setLoadingRides(true);
-      setSubmitDisabled(true);
-      fetchPageNum.current += 1;
-      getUserActivities(fetchPageNum.current, userAccessToken)
-        .then((activities) => {
-          const rideActivities = filterRideActivities(activities);
-          const cleanedRides = cleanRideData(rideActivities);
-          if (cleanedRides) {
-            setUserRides([...userRides, ...cleanedRides]);
-            window.localStorage.setItem(
-              "userRides",
-              JSON.stringify([...userRides, ...cleanedRides])
-            );
-          }
-          lastLoadedPageNum.current += 1;
-          setLoadingRides(false);
-          setSubmitDisabled(false);
-        })
-        .catch(() => {
-          changeErrorMessage(`An error occurred while fetching your rides. 
-      Please return to the home page and try logging in again.`);
-        });
     }
     // eslint-disable-next-line
   }, [selectedRebuildDate, userRides]);
@@ -191,7 +164,7 @@ export default function NewPartForm({
       };
     }
 
-    console.log(selectedBikeDetails)
+    console.log(selectedBikeDetails);
 
     const newSuspensionDetails = {
       id: uuidv4(),

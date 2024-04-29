@@ -31,7 +31,6 @@ export default function EditSus({
   setPagesFetched,
   userBikes,
   setUserBikes,
-  changeErrorMessage,
   userID,
   setUserID,
 }) {
@@ -147,7 +146,7 @@ export default function EditSus({
           setSubmitDisabled(false);
         })
         .catch(() => {
-          changeErrorMessage(`An error occurred while fetching your rides. 
+          setErrorModalMessage(`An error occurred while fetching your rides. 
       Please return to the home page and try logging in again.`);
         });
     }
