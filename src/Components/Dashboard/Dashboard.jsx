@@ -50,8 +50,8 @@ export default function Dashboard({
       setUserAccessToken(loadedToken);
     }
     if (!userID) {
-      const loadedToken = JSON.parse(localStorage.getItem("userID"));
-      setUserID(loadedToken);
+      const loadedId = JSON.parse(localStorage.getItem("userID"));
+      setUserID(loadedId);
     }
     // eslint-disable-next-line
   }, []);
