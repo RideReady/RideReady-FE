@@ -1,19 +1,15 @@
 import { useEffect, useRef, useState } from "react";
 import "./EditSus.css";
 import { useNavigate } from "react-router-dom";
-import { convertSusToDatabaseFormat, findSusIndexByID } from "../../util";
+import { convertSusToDatabaseFormat, fetchMoreRidesIfNeeded, findSusIndexByID } from "../../util";
 import moment from "moment";
 import {
   calculateRebuildLife,
-  isOldestRideBeforeRebuild,
-  filterRideActivities,
-  cleanRideData,
   filterRidesForSpecificBike,
   convertSuspensionFromDatabase,
 } from "../../util";
 import {
   editUserSuspensionInDatabase,
-  getUserActivities,
   loadUserSuspensionFromDatabase,
 } from "../../Services/APICalls";
 import PropTypes from "prop-types";
@@ -117,42 +113,22 @@ export default function EditSus({
   }, [selectedSuspension, userSuspension]);
 
   useEffect(() => {
-    let moreRidesNeeded;
-    if (newRebuildDate) {
-      moreRidesNeeded = isOldestRideBeforeRebuild(userRides, newRebuildDate);
-    }
-    if (moreRidesNeeded) {
-      if (
-        lastLoadedPageNum.current !== fetchPageNum.current ||
-        lastLoadedPageNum.current > 10
-      )
-        return;
-      setLoadingRides(true);
-      setSubmitDisabled(true);
-      fetchPageNum.current += 1;
-      getUserActivities(fetchPageNum.current, userAccessToken)
-        .then((activities) => {
-          const rideActivities = filterRideActivities(activities);
-          const cleanedRides = cleanRideData(rideActivities);
-          if (cleanedRides) {
-            setUserRides([...userRides, ...cleanedRides]);
-            window.localStorage.setItem(
-              "userRides",
-              JSON.stringify([...userRides, ...cleanedRides])
-            );
-          }
-          lastLoadedPageNum.current += 1;
-          setLoadingRides(false);
-          setSubmitDisabled(false);
-        })
-        .catch(() => {
-          setErrorModalMessage(`An error occurred while fetching your rides. 
-      Please return to the home page and try logging in again.`);
-        });
+    if(newRebuildDate) {
+      fetchMoreRidesIfNeeded(
+        newRebuildDate,
+        userRides,
+        setUserRides,
+        lastLoadedPageNum,
+        fetchPageNum,
+        setLoadingRides,
+        setSubmitDisabled,
+        userAccessToken,
+        setErrorModalMessage
+      );
     }
     // eslint-disable-next-line
   }, [newRebuildDate, userRides]);
-
+  
   const handleSubmit = () => {
     if (!newRebuildDate) {
       setSubmitError(true);
