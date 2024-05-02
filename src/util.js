@@ -229,40 +229,39 @@ export const sortUserSuspensionByBikeId = (susArr) => {
 };
 
 export const fetchMoreRidesIfNeeded = (
+  userAccessToken,
   rebuildDate,
   userRideState,
   setUserRideState,
-  lastLoadedPageNumRef,
-  fetchPageNumRef,
+  pagesFetchedState,
+  setPagesFetchedState,
   setLoadingRidesState,
   setSubmitDisabledState,
-  userAccessToken,
   setErrorMsgState
 ) => {
   console.log(
-    {rebuildDate},
-    {userRideState},
-    {lastLoadedPageNumRef},
-    {fetchPageNumRef},
-    {setLoadingRidesState},
-    {setSubmitDisabledState},
-    {userAccessToken},
-    {setErrorMsgState}
+    { rebuildDate },
+    { userRideState },
+    { pagesFetchedState },
+    { setPagesFetchedState },
+    { setLoadingRidesState },
+    { setSubmitDisabledState },
+    { userAccessToken },
+    { setErrorMsgState }
   );
-  let moreRidesNeeded;
-  if (rebuildDate) {
-    moreRidesNeeded = isOldestRideBeforeRebuild(userRideState, rebuildDate);
-  }
-  if (moreRidesNeeded) {
-    if (
-      lastLoadedPageNumRef.current !== fetchPageNumRef.current ||
-      lastLoadedPageNumRef.current > 10
-    )
-      return;
-    setLoadingRidesState(true);
-    setSubmitDisabledState(true);
-    fetchPageNumRef.current += 1;
-    getUserActivities(fetchPageNumRef.current, userAccessToken)
+  if (!rebuildDate || !userAccessToken) return;
+  if (setLoadingRidesState) setLoadingRidesState(true);
+  if (setSubmitDisabledState) setSubmitDisabledState(true);
+
+  let currentPagesFetched = pagesFetchedState;
+  while (currentPagesFetched <= 10) {
+    const moreRidesNeeded = isOldestRideBeforeRebuild(
+      userRideState,
+      rebuildDate
+    );
+    if (moreRidesNeeded === false) break;
+
+    getUserActivities(currentPagesFetched, userAccessToken)
       .then((activities) => {
         const rideActivities = filterRideActivities(activities);
         const cleanedRides = cleanRideData(rideActivities);
@@ -273,13 +272,16 @@ export const fetchMoreRidesIfNeeded = (
             JSON.stringify([...userRideState, ...cleanedRides])
           );
         }
-        lastLoadedPageNumRef.current += 1;
-        setLoadingRidesState(false);
-        setSubmitDisabledState(false);
+        currentPagesFetched += 1;
       })
-      .catch(() => {
-        setErrorMsgState(`An error occurred while fetching your rides. 
-      Please return to the home page and try logging in again.`);
+      .catch((error) => {
+        console.error(error);
+        if (setErrorMsgState)
+          setErrorMsgState(`An error occurred while fetching your rides. 
+        Please return to the home page and try logging in again.`);
       });
   }
+  setPagesFetchedState(currentPagesFetched);
+  if (setLoadingRidesState) setLoadingRidesState(false);
+  if (setSubmitDisabledState) setSubmitDisabledState(false);
 };
