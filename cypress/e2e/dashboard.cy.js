@@ -15,7 +15,7 @@ describe("dashboard", () => {
 
     cy.intercept(
       "GET",
-      `https://www.strava.com/api/v3/athlete/activities?page=*`,
+      `https://www.strava.com/api/v3/athlete/activities?page=1*`,
       {
         fixture: "activityDataPage1.json",
       }
