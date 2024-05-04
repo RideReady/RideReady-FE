@@ -1,5 +1,6 @@
 import moment from "moment";
 import { suspensionData } from "./SuspensionData";
+import { getUserActivities } from "./Services/APICalls";
 
 export const testForDeniedPermission = (url) => {
   if (url.split("&")[1] === "error=access_denied") {
@@ -46,7 +47,6 @@ export const getGearIDNumbers = (userRides) => {
   return gearNumbers;
 };
 
-// Could this be refactored to use filterRidesForSpecificBike?
 export const calculateRebuildLife = (
   newSus,
   rebuildDate,
@@ -59,9 +59,10 @@ export const calculateRebuildLife = (
   let ridesOnBike;
   let rideTimeSinceLastRebuild;
 
+  // b prefix comes from Strava, otherwise its unknown
   if (onBike.startsWith("b") && bikeOptions) {
     susBike = bikeOptions.find((bike) => bike.id === onBike);
-    ridesOnBike = userRides.filter((ride) => ride.gear_id === susBike.id);
+    ridesOnBike = filterRidesForSpecificBike(userRides, susBike);
   }
   // For known bikes, ridesOnBike is true. Else use all userRides.
   if (ridesOnBike) {
@@ -224,4 +225,67 @@ export const sortUserSuspensionByBikeId = (susArr) => {
     return 0;
   });
   return sortedSusArr;
+};
+
+export const fetchMoreRidesIfNeeded = async (
+  userAccessToken,
+  rebuildDate,
+  userRideState,
+  setUserRideState,
+  pagesFetchedState,
+  setPagesFetchedState,
+  setLoadingRidesState,
+  setSubmitDisabledState,
+  setErrorMsgState
+) => {
+  if (!rebuildDate || !userAccessToken) return;
+  const moreRidesNeeded = isOldestRideBeforeRebuild(userRideState, rebuildDate);
+  if (!moreRidesNeeded) {
+    console.log("More rides needed, fetching activities");
+    return;
+  }
+
+  if (setLoadingRidesState) setLoadingRidesState(true);
+  if (setSubmitDisabledState) setSubmitDisabledState(true);
+  let fetchedRides = [];
+  let resultRideArr = [];
+  let currentPagesFetched = pagesFetchedState + 1;
+
+  try {
+    while (currentPagesFetched <= 10) {
+      const fetchMoreRides = isOldestRideBeforeRebuild(
+        [...userRideState, ...fetchedRides],
+        rebuildDate
+      );
+      if (!fetchMoreRides) {
+        resultRideArr = [...userRideState, ...fetchedRides];
+        return resultRideArr;
+      }
+      console.log(`Fetching page ${currentPagesFetched} athlete activities`);
+
+      const activities = await getUserActivities(
+        currentPagesFetched,
+        userAccessToken
+      );
+      const rideActivities = filterRideActivities(activities);
+      const cleanedRides = cleanRideData(rideActivities);
+
+      if (cleanedRides) {
+        fetchedRides.push(...cleanedRides);
+        currentPagesFetched += 1;
+      }
+    }
+  } catch (error) {
+    console.error(error);
+    setErrorMsgState &&
+      setErrorMsgState(
+        `An error occurred while fetching your rides. Please return to the home page and try logging in again.`
+      );
+  } finally {
+    setUserRideState(resultRideArr);
+    window.localStorage.setItem("userRides", JSON.stringify(resultRideArr));
+    setPagesFetchedState(currentPagesFetched);
+    if (setLoadingRidesState) setLoadingRidesState(false);
+    if (setSubmitDisabledState) setSubmitDisabledState(false);
+  }
 };

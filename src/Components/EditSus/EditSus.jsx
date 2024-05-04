@@ -1,19 +1,19 @@
 import { useEffect, useRef, useState } from "react";
 import "./EditSus.css";
 import { useNavigate } from "react-router-dom";
-import { convertSusToDatabaseFormat, findSusIndexByID } from "../../util";
+import {
+  convertSusToDatabaseFormat,
+  fetchMoreRidesIfNeeded,
+  findSusIndexByID,
+} from "../../util";
 import moment from "moment";
 import {
   calculateRebuildLife,
-  isOldestRideBeforeRebuild,
-  filterRideActivities,
-  cleanRideData,
   filterRidesForSpecificBike,
   convertSuspensionFromDatabase,
 } from "../../util";
 import {
   editUserSuspensionInDatabase,
-  getUserActivities,
   loadUserSuspensionFromDatabase,
 } from "../../Services/APICalls";
 import PropTypes from "prop-types";
@@ -31,14 +31,12 @@ export default function EditSus({
   setPagesFetched,
   userBikes,
   setUserBikes,
-  changeErrorMessage,
   userID,
   setUserID,
 }) {
   const [newRebuildDate, setNewRebuildDate] = useState("");
   const [editSusIndex, setEditSusIndex] = useState(null);
   const [editSusDetails, setEditSusDetails] = useState(null);
-  const fetchPageNum = useRef(pagesFetched);
   const lastLoadedPageNum = useRef(pagesFetched);
   const [loadingRides, setLoadingRides] = useState(false);
   const [submitDisabled, setSubmitDisabled] = useState(false);
@@ -118,41 +116,21 @@ export default function EditSus({
   }, [selectedSuspension, userSuspension]);
 
   useEffect(() => {
-    let moreRidesNeeded;
     if (newRebuildDate) {
-      moreRidesNeeded = isOldestRideBeforeRebuild(userRides, newRebuildDate);
-    }
-    if (moreRidesNeeded) {
-      if (
-        lastLoadedPageNum.current !== fetchPageNum.current ||
-        lastLoadedPageNum.current > 10
-      )
-        return;
-      setLoadingRides(true);
-      setSubmitDisabled(true);
-      fetchPageNum.current += 1;
-      getUserActivities(fetchPageNum.current, userAccessToken)
-        .then((activities) => {
-          const rideActivities = filterRideActivities(activities);
-          const cleanedRides = cleanRideData(rideActivities);
-          if (cleanedRides) {
-            setUserRides([...userRides, ...cleanedRides]);
-            window.localStorage.setItem(
-              "userRides",
-              JSON.stringify([...userRides, ...cleanedRides])
-            );
-          }
-          lastLoadedPageNum.current += 1;
-          setLoadingRides(false);
-          setSubmitDisabled(false);
-        })
-        .catch(() => {
-          changeErrorMessage(`An error occurred while fetching your rides. 
-      Please return to the home page and try logging in again.`);
-        });
+      fetchMoreRidesIfNeeded(
+        userAccessToken,
+        newRebuildDate,
+        userRides,
+        setUserRides,
+        pagesFetched,
+        setPagesFetched,
+        setLoadingRides,
+        setSubmitDisabled,
+        setErrorModalMessage
+      );
     }
     // eslint-disable-next-line
-  }, [newRebuildDate, userRides]);
+  }, [newRebuildDate]);
 
   const handleSubmit = () => {
     if (!newRebuildDate) {

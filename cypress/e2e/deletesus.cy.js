@@ -9,13 +9,25 @@ describe("deleteSus", () => {
       },
     }).as("stravaPostAuthToken");
 
+    cy.intercept("https://www.strava.com/api/v3/athlete", {
+      fixture: "athleteDetails.json",
+    }).as("stravaAthleteDetailsApi");
+
     cy.intercept(
       "GET",
-      `https://www.strava.com/api/v3/athlete/activities?page=*`,
+      `https://www.strava.com/api/v3/athlete/activities?page=1*`,
       {
-        fixture: "RideData.json",
+        fixture: "activityDataPage1.json",
       }
-    ).as("stravaRideApi");
+    ).as("stravaActivityApiPage1");
+
+    cy.intercept(
+      "GET",
+      `https://www.strava.com/api/v3/athlete/activities?page=2*`,
+      {
+        fixture: "activityDataPage2.json",
+      }
+    ).as("stravaActivityApiPage2");
 
     cy.intercept("GET", `https://www.strava.com/api/v3/gear/b9082682`, {
       fixture: "EnduroData.json",
@@ -24,6 +36,10 @@ describe("deleteSus", () => {
     cy.intercept("GET", `https://www.strava.com/api/v3/gear/b1979857`, {
       fixture: "AllezData.json",
     }).as("stravaGearApiAllez");
+
+    cy.intercept("GET", "https://www.strava.com/api/v3/gear/b3913353", {
+      fixture: "notMyBikeData.json",
+    }).as("stravaGearApiNotMyBike");
 
     cy.intercept("GET", "http://localhost:5001/suspension/*", {
       body: { suspension: [] },

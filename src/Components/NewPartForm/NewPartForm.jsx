@@ -4,15 +4,12 @@ import "./NewPartForm.css";
 import PropTypes from "prop-types";
 import {
   calculateRebuildLife,
-  isOldestRideBeforeRebuild,
-  filterRideActivities,
-  cleanRideData,
   convertSusToDatabaseFormat,
   filterRidesForSpecificBike,
   convertSuspensionFromDatabase,
+  fetchMoreRidesIfNeeded,
 } from "../../util";
 import {
-  getUserActivities,
   postUserSuspensionToDatabase,
   loadUserSuspensionFromDatabase,
 } from "../../Services/APICalls";
@@ -31,7 +28,6 @@ export default function NewPartForm({
   setUserRides,
   pagesFetched,
   setPagesFetched,
-  changeErrorMessage,
   setUserID,
 }) {
   const [bikeOptions, setBikeOptions] = useState(userBikes);
@@ -39,7 +35,6 @@ export default function NewPartForm({
   const [selectedBike, setSelectedBike] = useState("");
   const [selectedSus, setSelectedSus] = useState("");
   const [selectedRebuildDate, setSelectedRebuildDate] = useState("");
-  const fetchPageNum = useRef(pagesFetched);
   const lastLoadedPageNum = useRef(pagesFetched);
   const [loadingRides, setLoadingRides] = useState(false);
   const [submitDisabled, setSubmitDisabled] = useState(false);
@@ -128,44 +123,21 @@ export default function NewPartForm({
   });
 
   useEffect(() => {
-    let moreRidesNeeded;
     if (selectedRebuildDate) {
-      moreRidesNeeded = isOldestRideBeforeRebuild(
+      fetchMoreRidesIfNeeded(
+        userAccessToken,
+        selectedRebuildDate,
         userRides,
-        selectedRebuildDate
+        setUserRides,
+        pagesFetched,
+        setPagesFetched,
+        setLoadingRides,
+        setSubmitDisabled,
+        setErrorModalMessage
       );
     }
-    if (moreRidesNeeded) {
-      if (
-        lastLoadedPageNum.current !== fetchPageNum.current ||
-        lastLoadedPageNum.current > 10
-      ) 
-        return;
-      setLoadingRides(true);
-      setSubmitDisabled(true);
-      fetchPageNum.current += 1;
-      getUserActivities(fetchPageNum.current, userAccessToken)
-        .then((activities) => {
-          const rideActivities = filterRideActivities(activities);
-          const cleanedRides = cleanRideData(rideActivities);
-          if (cleanedRides) {
-            setUserRides([...userRides, ...cleanedRides]);
-            window.localStorage.setItem(
-              "userRides",
-              JSON.stringify([...userRides, ...cleanedRides])
-            );
-          }
-          lastLoadedPageNum.current += 1;
-          setLoadingRides(false);
-          setSubmitDisabled(false);
-        })
-        .catch(() => {
-          changeErrorMessage(`An error occurred while fetching your rides. 
-      Please return to the home page and try logging in again.`);
-        });
-    }
     // eslint-disable-next-line
-  }, [selectedRebuildDate, userRides]);
+  }, [selectedRebuildDate]);
 
   const handleSubmit = () => {
     if (!(selectedBike && selectedSus && selectedRebuildDate)) {
@@ -191,7 +163,7 @@ export default function NewPartForm({
       };
     }
 
-    console.log(selectedBikeDetails)
+    console.log(selectedBikeDetails);
 
     const newSuspensionDetails = {
       id: uuidv4(),

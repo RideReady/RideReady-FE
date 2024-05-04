@@ -9,13 +9,33 @@ describe("EditSus", () => {
       },
     }).as("stravaPostAuthToken");
 
+    cy.intercept("https://www.strava.com/api/v3/athlete", {
+      fixture: "athleteDetails.json",
+    }).as("stravaAthleteDetailsApi");
+
     cy.intercept(
       "GET",
-      `https://www.strava.com/api/v3/athlete/activities?page=*`,
+      `https://www.strava.com/api/v3/athlete/activities?page=1*`,
       {
-        fixture: "RideData.json",
+        fixture: "activityDataPage1.json",
       }
-    ).as("stravaRideApi");
+    ).as("stravaActivityApiPage1");
+
+    cy.intercept(
+      "GET",
+      `https://www.strava.com/api/v3/athlete/activities?page=2*`,
+      {
+        fixture: "activityDataPage2.json",
+      }
+    ).as("stravaActivityApiPage2");
+
+    cy.intercept(
+      "GET",
+      `https://www.strava.com/api/v3/athlete/activities?page=3*`,
+      {
+        fixture: "activityDataPage3.json",
+      }
+    ).as("stravaActivityApiPage2");
 
     cy.intercept("GET", `https://www.strava.com/api/v3/gear/b9082682`, {
       fixture: "EnduroData.json",
@@ -24,6 +44,10 @@ describe("EditSus", () => {
     cy.intercept("GET", `https://www.strava.com/api/v3/gear/b1979857`, {
       fixture: "AllezData.json",
     }).as("stravaGearApiAllez");
+
+    cy.intercept("GET", "https://www.strava.com/api/v3/gear/b3913353", {
+      fixture: "notMyBikeData.json",
+    }).as("stravaGearApiNotMyBike");
 
     cy.intercept("GET", "http://localhost:5001/suspension/*", {
       body: { suspension: [] },
@@ -89,8 +113,8 @@ describe("EditSus", () => {
 
     cy.get("h2").should("have.text", "RockShox Fork");
     cy.get("h3").eq(0).should("have.text", "on your Specialized Enduro");
-    cy.get("h3").eq(1).should("have.text", "92% service life remaining");
-    cy.get("h3").eq(2).should("have.text", `It's Ride Ready!`);
+    cy.get("h3").eq(1).should("have.text", "18% service life remaining");
+    cy.get("h3").eq(2).should("have.text", `Get ready to rebuild soon!`);
     cy.get("p").eq(0).should("have.text", "Last serviced: Oct 10, 2022");
   });
 

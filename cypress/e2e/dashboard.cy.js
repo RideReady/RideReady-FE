@@ -9,13 +9,17 @@ describe("dashboard", () => {
       },
     }).as("stravaPostAuthToken");
 
+    cy.intercept("https://www.strava.com/api/v3/athlete", {
+      fixture: "athleteDetails.json",
+    }).as("stravaAthleteDetailsApi");
+
     cy.intercept(
       "GET",
-      `https://www.strava.com/api/v3/athlete/activities?page=*`,
+      `https://www.strava.com/api/v3/athlete/activities?page=1*`,
       {
-        fixture: "RideData.json",
+        fixture: "activityDataPage1.json",
       }
-    ).as("stravaRideApi");
+    ).as("stravaActivityApiPage1");
 
     cy.intercept("GET", `https://www.strava.com/api/v3/gear/b9082682`, {
       fixture: "EnduroData.json",
@@ -25,7 +29,11 @@ describe("dashboard", () => {
       fixture: "AllezData.json",
     }).as("stravaGearApiAllez");
 
-    cy.intercept("GET", "http://localhost:5001/suspension/*", {
+    cy.intercept("GET", "https://www.strava.com/api/v3/gear/b3913353", {
+      fixture: "notMyBikeData.json",
+    }).as("stravaGearApiNotMyBike");
+
+    cy.intercept("GET", "http://localhost:5001/suspension/391197", {
       body: { suspension: [] },
     }).as("localDbGetSuspension");
 
@@ -96,7 +104,7 @@ describe("dashboard", () => {
   });
 
   it("Should show the user an error if error loading suspension from DB", () => {
-    cy.intercept("GET", "http://localhost:5001/suspension/*", {
+    cy.intercept("GET", "http://localhost:5001/suspension/391197", {
       statusCode: 500,
       body: "Error with suspension query for userID: Error details",
     });
@@ -156,5 +164,73 @@ describe("dashboard", () => {
     cy.get("button").eq(1).should("have.text", "Update service date");
     cy.get("button").eq(2).should("have.text", "Add new suspension");
     cy.get("button").eq(3).should("have.text", "Send feedback");
+  });
+});
+
+describe("dashboard login when new rides are needed", () => {
+  it("should retrieve rides until ride data includes rebuild date", () => {
+    cy.intercept("POST", `https://www.strava.com/oauth/token`, {
+      statusCode: 200,
+      body: {
+        access_token: "accessToken",
+      },
+    }).as("stravaPostAuthToken");
+
+    cy.intercept("https://www.strava.com/api/v3/athlete", {
+      fixture: "athleteDetails.json",
+    }).as("stravaAthleteDetailsApi");
+
+    cy.intercept(
+      "GET",
+      `https://www.strava.com/api/v3/athlete/activities?page=1*`,
+      {
+        fixture: "activityDataPage1.json",
+      }
+    ).as("stravaActivityApiPage1");
+
+    cy.intercept(
+      "GET",
+      `https://www.strava.com/api/v3/athlete/activities?page=2*`,
+      {
+        fixture: "activityDataPage2.json",
+      }
+    ).as("stravaActivityApiPage2");
+
+    cy.intercept("GET", `https://www.strava.com/api/v3/gear/b9082682`, {
+      fixture: "EnduroData.json",
+    }).as("stravaGearApiEnduro");
+
+    cy.intercept("GET", `https://www.strava.com/api/v3/gear/b1979857`, {
+      fixture: "AllezData.json",
+    }).as("stravaGearApiAllez");
+
+    cy.intercept("GET", "https://www.strava.com/api/v3/gear/b3913353", {
+      fixture: "notMyBikeData.json",
+    }).as("stravaGearApiNotMyBike");
+
+    cy.intercept("GET", "http://localhost:5001/suspension/391197", {
+      fixture: "dbUserSusNeedsMoreRides.json",
+    }).as("localDbSusNeedsMoreRides");
+
+    cy.intercept("PATCH", "http://localhost:5001/suspension/*", {
+      statusCode: 200,
+      body: JSON.stringify("Suspension XXXXXX updated successfully"),
+    }).as("patchSusDbSuccess");
+
+    cy.visit(
+      "http://localhost:5173/redirect/exchange_token?state=&code=97dd82f961714a09adb14e47b242a23103c4c202&scope=read,activity:read_all"
+    );
+
+    cy.get("article.tile")
+      .eq(0)
+      .find("h3")
+      .eq(1)
+      .should("have.text", "50% service life remaining");
+
+      cy.get("article.tile")
+      .eq(1)
+      .find("h3")
+      .eq(1)
+      .should("have.text", "50% service life remaining");
   });
 });

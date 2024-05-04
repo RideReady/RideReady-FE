@@ -40,6 +40,7 @@ export default function App() {
             <Redirect
               setUserAccessToken={setUserAccessToken}
               userAccessToken={userAccessToken}
+              userId={userID}
               setUserID={setUserID}
               setUserBikes={setUserBikes}
               setUserRides={setUserRides}
@@ -65,6 +66,8 @@ export default function App() {
               setUserAccessToken={setUserAccessToken}
               dashboardInitialized={dashboardInitialized}
               setDashboardInitialized={setDashboardInitialized}
+              pagesFetched={pagesFetched}
+              setPagesFetched={setPagesFetched}
             />
           }
         />
@@ -103,7 +106,6 @@ export default function App() {
               setPagesFetched={setPagesFetched}
               userBikes={userBikes}
               setUserBikes={setUserBikes}
-              changeErrorMessage={changeErrorMessage}
               userID={userID}
               setUserID={setUserID}
             />

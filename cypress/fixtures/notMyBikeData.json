@@ -1,0 +1,15 @@
+{
+  "id": "b3913353",
+  "primary": false,
+  "name": "Not my bike",
+  "nickname": "Not my bike",
+  "resource_state": 3,
+  "retired": false,
+  "distance": 301432,
+  "converted_distance": 187.3,
+  "brand_name": null,
+  "model_name": null,
+  "frame_type": 3,
+  "description": "",
+  "weight": 30.0
+}

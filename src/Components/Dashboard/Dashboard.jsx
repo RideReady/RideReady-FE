@@ -14,6 +14,7 @@ import {
   filterRidesForSpecificBike,
   convertSusToDatabaseFormat,
   sortUserSuspensionByBikeId,
+  fetchMoreRidesIfNeeded,
 } from "../../util";
 
 export default function Dashboard({
@@ -30,6 +31,8 @@ export default function Dashboard({
   setUserAccessToken,
   dashboardInitialized,
   setDashboardInitialized,
+  pagesFetched,
+  setPagesFetched,
 }) {
   const [loadingSus, setLoadingSus] = useState("");
   const [buttonLink, setButtonLink] = useState("/dashboard/add-new-part");
@@ -50,8 +53,8 @@ export default function Dashboard({
       setUserAccessToken(loadedToken);
     }
     if (!userID) {
-      const loadedToken = JSON.parse(localStorage.getItem("userID"));
-      setUserID(loadedToken);
+      const loadedId = JSON.parse(localStorage.getItem("userID"));
+      setUserID(loadedId);
     }
     // eslint-disable-next-line
   }, []);
@@ -99,63 +102,79 @@ export default function Dashboard({
   ]);
 
   useEffect(() => {
-    if (!userSuspension || !userRides || !userBikes) return;
     if (dashboardInitialized.current === true) return;
+    if (!userSuspension || !userRides || !userBikes) return;
     let userSusStateNeedsReset = false;
 
-    const recalculatedUserSus = userSuspension.map((sus) => {
+    const promises = userSuspension.map((sus) => {
       const susNeedsRecalc = isNewestRideAfterLastCalculated(userRides, sus);
-      if (susNeedsRecalc === true) {
+      if (susNeedsRecalc) {
         console.log(`${sus.id} needs recalculation`);
         userSusStateNeedsReset = true;
-        const newRebuildLife = calculateRebuildLife(
-          sus.susData.id,
-          sus.rebuildDate,
-          userRides,
-          sus.onBike.id,
-          userBikes
-        );
-        console.log(`New rebuild life is ${newRebuildLife} for ${sus.id}`);
 
-        let updatedSus = JSON.parse(JSON.stringify(sus));
-        updatedSus.rebuildLife = newRebuildLife;
-        const newestRideOnBikeDate = filterRidesForSpecificBike(
-          userRides,
-          sus.onBike
-        )[0].ride_date;
-        updatedSus.lastRideCalculated = newestRideOnBikeDate;
-
-        const susDataToPatch = convertSusToDatabaseFormat(updatedSus, userID);
-        editUserSuspensionInDatabase(susDataToPatch)
-          .then((result) => {
-            console.log(result);
-          })
-          .catch((error) => {
-            console.log(
-              `There was an error updating rebuild life based on new ride data. ${error}`
+        return (async () => {
+          try {
+            const updatedRideArr = await fetchMoreRidesIfNeeded(
+              userAccessToken,
+              sus.rebuildDate,
+              userRides,
+              setUserRides,
+              pagesFetched,
+              setPagesFetched,
+              null,
+              null,
+              null
             );
-          });
 
-        return updatedSus;
-      } else if (susNeedsRecalc === false) {
+            const newRebuildLife = calculateRebuildLife(
+              sus.susData.id,
+              sus.rebuildDate,
+              updatedRideArr,
+              sus.onBike.id,
+              userBikes
+            );
+            console.log(`New rebuild life is ${newRebuildLife} for ${sus.id}`);
+
+            let updatedSus = structuredClone(sus);
+            updatedSus.rebuildLife = newRebuildLife;
+            const newestRideOnBikeDate = filterRidesForSpecificBike(
+              userRides,
+              sus.onBike
+            )[0].ride_date;
+            updatedSus.lastRideCalculated = newestRideOnBikeDate;
+
+            await editUserSuspensionInDatabase(
+              convertSusToDatabaseFormat(updatedSus, userID)
+            );
+            return updatedSus;
+          } catch (error) {
+            console.error(
+              "Error fetching more rides and recalculating:",
+              error
+            );
+            return sus;
+          }
+        })();
+      } else {
         console.log(`${sus.id} does not need recalculation`);
-        return sus;
+        return Promise.resolve(sus);
       }
     });
 
     if (userSusStateNeedsReset) {
-      setUserSuspension(recalculatedUserSus);
+      Promise.all(promises)
+        .then((updatedSusArray) => {
+          console.log(updatedSusArray);
+          setUserSuspension(updatedSusArray);
+        })
+        .catch((err) => {
+          console.error("Error resolving promises of updated sus:", err);
+        });
     }
+
     setDashboardInitialized(true);
-  }, [
-    userSuspension,
-    userBikes,
-    userRides,
-    userID,
-    setUserSuspension,
-    dashboardInitialized,
-    setDashboardInitialized,
-  ]);
+    // eslint-disable-next-line
+  }, [userSuspension, dashboardInitialized]);
 
   return (
     <section className="dashboard">
@@ -196,4 +215,6 @@ Dashboard.propTypes = {
   setUserAccessToken: PropTypes.func,
   dashboardInitialized: PropTypes.object,
   setDashboardInitialized: PropTypes.func,
+  pagesFetched: PropTypes.number,
+  setPagesFetched: PropTypes.func,
 };

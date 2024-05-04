@@ -23,18 +23,18 @@ export const getAccessToken = (userAuthToken) => {
 
 // Not using this but may in down the road, works for
 // fetching all user information
-// export const getUserDetails = (userAccessToken) => {
-//   return fetch("https://www.strava.com/api/v3/athlete", {
-//     headers: {
-//       Authorization: `Bearer ${userAccessToken}`,
-//     },
-//   }).then((response) => {
-//     if (response.ok) {
-//       return response.json();
-//     }
-//     throw new Error();
-//   });
-// };
+export const getAthleteDetails = (userAccessToken) => {
+  return fetch("https://www.strava.com/api/v3/athlete", {
+    headers: {
+      Authorization: `Bearer ${userAccessToken}`,
+    },
+  }).then((response) => {
+    if (response.ok) {
+      return response.json();
+    }
+    throw new Error();
+  });
+};
 
 export const getUserActivities = (pageNum, userAccessToken) => {
   return fetch(
