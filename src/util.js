@@ -257,10 +257,7 @@ export const fetchMoreRidesIfNeeded = async (
         [...userRideState, ...fetchedRides],
         rebuildDate
       );
-      if (!fetchMoreRides) {
-        resultRideArr = [...userRideState, ...fetchedRides];
-        return resultRideArr;
-      }
+      if (!fetchMoreRides) break;
       console.log(`Fetching page ${currentPagesFetched} athlete activities`);
 
       const activities = await getUserActivities(
@@ -275,7 +272,8 @@ export const fetchMoreRidesIfNeeded = async (
         currentPagesFetched += 1;
       }
     }
-    console.log("Maximum activities (1000) fetched");
+    resultRideArr = [...userRideState, ...fetchedRides];
+    return resultRideArr;
   } catch (error) {
     console.error(error);
     if (setErrorMsgState) {
