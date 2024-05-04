@@ -275,7 +275,7 @@ export const fetchMoreRidesIfNeeded = async (
         currentPagesFetched += 1;
       }
     }
-    throw new Error("Maximum activities (1000) fetched");
+    console.log("Maximum activities (1000) fetched");
   } catch (error) {
     console.error(error);
     if (setErrorMsgState) {
