@@ -241,7 +241,7 @@ export const fetchMoreRidesIfNeeded = async (
   if (!rebuildDate || !userAccessToken) return;
   const moreRidesNeeded = isOldestRideBeforeRebuild(userRideState, rebuildDate);
   if (!moreRidesNeeded) {
-    console.log("More rides needed, fetching activities");
+    console.log("Mores rides not needed");
     return;
   }
 
@@ -252,7 +252,7 @@ export const fetchMoreRidesIfNeeded = async (
   let currentPagesFetched = pagesFetchedState + 1;
 
   try {
-    while (currentPagesFetched <= 10) {
+    while (currentPagesFetched <= 5) {
       const fetchMoreRides = isOldestRideBeforeRebuild(
         [...userRideState, ...fetchedRides],
         rebuildDate
@@ -275,12 +275,14 @@ export const fetchMoreRidesIfNeeded = async (
         currentPagesFetched += 1;
       }
     }
+    throw new Error("Maximum activities (1000) fetched");
   } catch (error) {
     console.error(error);
-    setErrorMsgState &&
+    if (setErrorMsgState) {
       setErrorMsgState(
         `An error occurred while fetching your rides. Please return to the home page and try logging in again.`
       );
+    }
   } finally {
     setUserRideState(resultRideArr);
     window.localStorage.setItem("userRides", JSON.stringify(resultRideArr));
