@@ -47,7 +47,6 @@ export const getGearIDNumbers = (userRides) => {
   return gearNumbers;
 };
 
-// Could this be refactored to use filterRidesForSpecificBike?
 export const calculateRebuildLife = (
   newSus,
   rebuildDate,
@@ -63,7 +62,7 @@ export const calculateRebuildLife = (
   // b prefix comes from Strava, otherwise its unknown
   if (onBike.startsWith("b") && bikeOptions) {
     susBike = bikeOptions.find((bike) => bike.id === onBike);
-    ridesOnBike = userRides.filter((ride) => ride.gear_id === susBike.id);
+    ridesOnBike = filterRidesForSpecificBike(userRides, susBike);
   }
   // For known bikes, ridesOnBike is true. Else use all userRides.
   if (ridesOnBike) {
@@ -228,7 +227,7 @@ export const sortUserSuspensionByBikeId = (susArr) => {
   return sortedSusArr;
 };
 
-export const fetchMoreRidesIfNeeded = (
+export const fetchMoreRidesIfNeeded = async (
   userAccessToken,
   rebuildDate,
   userRideState,
@@ -239,49 +238,54 @@ export const fetchMoreRidesIfNeeded = (
   setSubmitDisabledState,
   setErrorMsgState
 ) => {
-  console.log(
-    { rebuildDate },
-    { userRideState },
-    { pagesFetchedState },
-    { setPagesFetchedState },
-    { setLoadingRidesState },
-    { setSubmitDisabledState },
-    { userAccessToken },
-    { setErrorMsgState }
-  );
   if (!rebuildDate || !userAccessToken) return;
+  const moreRidesNeeded = isOldestRideBeforeRebuild(userRideState, rebuildDate);
+  if (!moreRidesNeeded) {
+    console.log("More rides needed, fetching activities");
+    return;
+  }
+
   if (setLoadingRidesState) setLoadingRidesState(true);
   if (setSubmitDisabledState) setSubmitDisabledState(true);
+  let fetchedRides = [];
+  let resultRideArr = [];
+  let currentPagesFetched = pagesFetchedState + 1;
 
-  let currentPagesFetched = pagesFetchedState;
-  while (currentPagesFetched <= 10) {
-    const moreRidesNeeded = isOldestRideBeforeRebuild(
-      userRideState,
-      rebuildDate
-    );
-    if (moreRidesNeeded === false) break;
+  try {
+    while (currentPagesFetched <= 10) {
+      const fetchMoreRides = isOldestRideBeforeRebuild(
+        [...userRideState, ...fetchedRides],
+        rebuildDate
+      );
+      if (!fetchMoreRides) {
+        resultRideArr = [...userRideState, ...fetchedRides];
+        return resultRideArr;
+      }
+      console.log(`Fetching page ${currentPagesFetched} athlete activities`);
 
-    getUserActivities(currentPagesFetched, userAccessToken)
-      .then((activities) => {
-        const rideActivities = filterRideActivities(activities);
-        const cleanedRides = cleanRideData(rideActivities);
-        if (cleanedRides) {
-          setUserRideState([...userRideState, ...cleanedRides]);
-          window.localStorage.setItem(
-            "userRides",
-            JSON.stringify([...userRideState, ...cleanedRides])
-          );
-        }
+      const activities = await getUserActivities(
+        currentPagesFetched,
+        userAccessToken
+      );
+      const rideActivities = filterRideActivities(activities);
+      const cleanedRides = cleanRideData(rideActivities);
+
+      if (cleanedRides) {
+        fetchedRides.push(...cleanedRides);
         currentPagesFetched += 1;
-      })
-      .catch((error) => {
-        console.error(error);
-        if (setErrorMsgState)
-          setErrorMsgState(`An error occurred while fetching your rides. 
-        Please return to the home page and try logging in again.`);
-      });
+      }
+    }
+  } catch (error) {
+    console.error(error);
+    setErrorMsgState &&
+      setErrorMsgState(
+        `An error occurred while fetching your rides. Please return to the home page and try logging in again.`
+      );
+  } finally {
+    setUserRideState(resultRideArr);
+    window.localStorage.setItem("userRides", JSON.stringify(resultRideArr));
+    setPagesFetchedState(currentPagesFetched);
+    if (setLoadingRidesState) setLoadingRidesState(false);
+    if (setSubmitDisabledState) setSubmitDisabledState(false);
   }
-  setPagesFetchedState(currentPagesFetched);
-  if (setLoadingRidesState) setLoadingRidesState(false);
-  if (setSubmitDisabledState) setSubmitDisabledState(false);
 };
