@@ -1,0 +1,24 @@
+{
+  "suspension": [
+      {
+          "id": "225ba3c8-3be3-4744-88e7-a2ca7cd2cb3e",
+          "user_id": 391197,
+          "rebuild_life": 1,
+          "rebuild_date": "2023-03-15T12:00:00.000Z",
+          "sus_data_id": 2,
+          "on_bike_id": "b9082682",
+          "date_created": "2022-07-11T05:25:13.000Z",
+          "last_ride_calculated": "2024-05-03T05:28:42.000Z"
+      },
+      {
+          "id": "c78326c2-45e4-4552-888f-d9ffe082f214",
+          "user_id": 391197,
+          "rebuild_life": 1,
+          "rebuild_date": "2023-02-10T14:00:00.000Z",
+          "sus_data_id": 1,
+          "on_bike_id": "b9082682",
+          "date_created": "2022-07-11T01:24:21.000Z",
+          "last_ride_calculated": "2024-05-03T05:28:42.000Z"
+      }
+  ]
+}
