@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import {
   getAccessToken,
   getUserActivities,
-  getUserDetails,
+  getAthleteDetails,
   getUserGearDetails,
 } from "../../Services/APICalls";
 import {
@@ -61,7 +61,7 @@ export default function Redirect({
 
   useEffect(() => {
     if (userAccessToken && !userID) {
-      getUserDetails(userAccessToken)
+      getAthleteDetails(userAccessToken)
         .then((userDetails) => {
           if (userDetails.id) {
             setUserID(userDetails.id);
