@@ -35,7 +35,6 @@ export default function NewPartForm({
   const [selectedBike, setSelectedBike] = useState("");
   const [selectedSus, setSelectedSus] = useState("");
   const [selectedRebuildDate, setSelectedRebuildDate] = useState("");
-  const fetchPageNum = useRef(pagesFetched);
   const lastLoadedPageNum = useRef(pagesFetched);
   const [loadingRides, setLoadingRides] = useState(false);
   const [submitDisabled, setSubmitDisabled] = useState(false);
@@ -124,21 +123,21 @@ export default function NewPartForm({
   });
 
   useEffect(() => {
-    if(selectedRebuildDate) {
+    if (selectedRebuildDate) {
       fetchMoreRidesIfNeeded(
+        userAccessToken,
         selectedRebuildDate,
         userRides,
         setUserRides,
-        lastLoadedPageNum,
-        fetchPageNum,
+        pagesFetched,
+        setPagesFetched,
         setLoadingRides,
         setSubmitDisabled,
-        userAccessToken,
         setErrorModalMessage
       );
     }
     // eslint-disable-next-line
-  }, [selectedRebuildDate, userRides]);
+  }, [selectedRebuildDate]);
 
   const handleSubmit = () => {
     if (!(selectedBike && selectedSus && selectedRebuildDate)) {
