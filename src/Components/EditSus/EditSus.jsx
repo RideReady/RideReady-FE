@@ -1,7 +1,11 @@
 import { useEffect, useRef, useState } from "react";
 import "./EditSus.css";
 import { useNavigate } from "react-router-dom";
-import { convertSusToDatabaseFormat, fetchMoreRidesIfNeeded, findSusIndexByID } from "../../util";
+import {
+  convertSusToDatabaseFormat,
+  fetchMoreRidesIfNeeded,
+  findSusIndexByID,
+} from "../../util";
 import moment from "moment";
 import {
   calculateRebuildLife,
@@ -33,7 +37,6 @@ export default function EditSus({
   const [newRebuildDate, setNewRebuildDate] = useState("");
   const [editSusIndex, setEditSusIndex] = useState(null);
   const [editSusDetails, setEditSusDetails] = useState(null);
-  const fetchPageNum = useRef(pagesFetched);
   const lastLoadedPageNum = useRef(pagesFetched);
   const [loadingRides, setLoadingRides] = useState(false);
   const [submitDisabled, setSubmitDisabled] = useState(false);
@@ -113,22 +116,22 @@ export default function EditSus({
   }, [selectedSuspension, userSuspension]);
 
   useEffect(() => {
-    if(newRebuildDate) {
+    if (newRebuildDate) {
       fetchMoreRidesIfNeeded(
+        userAccessToken,
         newRebuildDate,
         userRides,
         setUserRides,
-        lastLoadedPageNum,
-        fetchPageNum,
+        pagesFetched,
+        setPagesFetched,
         setLoadingRides,
         setSubmitDisabled,
-        userAccessToken,
         setErrorModalMessage
       );
     }
     // eslint-disable-next-line
-  }, [newRebuildDate, userRides]);
-  
+  }, [newRebuildDate]);
+
   const handleSubmit = () => {
     if (!newRebuildDate) {
       setSubmitError(true);
