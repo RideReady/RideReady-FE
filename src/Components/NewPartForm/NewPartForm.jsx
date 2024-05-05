@@ -8,6 +8,7 @@ import {
   filterRidesForSpecificBike,
   convertSuspensionFromDatabase,
   fetchMoreRidesIfNeeded,
+  isDateWithin20Years,
 } from "../../util";
 import {
   postUserSuspensionToDatabase,
@@ -123,7 +124,7 @@ export default function NewPartForm({
   });
 
   useEffect(() => {
-    if (selectedRebuildDate) {
+    if (selectedRebuildDate && isDateWithin20Years(selectedRebuildDate)) {
       fetchMoreRidesIfNeeded(
         userAccessToken,
         selectedRebuildDate,
@@ -140,7 +141,7 @@ export default function NewPartForm({
   }, [selectedRebuildDate]);
 
   const handleSubmit = () => {
-    if (!(selectedBike && selectedSus && selectedRebuildDate)) {
+    if (!selectedBike || !selectedSus || !selectedRebuildDate) {
       setSubmitError(true);
       setTimeout(() => setSubmitError(false), 3000);
       return;

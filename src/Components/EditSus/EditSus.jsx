@@ -5,6 +5,7 @@ import {
   convertSusToDatabaseFormat,
   fetchMoreRidesIfNeeded,
   findSusIndexByID,
+  isDateWithin20Years,
 } from "../../util";
 import moment from "moment";
 import {
@@ -116,7 +117,7 @@ export default function EditSus({
   }, [selectedSuspension, userSuspension]);
 
   useEffect(() => {
-    if (newRebuildDate) {
+    if (newRebuildDate && isDateWithin20Years(newRebuildDate)) {
       fetchMoreRidesIfNeeded(
         userAccessToken,
         newRebuildDate,

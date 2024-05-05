@@ -289,3 +289,12 @@ export const fetchMoreRidesIfNeeded = async (
     if (setSubmitDisabledState) setSubmitDisabledState(false);
   }
 };
+
+export const isDateWithin20Years = (rebuildDate) => {
+  const oldestAllowed = moment().subtract(20, "years").format();
+  if (moment(rebuildDate).isAfter(oldestAllowed)) {
+    return true;
+  } else {
+    return false;
+  }
+};
