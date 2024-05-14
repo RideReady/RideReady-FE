@@ -1,12 +1,12 @@
-import { useState, useEffect } from "react";
-import PropTypes from "prop-types";
-import "./Tile.css";
-import moment from "moment";
-import { NavLink } from "react-router-dom";
+import { useState, useEffect } from 'react';
+import PropTypes from 'prop-types';
+import './Tile.css';
+import moment from 'moment';
+import { NavLink } from 'react-router-dom';
 
 export default function Tile({ susDetails, setSelectedSuspension, id }) {
-  const [rebuildLifeMessage, setRebuildLifeMessage] = useState("");
-  const [rebuildLifeBad, setRebuildLifeBad] = useState("");
+  const [rebuildLifeMessage, setRebuildLifeMessage] = useState('');
+  const [rebuildLifeBad, setRebuildLifeBad] = useState('');
 
   let rebuildLifePercentage = (susDetails.rebuildLife * 100).toFixed(0);
   if (rebuildLifePercentage <= 0) {
@@ -15,13 +15,13 @@ export default function Tile({ susDetails, setSelectedSuspension, id }) {
 
   const lastRebuildDateDisplay = moment(
     susDetails.rebuildDate.slice(0, 10)
-  ).format("ll");
+  ).format('ll');
 
   const bikeDisplayMessage = () => {
     if (susDetails.onBike.brand_name && susDetails.onBike.model_name) {
       return `on your ${susDetails.onBike.brand_name} ${susDetails.onBike.model_name}`;
     } else {
-      return "";
+      return '';
     }
   };
 
@@ -43,21 +43,25 @@ export default function Tile({ susDetails, setSelectedSuspension, id }) {
       <h3>{`${rebuildLifePercentage}% service life remaining`}</h3>
       <h3
         id="rebuildMsg"
-        className={`${rebuildLifeBad ? "rebuild-bad" : "rebuild-good"}`}
+        className={`${rebuildLifeBad ? 'rebuild-bad' : 'rebuild-good'}`}
       >
         {rebuildLifeMessage}
       </h3>
       <p>{`Last serviced: ${lastRebuildDateDisplay}`}</p>
-      <a href={susDetails.susData.serviceLink}>
+      <a
+        href={susDetails.susData.serviceLink}
+        target="_blank"
+        rel="noopener noreferrer"
+      >
         <p>Link to service resource</p>
       </a>
       <div className="tile-button-section">
-        <NavLink to={"/dashboard/delete"}>
+        <NavLink to={'/dashboard/delete'}>
           <button
             onClick={() => {
               setSelectedSuspension(id);
               window.localStorage.setItem(
-                "selectedSuspension",
+                'selectedSuspension',
                 JSON.stringify(id)
               );
             }}
@@ -65,12 +69,12 @@ export default function Tile({ susDetails, setSelectedSuspension, id }) {
             Delete suspension
           </button>
         </NavLink>
-        <NavLink to={"/dashboard/edit"}>
+        <NavLink to={'/dashboard/edit'}>
           <button
             onClick={() => {
               setSelectedSuspension(id);
               window.localStorage.setItem(
-                "selectedSuspension",
+                'selectedSuspension',
                 JSON.stringify(id)
               );
             }}
