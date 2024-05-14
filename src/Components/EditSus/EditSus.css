@@ -1,17 +1,9 @@
 .edit-part-form-section {
   height: 100vh;
   width: 100vw;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  align-items: center;
 }
 .edit-part-form-section button {
   width: 20vw;
-}
-
-.edit-spacer {
-  height: 10vh;
 }
 
 .edit-sus-details {
@@ -20,7 +12,8 @@
   justify-content: space-between;
   align-items: center;
   width: 90vw;
-  height: 35vh;
+  height: 38vh;
+  margin: 15vh auto 0vh auto;
 }
 
 .edit-section-buttons {
@@ -56,6 +49,12 @@
   font-size: 20px;
   padding: 20px;
   color: #F6AE2D;
+}
+
+.error-wait-message {
+  margin-top: 2.5vh;
+  color: #F26419;
+  font-weight: 700;
 }
 
 @media only screen and (min-width: 860px) {

@@ -1,23 +1,24 @@
-import { useEffect, useRef, useState } from "react";
-import "./EditSus.css";
-import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from 'react';
+import './EditSus.css';
+import { useNavigate } from 'react-router-dom';
 import {
   convertSusToDatabaseFormat,
   fetchMoreRidesIfNeeded,
   findSusIndexByID,
   isDateWithin20Years,
-} from "../../util";
-import moment from "moment";
+  isOldestRideBeforeRebuild,
+} from '../../util';
+import moment from 'moment';
 import {
   calculateRebuildLife,
   filterRidesForSpecificBike,
   convertSuspensionFromDatabase,
-} from "../../util";
+} from '../../util';
 import {
   editUserSuspensionInDatabase,
   loadUserSuspensionFromDatabase,
-} from "../../Services/APICalls";
-import PropTypes from "prop-types";
+} from '../../Services/APICalls';
+import PropTypes from 'prop-types';
 
 export default function EditSus({
   setUserSuspension,
@@ -35,43 +36,42 @@ export default function EditSus({
   userID,
   setUserID,
 }) {
-  const [newRebuildDate, setNewRebuildDate] = useState("");
+  const [newRebuildDate, setNewRebuildDate] = useState('');
   const [editSusIndex, setEditSusIndex] = useState(null);
   const [editSusDetails, setEditSusDetails] = useState(null);
-  const lastLoadedPageNum = useRef(pagesFetched);
   const [loadingRides, setLoadingRides] = useState(false);
   const [submitDisabled, setSubmitDisabled] = useState(false);
-  const [submitError, setSubmitError] = useState(false);
-  const [errorModalMessage, setErrorModalMessage] = useState("");
+  const [submitError, setSubmitError] = useState('');
+  const [errorModalMessage, setErrorModalMessage] = useState('');
 
   const navigate = useNavigate();
-  const editSusErrorModal = document.getElementById("editSusErrorModal");
+  const editSusErrorModal = document.getElementById('editSusErrorModal');
 
   useEffect(() => {
     if (!userBikes) {
-      const loadedBikes = JSON.parse(localStorage.getItem("userBikes"));
+      const loadedBikes = JSON.parse(localStorage.getItem('userBikes'));
       setUserBikes(loadedBikes);
     }
     if (!userRides) {
-      const loadedRides = JSON.parse(localStorage.getItem("userRides"));
+      const loadedRides = JSON.parse(localStorage.getItem('userRides'));
       setUserRides(loadedRides);
     }
     if (!userAccessToken) {
-      const loadedToken = JSON.parse(localStorage.getItem("userAccessToken"));
+      const loadedToken = JSON.parse(localStorage.getItem('userAccessToken'));
       setUserAccessToken(loadedToken);
     }
     if (!selectedSuspension) {
       const loadedSelection = JSON.parse(
-        localStorage.getItem("selectedSuspension")
+        localStorage.getItem('selectedSuspension')
       );
       if (loadedSelection === null) {
-        navigate("/dashboard");
+        navigate('/dashboard');
       } else {
         setSelectedSuspension(loadedSelection);
       }
     }
     if (!userID) {
-      const loadedID = JSON.parse(localStorage.getItem("userID"));
+      const loadedID = JSON.parse(localStorage.getItem('userID'));
       setUserID(loadedID);
     }
     if (!userSuspension && userID && userBikes) {
@@ -117,26 +117,58 @@ export default function EditSus({
   }, [selectedSuspension, userSuspension]);
 
   useEffect(() => {
-    if (newRebuildDate && isDateWithin20Years(newRebuildDate)) {
-      fetchMoreRidesIfNeeded(
-        userAccessToken,
-        newRebuildDate,
-        userRides,
-        setUserRides,
-        pagesFetched,
-        setPagesFetched,
-        setLoadingRides,
-        setSubmitDisabled,
-        setErrorModalMessage
-      );
-    }
+    if (
+      !newRebuildDate ||
+      !isDateWithin20Years(newRebuildDate) ||
+      loadingRides ||
+      !userAccessToken ||
+      !userRides
+    )
+      return;
+    if (!isOldestRideBeforeRebuild(userRides, newRebuildDate)) return;
+    (async () => {
+      try {
+        setLoadingRides(true);
+        setSubmitDisabled(true);
+        const result = await fetchMoreRidesIfNeeded(
+          userAccessToken,
+          newRebuildDate,
+          userRides,
+          pagesFetched
+        );
+        if (!result) {
+          throw new Error('An unknown error occurred');
+        }
+        const { newUserRides, newPagesFetched } = result;
+        setUserRides(newUserRides);
+        window.localStorage.setItem('userRides', JSON.stringify(newUserRides));
+        setPagesFetched(newPagesFetched);
+      } catch (err) {
+        setErrorModalMessage(
+          `An error occurred while fetching more rides. ${err}`
+        );
+        editSusErrorModal.showModal();
+        setTimeout(() => {
+          editSusErrorModal.close();
+        }, 10000);
+      } finally {
+        setLoadingRides(false);
+        setSubmitDisabled(false);
+      }
+    })();
     // eslint-disable-next-line
   }, [newRebuildDate]);
 
   const handleSubmit = () => {
-    if (!newRebuildDate) {
-      setSubmitError(true);
-      setTimeout(() => setSubmitError(false), 3000);
+    if (!newRebuildDate || submitDisabled) {
+      setSubmitError('Please fill out all forms before submitting');
+      setTimeout(() => setSubmitError(''), 3000);
+      return;
+    }
+
+    if (!isDateWithin20Years(newRebuildDate)) {
+      setSubmitError('Please select a rebuild date within 20 years');
+      setTimeout(() => setSubmitError(''), 3000);
       return;
     }
 
@@ -152,26 +184,27 @@ export default function EditSus({
     const newestRideOnBikeDate = filterRidesForSpecificBike(
       userRides,
       modifiedSus.onBike
-    )[0].ride_date;
+    )[0]?.ride_date;
     modifiedSus.lastRideCalculated = newestRideOnBikeDate;
 
-    const susDataConvertedForDatabase = convertSusToDatabaseFormat(modifiedSus);
-
-    editUserSuspensionInDatabase(susDataConvertedForDatabase)
+    editUserSuspensionInDatabase(
+      convertSusToDatabaseFormat(modifiedSus, userID)
+    )
       .then((result) => {
         console.log(result);
-        let newUserSusArr = JSON.parse(JSON.stringify(userSuspension, userID));
-        newUserSusArr.splice(editSusIndex, 1, modifiedSus);
-        setUserSuspension(newUserSusArr);
+        setUserSuspension((prevUserSuspension) => {
+          const newSusArr = [...prevUserSuspension];
+          newSusArr.splice(editSusIndex, 1, modifiedSus);
+          return newSusArr;
+        });
 
-        window.localStorage.setItem("selectedSuspension", JSON.stringify(null));
+        window.localStorage.setItem('selectedSuspension', JSON.stringify(null));
         setSelectedSuspension(null);
-        setPagesFetched(lastLoadedPageNum.current);
       })
       .catch((error) => {
         console.log(error);
         setErrorModalMessage(
-          `There was an issue modifying your suspension rebuild date. Please try reloading the page by clicking the button below and try your request again.`
+          `There was an issue modifying your suspension rebuild date. Please try reloading the page by clicking the button below and try your request again. ${error}`
         );
         editSusErrorModal.showModal();
         setTimeout(() => {
@@ -187,7 +220,7 @@ export default function EditSus({
         className="site-logo"
         onClick={() => {
           window.localStorage.setItem(
-            "selectedSuspension",
+            'selectedSuspension',
             JSON.stringify(null)
           );
           setSelectedSuspension(null);
@@ -202,14 +235,14 @@ export default function EditSus({
         )}
         {editSusDetails && (
           <h2>{`Currently: ${moment(editSusDetails.rebuildDate).format(
-            "ll"
+            'll'
           )}`}</h2>
         )}
         <form>
           <input
             type="date"
             value={newRebuildDate}
-            max={new Date().toLocaleDateString("fr-ca")}
+            max={new Date().toLocaleDateString('fr-ca')}
             onChange={(event) => setNewRebuildDate(event.target.value)}
           />
         </form>
@@ -217,7 +250,7 @@ export default function EditSus({
           <button
             onClick={() => {
               window.localStorage.setItem(
-                "selectedSuspension",
+                'selectedSuspension',
                 JSON.stringify(null)
               );
               setSelectedSuspension(null);
@@ -229,20 +262,15 @@ export default function EditSus({
             Submit
           </button>
         </div>
-        {submitError && (
-          <p className="error-wait-message">
-            Please fill out all forms before submitting
-          </p>
-        )}
-        {loadingRides && (
-          <p className="error-wait-message">
-            Please wait for data to load.
-            <br />
-            This could take up to 15 seconds
-          </p>
-        )}
       </div>
-      <div className="edit-spacer"></div>
+      {submitError && <p className="error-wait-message">{submitError}</p>}
+      {loadingRides && (
+        <p className="error-wait-message">
+          Please wait for data to load.
+          <br />
+          This could take up to 15 seconds
+        </p>
+      )}
       <dialog id="editSusErrorModal">
         {errorModalMessage}
         <button id="reloadButton" onClick={() => window.location.reload()}>
