@@ -1,20 +1,20 @@
-import moment from "moment";
-import { suspensionData } from "./SuspensionData";
-import { getUserActivities } from "./Services/APICalls";
+import moment from 'moment';
+import { suspensionData } from './SuspensionData';
+import { getUserActivities } from './Services/APICalls';
 
 export const testForDeniedPermission = (url) => {
-  if (url.split("&")[1] === "error=access_denied") {
+  if (url.split('&')[1] === 'error=access_denied') {
     return true;
   }
 };
 
 export const stripURLForToken = (url) => {
   if (!url) return;
-  return url.split("&")[1].slice(5);
+  return url.split('&')[1].slice(5);
 };
 
 export const filterRideActivities = (activities) => {
-  const rideActivities = activities.filter((act) => act.type === "Ride");
+  const rideActivities = activities.filter((act) => act.type === 'Ride');
   return rideActivities;
 };
 
@@ -59,9 +59,11 @@ export const calculateRebuildLife = (
   let ridesOnBike;
   let rideTimeSinceLastRebuild;
 
-  // b prefix comes from Strava, otherwise its unknown
-  if (onBike.startsWith("b") && bikeOptions) {
+  // This conditional might not be needed now with filterRidesForSpecificBike
+  // as it handles both known and unknown, would need to test
+  if (onBike.startsWith('b') && bikeOptions) {
     susBike = bikeOptions.find((bike) => bike.id === onBike);
+    // This is correctly filtering all rides for a specific bike
     ridesOnBike = filterRidesForSpecificBike(userRides, susBike);
   }
   // For known bikes, ridesOnBike is true. Else use all userRides.
@@ -123,9 +125,9 @@ const findBikeDetailsById = (sus, bikeOptions) => {
     return bikeResult;
   } else {
     return {
-      id: "unknownBike",
-      brand_name: "Unknown",
-      model_name: "Bike",
+      id: 'unknownBike',
+      brand_name: 'Unknown',
+      model_name: 'Bike',
     };
   }
 };
@@ -178,7 +180,7 @@ export const isNewestRideAfterLastCalculated = (userRides, sus) => {
 
 export const filterRidesForSpecificBike = (userRides, onBike) => {
   let filteredRides;
-  if (onBike.id !== "unknownBike") {
+  if (onBike.id !== 'unknownBike') {
     filteredRides = userRides.filter((ride) => ride.gear_id === onBike.id);
   } else {
     filteredRides = userRides;
@@ -191,7 +193,7 @@ export const formatBikeDetails = (fetchedGearDetails) => {
     return {
       id: detail.id,
       name: detail.name,
-      brand_name: detail.brand_name ? detail.brand_name : "",
+      brand_name: detail.brand_name ? detail.brand_name : '',
       model_name: detail.model_name ? detail.model_name : detail.name,
       frame_type: generateBikeTypeString(detail.frame_type),
     };
@@ -201,17 +203,17 @@ export const formatBikeDetails = (fetchedGearDetails) => {
 export const generateBikeTypeString = (frameTypeIdFromStrava) => {
   switch (frameTypeIdFromStrava) {
     case 1:
-      return "Mountain Bike";
+      return 'Mountain Bike';
     case 2:
-      return "Cross Bike";
+      return 'Cross Bike';
     case 3:
-      return "Road Bike";
+      return 'Road Bike';
     case 4:
-      return "TT Bike";
+      return 'TT Bike';
     case 5:
-      return "Gravel Bike";
+      return 'Gravel Bike';
     default:
-      return "Unknown Bike Type";
+      return 'Unknown Bike Type';
   }
 };
 
@@ -231,25 +233,10 @@ export const fetchMoreRidesIfNeeded = async (
   userAccessToken,
   rebuildDate,
   userRideState,
-  setUserRideState,
-  pagesFetchedState,
-  setPagesFetchedState,
-  setLoadingRidesState,
-  setSubmitDisabledState,
-  setErrorMsgState
+  pagesFetchedState
 ) => {
-  if (!rebuildDate || !userAccessToken) return;
-  const moreRidesNeeded = isOldestRideBeforeRebuild(userRideState, rebuildDate);
-  if (!moreRidesNeeded) {
-    console.log("Mores rides not needed");
-    return;
-  }
-
-  if (setLoadingRidesState) setLoadingRidesState(true);
-  if (setSubmitDisabledState) setSubmitDisabledState(true);
   let fetchedRides = [];
-  let resultRideArr = [];
-  let currentPagesFetched = pagesFetchedState + 1;
+  let currentPagesFetched = pagesFetchedState;
 
   try {
     while (currentPagesFetched <= 5) {
@@ -257,11 +244,19 @@ export const fetchMoreRidesIfNeeded = async (
         [...userRideState, ...fetchedRides],
         rebuildDate
       );
-      if (!fetchMoreRides) break;
-      console.log(`Fetching page ${currentPagesFetched} athlete activities`);
+      if (!fetchMoreRides) {
+        const result = {
+          newUserRides: [...userRideState, ...fetchedRides],
+          newPagesFetched: currentPagesFetched,
+        };
+        return result;
+      }
 
+      console.log(
+        `Fetching page ${currentPagesFetched + 1} athlete activities`
+      );
       const activities = await getUserActivities(
-        currentPagesFetched,
+        currentPagesFetched + 1,
         userAccessToken
       );
       const rideActivities = filterRideActivities(activities);
@@ -272,26 +267,15 @@ export const fetchMoreRidesIfNeeded = async (
         currentPagesFetched += 1;
       }
     }
-    resultRideArr = [...userRideState, ...fetchedRides];
-    return resultRideArr;
+    throw new Error('Maximum activities fetched');
   } catch (error) {
     console.error(error);
-    if (setErrorMsgState) {
-      setErrorMsgState(
-        `An error occurred while fetching your rides. Please return to the home page and try logging in again.`
-      );
-    }
-  } finally {
-    setUserRideState(resultRideArr);
-    window.localStorage.setItem("userRides", JSON.stringify(resultRideArr));
-    setPagesFetchedState(currentPagesFetched);
-    if (setLoadingRidesState) setLoadingRidesState(false);
-    if (setSubmitDisabledState) setSubmitDisabledState(false);
+    throw error;
   }
 };
 
 export const isDateWithin20Years = (rebuildDate) => {
-  const oldestAllowed = moment().subtract(20, "years").format();
+  const oldestAllowed = moment().subtract(20, 'years').format();
   if (moment(rebuildDate).isAfter(oldestAllowed)) {
     return true;
   } else {
