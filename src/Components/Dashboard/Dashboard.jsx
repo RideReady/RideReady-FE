@@ -1,12 +1,12 @@
-import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import Container from "../Container/Container";
-import "./Dashboard.css";
-import PropTypes from "prop-types";
+import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import Container from '../Container/Container';
+import './Dashboard.css';
+import PropTypes from 'prop-types';
 import {
   editUserSuspensionInDatabase,
   loadUserSuspensionFromDatabase,
-} from "../../Services/APICalls";
+} from '../../Services/APICalls';
 import {
   calculateRebuildLife,
   convertSuspensionFromDatabase,
@@ -15,7 +15,7 @@ import {
   convertSusToDatabaseFormat,
   sortUserSuspensionByBikeId,
   fetchMoreRidesIfNeeded,
-} from "../../util";
+} from '../../util';
 
 export default function Dashboard({
   userID,
@@ -34,26 +34,26 @@ export default function Dashboard({
   pagesFetched,
   setPagesFetched,
 }) {
-  const [loadingSus, setLoadingSus] = useState("");
-  const [buttonLink, setButtonLink] = useState("/dashboard/add-new-part");
-  const [buttonMsg, setButtonMsg] = useState("Add new suspension");
+  const [loadingSus, setLoadingSus] = useState('');
+  const [buttonLink, setButtonLink] = useState('/dashboard/add-new-part');
+  const [buttonMsg, setButtonMsg] = useState('Add new suspension');
   const navigate = useNavigate();
 
   useEffect(() => {
     if (!userBikes) {
-      const loadedBikes = JSON.parse(localStorage.getItem("userBikes"));
+      const loadedBikes = JSON.parse(localStorage.getItem('userBikes'));
       setUserBikes(loadedBikes);
     }
     if (!userRides) {
-      const loadedRides = JSON.parse(localStorage.getItem("userRides"));
+      const loadedRides = JSON.parse(localStorage.getItem('userRides'));
       setUserRides(loadedRides);
     }
     if (!userAccessToken) {
-      const loadedToken = JSON.parse(localStorage.getItem("userAccessToken"));
+      const loadedToken = JSON.parse(localStorage.getItem('userAccessToken'));
       setUserAccessToken(loadedToken);
     }
     if (!userID) {
-      const loadedId = JSON.parse(localStorage.getItem("userID"));
+      const loadedId = JSON.parse(localStorage.getItem('userID'));
       setUserID(loadedId);
     }
     // eslint-disable-next-line
@@ -61,15 +61,15 @@ export default function Dashboard({
 
   useEffect(() => {
     if (userRides && userRides.length <= 0) {
-      setButtonLink("/");
-      setButtonMsg("Return to login page");
+      setButtonLink('/');
+      setButtonMsg('Return to login page');
     }
   }, [userRides]);
 
   useEffect(() => {
     if (userID === null || userBikes === null) return;
     if (!userSuspension && dashboardInitialized.current === false) {
-      setLoadingSus("loading");
+      setLoadingSus('loading');
       loadUserSuspensionFromDatabase(userID)
         .then((result) => {
           if (result.suspension && result.suspension.length > 0) {
@@ -83,14 +83,14 @@ export default function Dashboard({
             console.log(`No suspension loaded from DB for userID: ${userID}`);
             setUserSuspension([]);
           }
-          setLoadingSus("");
+          setLoadingSus('');
         })
         .catch((error) => {
           console.log(error);
-          setLoadingSus("error");
+          setLoadingSus('error');
           setUserSuspension([]);
-          setButtonLink("/");
-          setButtonMsg("Return to login page");
+          setButtonLink('/');
+          setButtonMsg('Return to login page');
         });
     }
   }, [
@@ -102,8 +102,13 @@ export default function Dashboard({
   ]);
 
   useEffect(() => {
-    if (dashboardInitialized.current === true) return;
-    if (!userSuspension || !userRides || !userBikes) return;
+    if (
+      dashboardInitialized.current === true ||
+      !userSuspension ||
+      !userRides ||
+      !userBikes
+    )
+      return;
     let userSusStateNeedsReset = false;
 
     const promises = userSuspension.map((sus) => {
@@ -114,28 +119,33 @@ export default function Dashboard({
 
         return (async () => {
           try {
-            const updatedRideArr = await fetchMoreRidesIfNeeded(
+            const result = await fetchMoreRidesIfNeeded(
               userAccessToken,
               sus.rebuildDate,
               userRides,
-              setUserRides,
-              pagesFetched,
-              setPagesFetched,
-              null,
-              null,
-              null
+              pagesFetched
             );
+            if (!result) {
+              throw new Error('An unknown error occurred');
+            }
+            const { newUserRides, newPagesFetched } = result;
+            setUserRides(newUserRides);
+            window.localStorage.setItem(
+              'userRides',
+              JSON.stringify(newUserRides)
+            );
+            setPagesFetched(newPagesFetched);
 
             const newRebuildLife = calculateRebuildLife(
               sus.susData.id,
               sus.rebuildDate,
-              updatedRideArr,
+              newUserRides,
               sus.onBike.id,
               userBikes
             );
             console.log(`New rebuild life is ${newRebuildLife} for ${sus.id}`);
 
-            let updatedSus = structuredClone(sus);
+            const updatedSus = structuredClone(sus);
             updatedSus.rebuildLife = newRebuildLife;
             const newestRideOnBikeDate = filterRidesForSpecificBike(
               userRides,
@@ -149,7 +159,7 @@ export default function Dashboard({
             return updatedSus;
           } catch (error) {
             console.error(
-              "Error fetching more rides and recalculating:",
+              'Error fetching more rides and recalculating:',
               error
             );
             return sus;
@@ -168,7 +178,7 @@ export default function Dashboard({
           setUserSuspension(updatedSusArray);
         })
         .catch((err) => {
-          console.error("Error resolving promises of updated sus:", err);
+          console.error('Error resolving promises of updated sus:', err);
         });
     }
 
@@ -192,7 +202,7 @@ export default function Dashboard({
         id="dash-send-feedback-btn"
         onClick={(e) => {
           e.preventDefault();
-          window.location = "mailto:rickv85@gmail.com";
+          window.location = 'mailto:rickv85@gmail.com';
         }}
       >
         Send feedback

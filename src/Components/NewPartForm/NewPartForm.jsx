@@ -1,20 +1,22 @@
-import { useEffect, useState, useRef } from "react";
-import { suspensionData } from "../../SuspensionData";
-import "./NewPartForm.css";
-import PropTypes from "prop-types";
+import { useEffect, useState } from 'react';
+import { suspensionData } from '../../SuspensionData';
+import './NewPartForm.css';
+import PropTypes from 'prop-types';
 import {
   calculateRebuildLife,
   convertSusToDatabaseFormat,
   filterRidesForSpecificBike,
   convertSuspensionFromDatabase,
   fetchMoreRidesIfNeeded,
-} from "../../util";
+  isDateWithin20Years,
+  isOldestRideBeforeRebuild,
+} from '../../util';
 import {
   postUserSuspensionToDatabase,
   loadUserSuspensionFromDatabase,
-} from "../../Services/APICalls";
-import { useNavigate } from "react-router-dom";
-import { v4 as uuidv4 } from "uuid";
+} from '../../Services/APICalls';
+import { useNavigate } from 'react-router-dom';
+import { v4 as uuidv4 } from 'uuid';
 
 export default function NewPartForm({
   userID,
@@ -32,34 +34,33 @@ export default function NewPartForm({
 }) {
   const [bikeOptions, setBikeOptions] = useState(userBikes);
   const [bikeDropdownOptions, setBikeDropdownOptions] = useState([]);
-  const [selectedBike, setSelectedBike] = useState("");
-  const [selectedSus, setSelectedSus] = useState("");
-  const [selectedRebuildDate, setSelectedRebuildDate] = useState("");
-  const lastLoadedPageNum = useRef(pagesFetched);
+  const [selectedBike, setSelectedBike] = useState('');
+  const [selectedSus, setSelectedSus] = useState('');
+  const [selectedRebuildDate, setSelectedRebuildDate] = useState('');
   const [loadingRides, setLoadingRides] = useState(false);
   const [submitDisabled, setSubmitDisabled] = useState(false);
-  const [submitError, setSubmitError] = useState(false);
-  const [errorModalMessage, setErrorModalMessage] = useState("");
+  const [submitError, setSubmitError] = useState('');
+  const [errorModalMessage, setErrorModalMessage] = useState('');
 
   const navigate = useNavigate();
-  const newPartErrorModal = document.getElementById("newPartErrorModal");
+  const newPartErrorModal = document.getElementById('newPartErrorModal');
 
   useEffect(() => {
     if (!userBikes) {
-      const loadedBikes = JSON.parse(localStorage.getItem("userBikes"));
+      const loadedBikes = JSON.parse(localStorage.getItem('userBikes'));
       setBikeOptions(loadedBikes);
       setUserBikes(loadedBikes);
     }
     if (!userRides) {
-      const loadedRides = JSON.parse(localStorage.getItem("userRides"));
+      const loadedRides = JSON.parse(localStorage.getItem('userRides'));
       setUserRides(loadedRides);
     }
     if (!userAccessToken) {
-      const loadedToken = JSON.parse(localStorage.getItem("userAccessToken"));
+      const loadedToken = JSON.parse(localStorage.getItem('userAccessToken'));
       setUserAccessToken(loadedToken);
     }
     if (!userID) {
-      const loadedID = JSON.parse(localStorage.getItem("userID"));
+      const loadedID = JSON.parse(localStorage.getItem('userID'));
       setUserID(loadedID);
     }
     if (!userSuspension && userID && userBikes) {
@@ -123,26 +124,59 @@ export default function NewPartForm({
   });
 
   useEffect(() => {
-    if (selectedRebuildDate) {
-      fetchMoreRidesIfNeeded(
-        userAccessToken,
-        selectedRebuildDate,
-        userRides,
-        setUserRides,
-        pagesFetched,
-        setPagesFetched,
-        setLoadingRides,
-        setSubmitDisabled,
-        setErrorModalMessage
-      );
-    }
+    if (
+      !selectedRebuildDate ||
+      !isDateWithin20Years(selectedRebuildDate) ||
+      loadingRides ||
+      !userAccessToken ||
+      !userRides
+    )
+      return;
+    if (!isOldestRideBeforeRebuild(userRides, selectedRebuildDate)) return;
+    (async () => {
+      try {
+        setLoadingRides(true);
+        setSubmitDisabled(true);
+        const result = await fetchMoreRidesIfNeeded(
+          userAccessToken,
+          selectedRebuildDate,
+          userRides,
+          pagesFetched
+        );
+        if (!result) {
+          throw new Error('An unknown error occurred');
+        }
+        const { newUserRides, newPagesFetched } = result;
+        setUserRides(newUserRides);
+        window.localStorage.setItem('userRides', JSON.stringify(newUserRides));
+        setPagesFetched(newPagesFetched);
+      } catch (err) {
+        setErrorModalMessage(
+          `An error occurred while fetching more rides. ${err}`
+        );
+        newPartErrorModal.showModal();
+        setTimeout(() => {
+          newPartErrorModal.close();
+        }, 10000);
+      } finally {
+        setLoadingRides(false);
+        setSubmitDisabled(false);
+      }
+    })();
     // eslint-disable-next-line
   }, [selectedRebuildDate]);
 
-  const handleSubmit = () => {
-    if (!(selectedBike && selectedSus && selectedRebuildDate)) {
-      setSubmitError(true);
-      setTimeout(() => setSubmitError(false), 3000);
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (!selectedBike || !selectedSus || !selectedRebuildDate) {
+      setSubmitError('Please fill out all forms before submitting');
+      setTimeout(() => setSubmitError(''), 3000);
+      return;
+    }
+
+    if (!isDateWithin20Years(selectedRebuildDate)) {
+      setSubmitError('Please select a rebuild date within 20 years');
+      setTimeout(() => setSubmitError(''), 3000);
       return;
     }
 
@@ -151,15 +185,15 @@ export default function NewPartForm({
     );
 
     let selectedBikeDetails;
-    if (bikeOptions && selectedBike !== "0") {
+    if (bikeOptions && selectedBike !== '0') {
       selectedBikeDetails = bikeOptions.find(
         (bike) => bike.id === selectedBike
       );
     } else {
       selectedBikeDetails = {
-        id: "unknownBike",
-        brand_name: "Unknown",
-        model_name: "Bike",
+        id: 'unknownBike',
+        brand_name: 'Unknown',
+        model_name: 'Bike',
       };
     }
 
@@ -197,19 +231,18 @@ export default function NewPartForm({
         if (userSuspension) {
           setUserSuspension([...userSuspension, newSuspensionDetails]);
           window.localStorage.setItem(
-            "userSuspension",
+            'userSuspension',
             JSON.stringify([...userSuspension, newSuspensionDetails])
           );
         } else {
           setUserSuspension([newSuspensionDetails]);
           window.localStorage.setItem(
-            "userSuspension",
+            'userSuspension',
             JSON.stringify([newSuspensionDetails])
           );
         }
 
-        setPagesFetched(lastLoadedPageNum.current);
-        navigate("/dashboard");
+        navigate('/dashboard');
       })
       .catch((error) => {
         console.log(error);
@@ -229,7 +262,7 @@ export default function NewPartForm({
         id="new-part-site-logo"
         className="site-logo"
         onClick={() => {
-          navigate("/dashboard");
+          navigate('/dashboard');
         }}
       >
         Ride Ready
@@ -242,7 +275,7 @@ export default function NewPartForm({
           value={selectedBike}
           onChange={(event) => setSelectedBike(event.target.value)}
         >
-          <option key={"0"} value={""} disabled>
+          <option key={'0'} value={''} disabled>
             Choose a bike
           </option>
           {bikeDropdownOptions}
@@ -253,7 +286,7 @@ export default function NewPartForm({
           value={selectedSus}
           onChange={(event) => setSelectedSus(event.target.value)}
         >
-          <option key={"0"} value={""} disabled>
+          <option key={'0'} value={''} disabled>
             Choose your suspension
           </option>
           {suspensionOptions}
@@ -261,18 +294,18 @@ export default function NewPartForm({
         <label htmlFor="lastRebuild">When was it last rebuilt?</label>
         <input
           name="lastRebuild"
-          type={"date"}
-          max={new Date().toLocaleDateString("fr-ca")}
+          type={'date'}
+          max={new Date().toLocaleDateString('fr-ca')}
           value={selectedRebuildDate}
           onChange={(event) => setSelectedRebuildDate(event.target.value)}
         />
+        <div className="newpartform-button-section">
+          <button onClick={() => navigate('/dashboard')}>Back</button>
+          <button onClick={(e) => handleSubmit(e)} disabled={submitDisabled}>
+            Submit
+          </button>
+        </div>
       </form>
-      <div className="newpartform-button-section">
-        <button onClick={() => navigate("/dashboard")}>Back</button>
-        <button onClick={() => handleSubmit()} disabled={submitDisabled}>
-          Submit
-        </button>
-      </div>
       {submitError && (
         <p className="error-wait-message">
           Please fill out all forms before submitting
