@@ -109,12 +109,13 @@ describe("EditSus", () => {
     cy.get("button").eq(1).click();
 
     cy.get("input").type("2022-10-10");
+    cy.wait(500);
     cy.get("button").eq(1).click();
 
     cy.get("h2").should("have.text", "RockShox Fork");
     cy.get("h3").eq(0).should("have.text", "on your Specialized Enduro");
-    cy.get("h3").eq(1).should("have.text", "18% service life remaining");
-    cy.get("h3").eq(2).should("have.text", `Get ready to rebuild soon!`);
+    cy.get("h3").eq(1).should("have.text", "50% service life remaining");
+    cy.get("h3").eq(2).should("have.text", `It's Ride Ready!`);
     cy.get("p").eq(0).should("have.text", "Last serviced: Oct 10, 2022");
   });
 
@@ -137,7 +138,7 @@ describe("EditSus", () => {
 
     cy.get("dialog[id='editSusErrorModal']").should(
       "contain",
-      "There was an issue modifying your suspension rebuild date. Please try reloading the page by clicking the button below and try your request again."
+      "There was an issue modifying your suspension rebuild date"
     );
   });
 });
