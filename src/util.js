@@ -63,7 +63,6 @@ export const calculateRebuildLife = (
   // as it handles both known and unknown, would need to test
   if (onBike.startsWith('b') && bikeOptions) {
     susBike = bikeOptions.find((bike) => bike.id === onBike);
-    // This is correctly filtering all rides for a specific bike
     ridesOnBike = filterRidesForSpecificBike(userRides, susBike);
   }
   // For known bikes, ridesOnBike is true. Else use all userRides.

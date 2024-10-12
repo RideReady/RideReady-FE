@@ -70,6 +70,7 @@ export default function Dashboard({
     if (userID === null || userBikes === null) return;
     if (!userSuspension && dashboardInitialized.current === false) {
       setLoadingSus('loading');
+      // If running locally - need to start local BE server or this call fails first
       loadUserSuspensionFromDatabase(userID)
         .then((result) => {
           if (result.suspension && result.suspension.length > 0) {
