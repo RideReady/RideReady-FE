@@ -174,13 +174,10 @@ export const isNewestRideAfterLastCalculated = (userRides, sus) => {
 };
 
 export const filterRidesForSpecificBike = (userRides, onBike) => {
-  let filteredRides;
   if (onBike.id !== 'unknownBike') {
-    filteredRides = userRides.filter((ride) => ride.gear_id === onBike.id);
-  } else {
-    filteredRides = userRides;
+    return userRides.filter((ride) => ride.gear_id === onBike.id);
   }
-  return filteredRides;
+  return userRides;
 };
 
 export const formatBikeDetails = (fetchedGearDetails) => {
