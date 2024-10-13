@@ -33,18 +33,14 @@ export const cleanRideData = (rides) => {
 };
 
 export const getGearIDNumbers = (userRides) => {
-  let gearNumbers = userRides.reduce((arr, ride) => {
-    let gearID = ride.gear_id;
-    if (arr.includes(gearID)) {
-      return arr;
-    } else if (gearID === null) {
-      return arr;
-    } else {
+  const result = userRides.reduce((arr, ride) => {
+    const gearID = ride.gear_id;
+    if (gearID && !arr.includes(gearID)) {
       arr.push(gearID);
-      return arr;
     }
+    return arr;
   }, []);
-  return gearNumbers;
+  return result;
 };
 
 export const calculateRebuildLife = (

@@ -79,6 +79,22 @@ export const userRides = [
     ride_date: '2024-09-14T17:20:16Z',
     gear_id: 'b9082682',
   },
+  {
+    id: undefined,
+    user_id: undefined,
+    ride_duration: undefined,
+    ride_distance: undefined,
+    ride_date: undefined,
+    gear_id: undefined,
+  },
+  {
+    id: 0,
+    user_id: 0,
+    ride_duration: 0,
+    ride_distance: 0,
+    ride_date: '',
+    gear_id: '',
+  },
 ];
 
 export const enduroInfo = {

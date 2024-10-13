@@ -3,14 +3,13 @@ import { describe, expect, test } from '@jest/globals';
 import * as utils from './util';
 import * as testData from './utilTestData';
 
-describe('filterRidesForSpecificBike', () => {
+describe('getGearIdNumbers', () => {
   test('it should correctly filter rides', () => {
-    const result = utils.filterRidesForSpecificBike(
-      testData.userRides,
-      testData.enduroInfo
-    );
-    expect(result).toEqual(false);
-  });
+    const result = utils.getGearIDNumbers(testData.userRides);
+    const expectedResult = ['b1979857', 'b9082682'];
 
-  // Cases for unknownBike
+    expectedResult.forEach((gearId) => {
+      expect(result).toContain(gearId);
+    });
+  });
 });
