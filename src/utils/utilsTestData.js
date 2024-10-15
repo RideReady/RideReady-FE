@@ -113,3 +113,16 @@ export const enduroInfo = {
     '2021 Specialized Enduro Comp\r\n34.2 lbs stock with Mallet E pedals',
   weight: 33.0,
 };
+
+export const bikeMissingModelAndBrand = {
+  id: 'unknownBike',
+  primary: false,
+  name: 'My bike',
+  nickname: 'My bike',
+  resource_state: 3,
+  retired: false,
+  distance: 6584,
+  converted_distance: 2000,
+  model_name: null,
+  frame_type: 1
+};

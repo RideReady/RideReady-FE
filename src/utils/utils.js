@@ -180,17 +180,17 @@ export const filterRidesForSpecificBike = (userRides, onBike) => {
   return userRides;
 };
 
-export const formatBikeDetails = (fetchedGearDetails) => {
-  return fetchedGearDetails.map((detail) => {
+export const formatBikeDetails = (fetchedGearDetails) =>
+  fetchedGearDetails.map((detail) => {
+    const { id, name, brand_name, model_name, frame_type } = detail;
     return {
-      id: detail.id,
-      name: detail.name,
-      brand_name: detail.brand_name ? detail.brand_name : '',
-      model_name: detail.model_name ? detail.model_name : detail.name,
-      frame_type: generateBikeTypeString(detail.frame_type),
+      id,
+      name,
+      brand_name: brand_name != null ? brand_name : '',
+      model_name: model_name != null ? model_name : name,
+      frame_type: generateBikeTypeString(frame_type),
     };
   });
-};
 
 export const generateBikeTypeString = (frameTypeIdFromStrava) => {
   switch (frameTypeIdFromStrava) {

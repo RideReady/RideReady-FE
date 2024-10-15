@@ -77,6 +77,32 @@ describe('filterRidesForSpecificBike', () => {
   });
 });
 
+describe('formatBikeDetails', () => {
+  test('it should return a bike object with id, name, brand_name, model_nam, and frame_type', () => {
+    expect(
+      utils.formatBikeDetails([
+        testData.enduroInfo,
+        testData.bikeMissingModelAndBrand,
+      ])
+    ).toEqual([
+      {
+        id: 'b9082682',
+        name: 'Enduro',
+        brand_name: 'Specialized',
+        model_name: 'Enduro',
+        frame_type: 'Mountain Bike',
+      },
+      {
+        id: 'unknownBike',
+        name: 'My bike',
+        brand_name: '',
+        model_name: 'My bike',
+        frame_type: 'Mountain Bike',
+      },
+    ]);
+  });
+});
+
 // describe('calculateRideTimeSinceLastRebuild', () => {
 //   test('it should calculate the amount of minutes the suspension has been ridden since a given rebuild date', () => {});
 // });
