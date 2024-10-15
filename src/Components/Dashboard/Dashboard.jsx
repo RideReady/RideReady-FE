@@ -15,7 +15,7 @@ import {
   convertSusToDatabaseFormat,
   sortUserSuspensionByBikeId,
   fetchMoreRidesIfNeeded,
-} from '../../util';
+} from '../../utils/utils';
 
 export default function Dashboard({
   userID,

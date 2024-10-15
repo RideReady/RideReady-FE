@@ -1,6 +1,6 @@
 import moment from 'moment';
-import { suspensionData } from './SuspensionData';
-import { getUserActivities } from './Services/APICalls';
+import { suspensionData } from '../SuspensionData';
+import { getUserActivities } from '../Services/APICalls';
 
 export const testForDeniedPermission = (url) => {
   if (url.split('&')[1] === 'error=access_denied') {

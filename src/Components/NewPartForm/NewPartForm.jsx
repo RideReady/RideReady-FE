@@ -10,7 +10,7 @@ import {
   fetchMoreRidesIfNeeded,
   isDateWithin20Years,
   isOldestRideBeforeRebuild,
-} from '../../util';
+} from '../../utils/utils';
 import {
   postUserSuspensionToDatabase,
   loadUserSuspensionFromDatabase,

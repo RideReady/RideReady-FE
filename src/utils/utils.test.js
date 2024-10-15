@@ -1,7 +1,7 @@
 import { describe, expect, test } from '@jest/globals';
 
-import * as utils from './util';
-import * as testData from './utilTestData';
+import * as utils from './utils';
+import * as testData from './utilsTestData';
 
 describe('getGearIdNumbers', () => {
   test('it should correctly filter rides', () => {

@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import "./DeleteSus.css";
 import { useNavigate } from "react-router-dom";
-import { findSusIndexByID, convertSuspensionFromDatabase } from "../../util";
+import { findSusIndexByID, convertSuspensionFromDatabase } from "../../utils/utils";
 import PropTypes from "prop-types";
 import {
   deleteUserSuspensionInDatabase,
