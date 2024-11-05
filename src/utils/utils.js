@@ -43,14 +43,17 @@ export const getGearIDNumbers = (userRides) => {
   return result;
 };
 
-export const calculateRebuildLife = (
-  newSus,
-  rebuildDate,
-  userRides,
-  onBike,
-  bikeOptions
-) => {
-  const suspension = suspensionData.find((sus) => sus.id === +newSus);
+const calculateRideTimeSinceLastRebuild = (rides, rebuildDate) => {
+  return rides.reduce((total, ride) => {
+    if (moment(ride.ride_date).isAfter(rebuildDate)) {
+      total += ride.ride_duration;
+    }
+    return total;
+  }, 0);
+};
+
+export const calculateRebuildLife = (newSusDataId, rebuildDate, userRides, onBike, bikeOptions) => {
+  const suspension = suspensionData.find((sus) => sus.id === +newSusDataId);
   let susBike;
   let ridesOnBike;
   let rideTimeSinceLastRebuild;
@@ -63,29 +66,13 @@ export const calculateRebuildLife = (
   }
   // For known bikes, ridesOnBike is true. Else use all userRides.
   if (ridesOnBike) {
-    rideTimeSinceLastRebuild = calculateRideTimeSinceLastRebuild(
-      ridesOnBike,
-      rebuildDate
-    );
+    rideTimeSinceLastRebuild = calculateRideTimeSinceLastRebuild(ridesOnBike, rebuildDate);
   } else {
-    rideTimeSinceLastRebuild = calculateRideTimeSinceLastRebuild(
-      userRides,
-      rebuildDate
-    );
+    rideTimeSinceLastRebuild = calculateRideTimeSinceLastRebuild(userRides, rebuildDate);
   }
   const hoursSinceLastRebuild = rideTimeSinceLastRebuild / 3600;
-  const percentRebuildLifeRemaining =
-    1 - hoursSinceLastRebuild / suspension.rebuildInt;
+  const percentRebuildLifeRemaining = parseFloat((1 - hoursSinceLastRebuild / suspension.rebuildInt).toFixed(6));
   return percentRebuildLifeRemaining;
-};
-
-export const calculateRideTimeSinceLastRebuild = (rides, rebuildDate) => {
-  return rides.reduce((total, ride) => {
-    if (moment(ride.ride_date).isAfter(rebuildDate)) {
-      total += ride.ride_duration;
-    }
-    return total;
-  }, 0);
 };
 
 export const isOldestRideBeforeRebuild = (rides, rebuildDate) => {
@@ -107,9 +94,7 @@ export const findSusIndexByID = (id, susOptions) => {
 };
 
 const findSusInfoById = (sus) => {
-  const susInfo = suspensionData.find(
-    (susData) => sus.sus_data_id === susData.id
-  );
+  const susInfo = suspensionData.find((susData) => sus.sus_data_id === susData.id);
   return susInfo;
 };
 
@@ -161,10 +146,7 @@ export const convertSusToDatabaseFormat = (sus, userID) => {
 
 export const isNewestRideAfterLastCalculated = (userRides, sus) => {
   const lastRideCalculatedDate = sus.lastRideCalculated;
-  const newestRideOnBikeDate = filterRidesForSpecificBike(
-    userRides,
-    sus.onBike
-  )[0].ride_date;
+  const newestRideOnBikeDate = filterRidesForSpecificBike(userRides, sus.onBike)[0].ride_date;
 
   if (moment(newestRideOnBikeDate).isAfter(lastRideCalculatedDate)) {
     return true;
@@ -225,17 +207,14 @@ export const fetchMoreRidesIfNeeded = async (
   userAccessToken,
   rebuildDate,
   userRideState,
-  pagesFetchedState
+  pagesFetchedState,
 ) => {
   let fetchedRides = [];
   let currentPagesFetched = pagesFetchedState;
 
   try {
     while (currentPagesFetched <= 5) {
-      const fetchMoreRides = isOldestRideBeforeRebuild(
-        [...userRideState, ...fetchedRides],
-        rebuildDate
-      );
+      const fetchMoreRides = isOldestRideBeforeRebuild([...userRideState, ...fetchedRides], rebuildDate);
       if (!fetchMoreRides) {
         const result = {
           newUserRides: [...userRideState, ...fetchedRides],
@@ -244,13 +223,8 @@ export const fetchMoreRidesIfNeeded = async (
         return result;
       }
 
-      console.log(
-        `Fetching page ${currentPagesFetched + 1} athlete activities`
-      );
-      const activities = await getUserActivities(
-        currentPagesFetched + 1,
-        userAccessToken
-      );
+      console.log(`Fetching page ${currentPagesFetched + 1} athlete activities`);
+      const activities = await getUserActivities(currentPagesFetched + 1, userAccessToken);
       const rideActivities = filterRideActivities(activities);
       const cleanedRides = cleanRideData(rideActivities);
 
