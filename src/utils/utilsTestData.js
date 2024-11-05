@@ -97,6 +97,30 @@ export const userRides = [
   },
 ];
 
+export const userBikes = [
+  {
+    id: 'b9082682',
+    name: 'Enduro',
+    brand_name: 'Specialized',
+    model_name: 'Enduro',
+    frame_type: 'Mountain Bike',
+  },
+  {
+    id: 'b3913353',
+    name: 'Not my bike',
+    brand_name: '',
+    model_name: 'Not my bike',
+    frame_type: 'Road Bike',
+  },
+  {
+    id: 'b1979857',
+    name: 'Allez',
+    brand_name: 'Specialized',
+    model_name: '2015 Allez Comp',
+    frame_type: 'Road Bike',
+  },
+];
+
 export const enduroInfo = {
   id: 'b9082682',
   primary: false,
@@ -109,8 +133,7 @@ export const enduroInfo = {
   brand_name: 'Specialized',
   model_name: 'Enduro',
   frame_type: 1,
-  description:
-    '2021 Specialized Enduro Comp\r\n34.2 lbs stock with Mallet E pedals',
+  description: '2021 Specialized Enduro Comp\r\n34.2 lbs stock with Mallet E pedals',
   weight: 33.0,
 };
 
@@ -124,5 +147,5 @@ export const bikeMissingModelAndBrand = {
   distance: 6584,
   converted_distance: 2000,
   model_name: null,
-  frame_type: 1
+  frame_type: 1,
 };

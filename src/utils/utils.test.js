@@ -1,5 +1,6 @@
 import { describe, expect, test } from '@jest/globals';
 
+import { suspensionData } from '../SuspensionData';
 import * as utils from './utils';
 import * as testData from './utilsTestData';
 
@@ -16,10 +17,7 @@ describe('getGearIdNumbers', () => {
 
 describe('filterRidesForSpecificBike', () => {
   test('it should filter correctly for bikes with a gearId', () => {
-    const result = utils.filterRidesForSpecificBike(
-      testData.userRides,
-      testData.enduroInfo
-    );
+    const result = utils.filterRidesForSpecificBike(testData.userRides, testData.enduroInfo);
     const expectedResult = [
       {
         id: 12568910646,
@@ -72,19 +70,14 @@ describe('filterRidesForSpecificBike', () => {
     expect(
       utils.filterRidesForSpecificBike(testData.userRides, {
         id: 'unknownBike',
-      })
+      }),
     ).toEqual(testData.userRides);
   });
 });
 
 describe('formatBikeDetails', () => {
   test('it should return a bike object with id, name, brand_name, model_nam, and frame_type', () => {
-    expect(
-      utils.formatBikeDetails([
-        testData.enduroInfo,
-        testData.bikeMissingModelAndBrand,
-      ])
-    ).toEqual([
+    expect(utils.formatBikeDetails([testData.enduroInfo, testData.bikeMissingModelAndBrand])).toEqual([
       {
         id: 'b9082682',
         name: 'Enduro',
@@ -103,6 +96,29 @@ describe('formatBikeDetails', () => {
   });
 });
 
-// describe('calculateRideTimeSinceLastRebuild', () => {
-//   test('it should calculate the amount of minutes the suspension has been ridden since a given rebuild date', () => {});
-// });
+describe('calculateRebuildLife', () => {
+  // Oldest ride on Enduro / testData.userBikes[0] : 2024-9-14
+  // Latest ride on Enduro: 2024-10-3
+  test('it should calculate the rebuild life for a known bike', () => {
+    const selectedSuspensionData = suspensionData[1];
+    const onBike = testData.userBikes[0];
+
+    const createResult = (rebuildDate) =>
+      utils.calculateRebuildLife(
+        selectedSuspensionData.id,
+        rebuildDate,
+        testData.userRides,
+        onBike.id,
+        testData.userBikes,
+      );
+
+    const result1 = createResult('2024-9-20');
+    expect(result1).toEqual(0.951253);
+
+    const result2 = createResult('2024-10-4');
+    expect(result2).toEqual(1);
+
+    const result3 = createResult('2024-9-13');
+    expect(result3).toEqual(0.922574);
+  });
+});
