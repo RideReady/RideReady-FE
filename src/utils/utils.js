@@ -45,7 +45,7 @@ export const getGearIDNumbers = (userRides) => {
 
 const calculateRideTimeSinceLastRebuild = (rides, rebuildDate) => {
   return rides.reduce((total, ride) => {
-    if (moment(ride.ride_date).isAfter(rebuildDate)) {
+    if (moment(ride.ride_date).isAfter(rebuildDate) && ride?.ride_duration) {
       total += ride.ride_duration;
     }
     return total;
@@ -71,7 +71,9 @@ export const calculateRebuildLife = (newSusDataId, rebuildDate, userRides, onBik
     rideTimeSinceLastRebuild = calculateRideTimeSinceLastRebuild(userRides, rebuildDate);
   }
   const hoursSinceLastRebuild = rideTimeSinceLastRebuild / 3600;
-  const percentRebuildLifeRemaining = parseFloat((1 - hoursSinceLastRebuild / suspension.rebuildInt).toFixed(6));
+  const percentRebuildLifeRemaining = parseFloat(
+    (1 - hoursSinceLastRebuild / suspension.rebuildInt).toFixed(6),
+  );
   return percentRebuildLifeRemaining;
 };
 
