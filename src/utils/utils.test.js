@@ -97,28 +97,34 @@ describe('formatBikeDetails', () => {
 });
 
 describe('calculateRebuildLife', () => {
-  // Oldest ride on Enduro / testData.userBikes[0] : 2024-9-14
-  // Latest ride on Enduro: 2024-10-3
+  const createRebuildLifeResult = (selectedSuspensionData, rebuildDate, onBike) =>
+    utils.calculateRebuildLife(
+      selectedSuspensionData.id,
+      rebuildDate,
+      testData.userRides,
+      onBike.id,
+      testData.userBikes,
+    );
+
   test('it should calculate the rebuild life for a known bike', () => {
-    const selectedSuspensionData = suspensionData[1];
-    const onBike = testData.userBikes[0];
+    const rockshoxRearShockData = suspensionData[1];
+    const knownBike = testData.userBikes[0];
 
-    const createResult = (rebuildDate) =>
-      utils.calculateRebuildLife(
-        selectedSuspensionData.id,
-        rebuildDate,
-        testData.userRides,
-        onBike.id,
-        testData.userBikes,
-      );
-
-    const result1 = createResult('2024-9-20');
+    const result1 = createRebuildLifeResult(rockshoxRearShockData, '2024-9-20', knownBike);
     expect(result1).toEqual(0.951253);
 
-    const result2 = createResult('2024-10-4');
+    const result2 = createRebuildLifeResult(rockshoxRearShockData, '2024-10-4', knownBike);
     expect(result2).toEqual(1);
 
-    const result3 = createResult('2024-9-13');
+    const result3 = createRebuildLifeResult(rockshoxRearShockData, '2024-9-13', knownBike);
     expect(result3).toEqual(0.922574);
+  });
+
+  test('it should use all rides after rebuild date if bike is unknown', () => {
+    const ohlinsForkSusData = suspensionData[5];
+    const unknownBike = { id: 'unknownBike' };
+
+    const result1 = createRebuildLifeResult(ohlinsForkSusData, '2024-9-23', unknownBike);
+    expect(result1).toEqual(0.910822);
   });
 });
