@@ -13,7 +13,7 @@ import {
   getGearIDNumbers,
   cleanRideData,
   formatBikeDetails,
-} from "../../util.js";
+} from "../../utils/utils.js";
 import "./Redirect.css";
 import PropTypes from "prop-types";
 

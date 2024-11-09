@@ -10,7 +10,7 @@ import {
   fetchMoreRidesIfNeeded,
   isDateWithin20Years,
   isOldestRideBeforeRebuild,
-} from '../../util';
+} from '../../utils/utils';
 import {
   postUserSuspensionToDatabase,
   loadUserSuspensionFromDatabase,
@@ -35,7 +35,7 @@ export default function NewPartForm({
   const [bikeOptions, setBikeOptions] = useState(userBikes);
   const [bikeDropdownOptions, setBikeDropdownOptions] = useState([]);
   const [selectedBike, setSelectedBike] = useState('');
-  const [selectedSus, setSelectedSus] = useState('');
+  const [selectedSusDataId, setSelectedSusDataId] = useState('');
   const [selectedRebuildDate, setSelectedRebuildDate] = useState('');
   const [loadingRides, setLoadingRides] = useState(false);
   const [submitDisabled, setSubmitDisabled] = useState(false);
@@ -168,7 +168,7 @@ export default function NewPartForm({
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (!selectedBike || !selectedSus || !selectedRebuildDate) {
+    if (!selectedBike || !selectedSusDataId || !selectedRebuildDate) {
       setSubmitError('Please fill out all forms before submitting');
       setTimeout(() => setSubmitError(''), 3000);
       return;
@@ -181,7 +181,7 @@ export default function NewPartForm({
     }
 
     const selectedSuspensionData = suspensionData.find(
-      (sus) => sus.id === +selectedSus
+      (sus) => sus.id === +selectedSusDataId
     );
 
     let selectedBikeDetails;
@@ -205,7 +205,7 @@ export default function NewPartForm({
       onBike: selectedBikeDetails,
       rebuildDate: selectedRebuildDate,
       rebuildLife: calculateRebuildLife(
-        selectedSus,
+        selectedSusDataId,
         selectedRebuildDate,
         userRides,
         selectedBike,
@@ -283,8 +283,8 @@ export default function NewPartForm({
         <label htmlFor="suspensionSelect">What is the make and type?</label>
         <select
           name="suspensionSelect"
-          value={selectedSus}
-          onChange={(event) => setSelectedSus(event.target.value)}
+          value={selectedSusDataId}
+          onChange={(event) => setSelectedSusDataId(event.target.value)}
         >
           <option key={'0'} value={''} disabled>
             Choose your suspension

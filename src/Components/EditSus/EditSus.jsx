@@ -7,13 +7,13 @@ import {
   findSusIndexByID,
   isDateWithin20Years,
   isOldestRideBeforeRebuild,
-} from '../../util';
+} from '../../utils/utils';
 import moment from 'moment';
 import {
   calculateRebuildLife,
   filterRidesForSpecificBike,
   convertSuspensionFromDatabase,
-} from '../../util';
+} from '../../utils/utils';
 import {
   editUserSuspensionInDatabase,
   loadUserSuspensionFromDatabase,
