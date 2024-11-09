@@ -2,78 +2,52 @@ import moment from 'moment';
 import { suspensionData } from '../SuspensionData';
 import { getUserActivities } from '../Services/APICalls';
 
-export const testForDeniedPermission = (url) => {
-  if (url.split('&')[1] === 'error=access_denied') {
-    return true;
-  }
-};
+export const testForDeniedPermission = (url) => url.split('&')[1] === 'error=access_denied';
 
 export const stripURLForToken = (url) => {
-  if (!url) return;
-  return url.split('&')[1].slice(5);
+  if (url) return url.split('&')[1].slice(5);
 };
 
-export const filterRideActivities = (activities) => {
-  const rideActivities = activities.filter((act) => act.type === 'Ride');
-  return rideActivities;
-};
+export const filterRideActivities = (activities) => activities.filter((act) => act.type === 'Ride');
 
-export const cleanRideData = (rides) => {
-  const cleanedRides = rides.map((ride) => {
-    return {
-      id: ride.id,
-      user_id: ride.athlete.id,
-      ride_duration: ride.moving_time,
-      ride_distance: ride.distance,
-      ride_date: ride.start_date,
-      gear_id: ride.gear_id,
-    };
-  });
-  return cleanedRides;
-};
+export const cleanRideData = (rides) =>
+  rides.map((ride) => ({
+    id: ride.id,
+    user_id: ride.athlete.id,
+    ride_duration: ride.moving_time,
+    ride_distance: ride.distance,
+    ride_date: ride.start_date,
+    gear_id: ride.gear_id,
+  }));
 
-export const getGearIDNumbers = (userRides) => {
-  const result = userRides.reduce((arr, ride) => {
+export const getGearIDNumbers = (userRides) =>
+  userRides.reduce((arr, ride) => {
     const gearID = ride.gear_id;
     if (gearID && !arr.includes(gearID)) {
       arr.push(gearID);
     }
     return arr;
   }, []);
-  return result;
-};
 
-const calculateRideTimeSinceLastRebuild = (rides, rebuildDate) => {
-  return rides.reduce((total, ride) => {
+const calculateRideTimeSinceLastRebuild = (rides, rebuildDate) =>
+  rides.reduce((total, ride) => {
     if (moment(ride.ride_date).isAfter(rebuildDate) && ride?.ride_duration) {
       total += ride.ride_duration;
     }
     return total;
   }, 0);
-};
 
 export const calculateRebuildLife = (newSusDataId, rebuildDate, userRides, onBike, bikeOptions) => {
   const suspension = suspensionData.find((sus) => sus.id === +newSusDataId);
-  let susBike;
-  let ridesOnBike;
-  let rideTimeSinceLastRebuild;
+  const susBike = bikeOptions.find((bike) => bike.id === onBike);
+  const ridesOnBike = filterRidesForSpecificBike(userRides, susBike);
+  const rideTimeSinceLastRebuild = calculateRideTimeSinceLastRebuild(ridesOnBike, rebuildDate);
 
-  // This conditional might not be needed now with filterRidesForSpecificBike
-  // as it handles both known and unknown, would need to test
-  if (onBike.startsWith('b') && bikeOptions) {
-    susBike = bikeOptions.find((bike) => bike.id === onBike);
-    ridesOnBike = filterRidesForSpecificBike(userRides, susBike);
-  }
-  // For known bikes, ridesOnBike is true. Else use all userRides.
-  if (ridesOnBike) {
-    rideTimeSinceLastRebuild = calculateRideTimeSinceLastRebuild(ridesOnBike, rebuildDate);
-  } else {
-    rideTimeSinceLastRebuild = calculateRideTimeSinceLastRebuild(userRides, rebuildDate);
-  }
   const hoursSinceLastRebuild = rideTimeSinceLastRebuild / 3600;
   const percentRebuildLifeRemaining = parseFloat(
     (1 - hoursSinceLastRebuild / suspension.rebuildInt).toFixed(6),
   );
+
   return percentRebuildLifeRemaining;
 };
 
@@ -86,39 +60,30 @@ export const isOldestRideBeforeRebuild = (rides, rebuildDate) => {
     }
     return oldest;
   }, today);
-  const lastRideBeforeRebuild = moment(oldestRideDate).isAfter(rebuildDate);
-  return lastRideBeforeRebuild;
+  return moment(oldestRideDate).isAfter(rebuildDate);
 };
 
-export const findSusIndexByID = (id, susOptions) => {
-  const foundSusIndex = susOptions.findIndex((sus) => sus.id === id);
-  return foundSusIndex;
-};
+export const findSusIndexByID = (id, susOptions) => susOptions.findIndex((sus) => sus.id === id);
 
-const findSusInfoById = (sus) => {
-  const susInfo = suspensionData.find((susData) => sus.sus_data_id === susData.id);
-  return susInfo;
-};
+const findSusInfoById = (sus) => suspensionData.find((susData) => sus.sus_data_id === susData.id);
 
 const findBikeDetailsById = (sus, bikeOptions) => {
-  const bikeResult = bikeOptions.find((bike) => bike.id === sus.on_bike_id);
+  const bikeResult = bikeOptions?.find((bike) => bike.id === sus.on_bike_id);
 
-  if (bikeResult) {
-    return bikeResult;
-  } else {
-    return {
-      id: 'unknownBike',
-      brand_name: 'Unknown',
-      model_name: 'Bike',
-    };
-  }
+  return bikeResult
+    ? bikeResult
+    : {
+        id: 'unknownBike',
+        brand_name: 'Unknown',
+        model_name: 'Bike',
+      };
 };
 
 export const convertSuspensionFromDatabase = (sus, bikeOptions) => {
   const foundBike = findBikeDetailsById(sus, bikeOptions);
   const foundSusInfo = findSusInfoById(sus);
 
-  const convertedSus = {
+  return {
     id: sus.id,
     onBike: foundBike,
     rebuildDate: sus.rebuild_date,
@@ -127,38 +92,28 @@ export const convertSuspensionFromDatabase = (sus, bikeOptions) => {
     dateCreated: sus.date_created,
     lastRideCalculated: sus.last_ride_calculated,
   };
-
-  return convertedSus;
 };
 
-export const convertSusToDatabaseFormat = (sus, userID) => {
-  const susDataConverted = {
-    id: sus.id,
-    user_id: userID,
-    rebuild_life: sus.rebuildLife,
-    rebuild_date: sus.rebuildDate,
-    sus_data_id: sus.susData.id,
-    on_bike_id: sus.onBike.id,
-    date_created: new Date(),
-    last_ride_calculated: sus.lastRideCalculated,
-  };
-
-  return susDataConverted;
-};
+export const convertSusToDatabaseFormat = (sus, userID) => ({
+  id: sus.id,
+  user_id: userID,
+  rebuild_life: sus.rebuildLife,
+  rebuild_date: sus.rebuildDate,
+  sus_data_id: sus.susData.id,
+  on_bike_id: sus.onBike.id,
+  date_created: new Date(),
+  last_ride_calculated: sus.lastRideCalculated,
+});
 
 export const isNewestRideAfterLastCalculated = (userRides, sus) => {
   const lastRideCalculatedDate = sus.lastRideCalculated;
   const newestRideOnBikeDate = filterRidesForSpecificBike(userRides, sus.onBike)[0].ride_date;
 
-  if (moment(newestRideOnBikeDate).isAfter(lastRideCalculatedDate)) {
-    return true;
-  } else {
-    return false;
-  }
+  return moment(newestRideOnBikeDate).isAfter(lastRideCalculatedDate);
 };
 
 export const filterRidesForSpecificBike = (userRides, onBike) => {
-  if (onBike.id !== 'unknownBike') {
+  if (onBike?.id && onBike.id !== 'unknownBike') {
     return userRides.filter((ride) => ride.gear_id === onBike.id);
   }
   return userRides;
@@ -244,9 +199,5 @@ export const fetchMoreRidesIfNeeded = async (
 
 export const isDateWithin20Years = (rebuildDate) => {
   const oldestAllowed = moment().subtract(20, 'years').format();
-  if (moment(rebuildDate).isAfter(oldestAllowed)) {
-    return true;
-  } else {
-    return false;
-  }
+  return moment(rebuildDate).isAfter(oldestAllowed);
 };
