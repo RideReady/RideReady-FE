@@ -9,8 +9,7 @@
   background-color: #86BBD8;
   border-radius: 10px;
   margin-top: 10px;
-  padding-top: 10px;
-  padding-bottom: 10px;
+  padding: 10px 5px;
 }
 .tile h2 {
   color: #2F4858;
@@ -20,11 +19,14 @@
 .tile h3 {
   color: #2F4858;
 }
+.tile h4 {
+  color: #2F4858;
+}
 .tile p {
   color: #2F4858;
 }
 .tile button {
-  height: 6vh;
+  height: 48px;
   font-size: 14px;
 }
 

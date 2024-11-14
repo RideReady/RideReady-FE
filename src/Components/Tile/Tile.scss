@@ -7,8 +7,7 @@
   background-color: $lightBlue;
   border-radius: 10px;
   margin-top: 10px;
-  padding-top: 10px;
-  padding-bottom: 10px;
+  padding: 10px 5px;
 
   h2 {
     color: $darkBlue;
@@ -20,19 +19,23 @@
     color: $darkBlue;
   }
 
+  h4 {
+    color: $darkBlue;
+  }
+
   p {
     color: $darkBlue;
   }
 
   button {
-    height: 6vh;
+    height: 48px;
     font-size: 14px;
   }
 }
 
 .tile-button-section {
   @include centered(row, space-between);
-  
+
   width: 285px;
   height: 9vh;
 }
