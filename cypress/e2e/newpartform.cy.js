@@ -135,6 +135,7 @@ describe("add-new-part", () => {
     cy.get("h3").eq(0).should("have.text", "on your Specialized Enduro");
     cy.get("h3").eq(1).should("have.text", "50% service life remaining");
     cy.get("h3").eq(2).should("have.text", `It's Ride Ready!`);
+    cy.get("h4").should('have.text', '100 hours ridden since rebuild')
     cy.get("p").eq(0).should("have.text", "Last serviced: Jan 1, 2023");
   });
 });
