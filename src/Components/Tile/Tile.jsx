@@ -8,14 +8,10 @@ export default function Tile({ susDetails, setSelectedSuspension, id }) {
   const [rebuildLifeMessage, setRebuildLifeMessage] = useState('');
   const [rebuildLifeBad, setRebuildLifeBad] = useState('');
 
-  let rebuildLifePercentage = (susDetails.rebuildLife * 100).toFixed(0);
-  if (rebuildLifePercentage <= 0) {
-    rebuildLifePercentage = 0;
-  }
+  const rebuildLifePercentage = +(susDetails.rebuildLife * 100).toFixed(0);
+  const hoursRiddenSinceRebuild = (susDetails.susData.rebuildInt * (1 - susDetails.rebuildLife)).toFixed(0);
 
-  const lastRebuildDateDisplay = moment(
-    susDetails.rebuildDate.slice(0, 10)
-  ).format('ll');
+  const lastRebuildDateDisplay = moment(susDetails.rebuildDate.slice(0, 10)).format('ll');
 
   const bikeDisplayMessage = () => {
     if (susDetails.onBike.brand_name && susDetails.onBike.model_name) {
@@ -40,19 +36,13 @@ export default function Tile({ susDetails, setSelectedSuspension, id }) {
     <article className="tile">
       <h2>{susDetails.susData.name}</h2>
       <h3>{bikeDisplayMessage()}</h3>
-      <h3>{`${rebuildLifePercentage}% service life remaining`}</h3>
-      <h3
-        id="rebuildMsg"
-        className={`${rebuildLifeBad ? 'rebuild-bad' : 'rebuild-good'}`}
-      >
+      <h3>{`${Math.max(rebuildLifePercentage, 0)}% service life remaining`}</h3>
+      <h3 id="rebuildMsg" className={`${rebuildLifeBad ? 'rebuild-bad' : 'rebuild-good'}`}>
         {rebuildLifeMessage}
       </h3>
+      <h4>{hoursRiddenSinceRebuild} hours ridden since rebuild</h4>
       <p>{`Last serviced: ${lastRebuildDateDisplay}`}</p>
-      <a
-        href={susDetails.susData.serviceLink}
-        target="_blank"
-        rel="noopener noreferrer"
-      >
+      <a href={susDetails.susData.serviceLink} target="_blank" rel="noopener noreferrer">
         <p>Link to service resource</p>
       </a>
       <div className="tile-button-section">
@@ -60,10 +50,7 @@ export default function Tile({ susDetails, setSelectedSuspension, id }) {
           <button
             onClick={() => {
               setSelectedSuspension(id);
-              window.localStorage.setItem(
-                'selectedSuspension',
-                JSON.stringify(id)
-              );
+              window.localStorage.setItem('selectedSuspension', JSON.stringify(id));
             }}
           >
             Delete suspension
@@ -73,10 +60,7 @@ export default function Tile({ susDetails, setSelectedSuspension, id }) {
           <button
             onClick={() => {
               setSelectedSuspension(id);
-              window.localStorage.setItem(
-                'selectedSuspension',
-                JSON.stringify(id)
-              );
+              window.localStorage.setItem('selectedSuspension', JSON.stringify(id));
             }}
           >
             Update service date

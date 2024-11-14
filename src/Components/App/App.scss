@@ -22,6 +22,11 @@ h3 {
   text-align: center;
 }
 
+h4 {
+  @include bodyText(20px);
+  text-align: center;
+}
+
 p {
   @include bodyText(18px);
   text-align: center;
